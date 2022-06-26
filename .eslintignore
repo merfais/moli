@@ -1,0 +1,7 @@
+coverage/**
+public/**
+node_modules/**
+src/old/**
+dist/**
+!.vuepress/clientAppEnhance.js
+!.vuepress/config.js

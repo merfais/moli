@@ -1,0 +1,10 @@
+export { default as genTitle } from './title';
+export { default as genLegend } from './legend';
+export { default as genTooltip } from './tooltip';
+export { default as genGraphic } from './graphic';
+export { default as genBackgroudColor } from './backgroundColor';
+export { default as genXAxis } from './xAxis';
+export { default as genYAxis } from './yAxis';
+export { default as genGrid } from './grid';
+export { default as genFooter } from './footer';
+export { default as genDataset } from './dataset';
