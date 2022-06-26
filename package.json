@@ -10,7 +10,6 @@
     "build": "vue-cli-service build",
     "report": "vue-cli-service build --report",
     "analyzer": "vue-cli-service build --analyzer",
-    "postbuild": "rm -rf dist/docs;cp -r docs/.vuepress/dist dist/docs;rm -rf dist.tgz;tar czvf dist.tgz ./dist;npm version patch",
     "lint": "cross-env NODE_ENV=production eslint --ext .vue,.js,.jsx,.cjs,.mjs --no-error-on-unmatched-pattern --max-warnings=0 ./",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
