@@ -9,3 +9,14 @@
 .ant-message {
   top: 60px;
 }
+
+.ant-tooltip {
+  .ant-tooltip-arrow-content {
+    background: #fff;
+  }
+  .ant-tooltip-inner {
+    background: #fff;
+    color: unset;
+  }
+}
+

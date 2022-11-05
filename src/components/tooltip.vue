@@ -14,6 +14,10 @@
 .container {
   position: relative;
 
+  :deep(.ant-tooltip) {
+    max-width: unset;
+  }
+
   :deep(.ant-tooltip-arrow) {
     z-index: 1;
 

@@ -5,6 +5,7 @@ import {
 } from 'vue';
 import {
   SettingOutlined,
+  CopyOutlined,
   DeleteOutlined,
 } from '@ant-design/icons-vue';
 
@@ -19,6 +20,7 @@ defineProps({
 const emit = defineEmits([
   'hover',
   'clickSetting',
+  'clickCopy',
   'clickDelete',
 ]);
 
@@ -52,9 +54,18 @@ function onClickConfirm() {
       <AButton
         class='tool-btn'
         type="link"
+        title="设置"
         @click="$emit('clickSetting')"
       >
         <SettingOutlined :size="15" />
+      </AButton>
+      <AButton
+        class='tool-btn'
+        type="link"
+        title="拷贝"
+        @click="$emit('clickCopy')"
+      >
+        <CopyOutlined :size="15" />
       </AButton>
       <template v-if="!disableDel">
         <APopconfirm v-if="enableConfim"
@@ -65,6 +76,7 @@ function onClickConfirm() {
           <AButton
             class='tool-btn'
             type="link"
+            title="删除"
           >
             <DeleteOutlined  :size="15" />
           </AButton>
@@ -72,6 +84,7 @@ function onClickConfirm() {
         <AButton v-else
           class='tool-btn'
           type="link"
+          title="删除"
           @click="$emit('clickDelete')"
         >
           <DeleteOutlined  :size="15" />
@@ -123,6 +136,10 @@ function onClickConfirm() {
     display: flex;
     align-items: center;
     color: #fff;
+
+    &:hover {
+      background: var(--info-color);
+    }
   }
 
   :deep(.ant-popover-content) {

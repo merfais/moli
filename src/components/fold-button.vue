@@ -6,7 +6,7 @@ import {
   DownOutlined,
   UpOutlined,
 } from '@ant-design/icons-vue';
-import RButton from './button';
+import IButton from './button';
 
 const props = defineProps({
   fold: Boolean,
@@ -49,13 +49,13 @@ function onClickCollapse(e) {
 
 </script>
 <template>
-  <RButton
+  <IButton
     @click="onClickCollapse"
   >
     <slot v-if="textPosition === 'left'" />
     <component :is="comp" />
     <slot v-if="textPosition === 'right'" />
-  </RButton>
+  </IButton>
 </template>
 <style scoped>
 </style>

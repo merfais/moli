@@ -1,20 +1,24 @@
 import { forEach } from 'lodash-es';
 
-export default function useUrlSearchParams(...args) {
+export default function useUrlSearchParams(key, search) {
   let convertMap = {};
-  let keys = args;
-  if (args.length === 1) {
-    const [key] = args;
-    if (Array.isArray(key)) {
-      keys = key;
-    } else if (typeof key === 'object') {
-      convertMap = key;
-      keys = Object.keys(key);
-    } else {
-      keys = [key];
-    }
+  let keys = [];
+  if (Array.isArray(key)) {
+    keys = key;
+  } else if (typeof key === 'object') {
+    convertMap = key;
+    keys = Object.keys(key);
+  } else if (key) {
+    keys = [key];
   }
-  const searchParams = new URLSearchParams(window.location.search);
+  let searchParams;
+  if (search instanceof window.URLSearchParams) {
+    searchParams = search;
+  } else if (typeof search === 'string') {
+    searchParams = new window.URLSearchParams(search);
+  } else {
+    searchParams = new window.URLSearchParams(window.location.search);
+  }
   if (!keys.length) {
     keys = [...searchParams.keys()];
   }

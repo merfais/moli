@@ -4,6 +4,10 @@ import {
   computed,
 } from 'vue';
 
+const props = defineProps({
+  clearAll: Boolean,
+});
+
 defineEmits([
   'cancel',
   'ok',
@@ -12,6 +16,19 @@ defineEmits([
 
 const slots = useSlots();
 const hasSlotFooter = computed(() => !!slots.footer);
+const bodyStyle = computed(() => {
+  const style = { position: 'relative' };
+  if (props.clearAll) {
+    style.padding = 0;
+  }
+  return style;
+});
+const headerStyle = computed(() => {
+  if (props.clearAll) {
+    return { display: 'none' };
+  }
+  return {};
+});
 
 </script>
 <template>
@@ -19,6 +36,8 @@ const hasSlotFooter = computed(() => !!slots.footer);
     destroyOnClose
     width="800px"
     :keyboard="false"
+    :bodyStyle="bodyStyle"
+    :headerStyle="headerStyle"
     @close="$emit('cancel');$emit('update:visible', false);"
   >
     <template v-for="(n, slotName) of $slots"
@@ -29,7 +48,7 @@ const hasSlotFooter = computed(() => !!slots.footer);
         v-bind="{ ...slotProps }"
       />
     </template>
-    <template v-if="!hasSlotFooter"
+    <template v-if="!hasSlotFooter && !clearAll"
       #footer
     >
       <div class="drawer-footer">
@@ -60,3 +79,4 @@ const hasSlotFooter = computed(() => !!slots.footer);
   margin-left: 10px;
 }
 </style>
+

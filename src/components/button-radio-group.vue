@@ -1,7 +1,4 @@
 <script setup>
-const props = defineProps({
-  options: Array,
-});
 const emit = defineEmits([
   'change',
 ]);
@@ -11,12 +8,11 @@ function onChange(e) {
 }
 </script>
 <template>
-  <ARadioGroup @change="onChange">
-    <ARadioButton v-for="item in props.options"
-      :key="item.value"
-      v-bind="item"
-    >
-      {{item.label}}
-    </ARadioButton>
+  <ARadioGroup
+    buttonStyle="solid"
+    optionType="button"
+    @change="onChange"
+  >
   </ARadioGroup>
 </template>
+

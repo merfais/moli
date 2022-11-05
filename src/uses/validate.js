@@ -1,3 +1,5 @@
+import { forEach } from 'lodash-es';
+
 /**
  * 校验普通字符，只能包含数字，字符，下划线
  */
@@ -7,8 +9,43 @@ export function isNormalChar(value) {
   }
 }
 
+export function isChinese(value) {
+  if (!/.*[\u4e00-\u9fa5]+.*/.test(value)) {
+    return '需要由中英文组成';
+  }
+}
+
+export function isDecimal(value) {
+  if (value === undefined || value === null || value === '') {
+    return;
+  }
+  // 科学计数法
+  if (/^-?\d+\.?\d*e-\d+$/.test(value)) {
+    return;
+  }
+  if (!/^-?((\d+\.\d+)|\d+)$/.test(value)) {
+    return '只能是小数';
+  }
+}
+
+export function isInt(value) {
+  if (value === undefined || value === null || value === '') {
+    return;
+  }
+  // 科学计数法
+  if (/^-?\d+\.?\d*e\+?\d+$/.test(value)) {
+    return;
+  }
+  if (!/^-?\d+$/.test(value)) {
+    return '只能是整形';
+  }
+}
+
 export function isNumber(value) {
-  if (!/^\d+$/.test(value)) {
+  if (isInt(value)) {
+    return '只能是数字';
+  }
+  if (isDecimal(value)) {
     return '只能是数字';
   }
 }
@@ -19,12 +56,44 @@ export function isBoolean(value) {
   }
 }
 
+export function fieldsRequired(fields) {
+  return (value) => {
+    let valid = true;
+    forEach(fields, (key) => {
+      if (!value[key] && value[key] !== 0 && value[key] !== false) {
+        valid = false;
+      }
+      return valid;
+    });
+    return !valid && '此字段是必填的';
+  };
+}
+
 export const required = {
   required: true,
   message: '此字段是必填的',
 };
 
-function genValidator(rule) {
+export const notEmpty = {
+  required: true,
+  validator: genValidator((value) => {
+    const msg = '此字段是必填的';
+    if (value === undefined || value === null) {
+      return msg;
+    }
+    if (typeof value === 'string' && !value.trim()) {
+      return msg;
+    }
+    if (Array.isArray(value) && !value.length) {
+      return msg;
+    }
+    if (typeof value === 'object' && !Object.keys(value).length) {
+      return msg;
+    }
+  }),
+};
+
+export function genValidator(rule) {
   return async (_, value) => {
     const msg = await rule(value);
     if (msg) {
@@ -50,3 +119,4 @@ export function useRules(options, ...rest) {
     // 其他类型不支持
   });
 }
+

@@ -3,7 +3,7 @@ const path = require('path');
 
 const devServer = {
   host: '0.0.0.0',
-  port: 8080,
+  port: 30111,
   allowedHosts: 'all',
   proxy: {
   },

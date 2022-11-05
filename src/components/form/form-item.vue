@@ -3,6 +3,8 @@ import {
   computed,
   watchEffect,
   reactive,
+  ref,
+  unref,
 } from 'vue';
 import {
   omit,
@@ -38,7 +40,15 @@ defineEmits([
   'update:value',
 ]);
 
-const model = computed(() => (props.component === 'ACheckbox' ? 'checked' : 'value'));
+const hiddenDomRef = ref();
+
+const model = computed(() => {
+  const compArr = ['ACheckbox', 'a-checkbox', 'ASwitch', 'a-switch'];
+  if (compArr.includes(props.component)) {
+    return 'checked';
+  }
+  return 'value';
+});
 
 const restCompProps = computed(() => {
   const result = omit(props.compProps, [
@@ -86,6 +96,12 @@ function getSlotProps(name, item, slotProps = {}) {
   return props;
 }
 
+function getPopupContainer() {
+  const domRef = unref(hiddenDomRef);
+  const el = domRef?.parentNode?.parentNode?.parentNode;
+  return el || document.body;
+}
+
 </script>
 <template>
   <AFormItem :class='className'>
@@ -94,7 +110,9 @@ function getSlotProps(name, item, slotProps = {}) {
         {{label}}
       </span>
     </template>
+    <div ref="hiddenDomRef" class="d-none"/>
     <component :is="component"
+      :getPopupContainer="getPopupContainer"
       v-bind="restCompProps"
       :[model]="value"
       @[`update:${model}`]="$emit('update:value', $event)"
@@ -127,4 +145,19 @@ function getSlotProps(name, item, slotProps = {}) {
   </AFormItem>
 </template>
 <style scoped>
+.ant-form-item {
+  :deep(.ant-input-number),
+  :deep(.ant-picker) {
+    width: 100%;
+  }
+
+  :deep(.ant-form-item-label) {
+    & > label > span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
 </style>
+
