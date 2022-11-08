@@ -5,25 +5,26 @@ import {
 import {
   map,
   omit,
+  upperFirst,
 } from 'lodash-es';
-import canvas from '@/pages/canvas/route';
+import canvasEditor from '@/pages/canvas-editor/route';
 
 const config = {
-  canvas,
+  canvasEditor,
   notFound: {
     title: '',
     path: '/:pathMatch(.*)*',
-    redirect: '/canvas',
+    redirect: '/canvas-editor',
   },
 };
 
-function genRoutesConf(rawConfig) {
+function genRoutesConf(rawConfig, pName = '') {
   return map(rawConfig, (item, name) => {
     const conf = omit(item, ['children', 'title', 'icon']);
     if (item.children) {
-      conf.children = genRoutesConf(item.children);
+      conf.children = genRoutesConf(item.children, name);
     }
-    conf.name = name;
+    conf.name = pName ? `${pName}${upperFirst(name)}` : name;
     return conf;
   });
 }

@@ -76,6 +76,7 @@ if (process.env.NODE_ENV !== 'production') {
     'array-bracket-spacing': 1,
     'brace-style': 1,
     'block-spacing': 1,
+    'comma-dangle': 1,
     'comma-spacing': 1,
     indent: [1, 2, { SwitchCase: 1 }],
     'key-spacing': 1,
