@@ -1,12 +1,12 @@
 <script setup>
 import HeaderSection from './header-section';
+import ToolboxSection from './toolbox-section';
 </script>
 <template>
   <div class="height-100">
     <HeaderSection />
     <section class="page-body height-100">
-      <section class="comp-selector-section">
-      </section>
+      <ToolboxSection />
       <section class="canvas-container">
       </section>
     </section>
