@@ -49,7 +49,7 @@ function onSaveName() {
 </template>
 <style scoped>
 .name-wrapper {
-  width: 200px;
+  width: 220px;
 
   .name-text {
     font-size: 16px;

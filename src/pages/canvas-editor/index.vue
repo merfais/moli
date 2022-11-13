@@ -1,14 +1,14 @@
 <script setup>
 import HeaderSection from './header-section';
 import ToolboxSection from './toolbox-section';
+import CanvasSection from './canvas-section';
 </script>
 <template>
   <div class="height-100">
     <HeaderSection />
-    <section class="page-body height-100">
+    <section class="page-body height-100 d-flex">
       <ToolboxSection />
-      <section class="canvas-container">
-      </section>
+      <CanvasSection class="flex-grow"/>
     </section>
   </div>
 </template>

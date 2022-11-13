@@ -26,6 +26,10 @@ const activeKey = ref([
 const compGroup = ref([]);
 const compConfigMap = reactive({});
 
+function onDragStart(compKey) {
+  console.info('onDragStart', compKey);
+}
+
 async function init() {
   try {
     const groupConfig = await getCompGroupConfig();
@@ -50,7 +54,7 @@ init();
 
 </script>
 <template>
-  <section class="comp-selector-section height-100">
+  <section class="comp-selector-section height-100 ">
     <ACollapse
       v-model:activeKey="activeKey"
     >
@@ -58,11 +62,14 @@ init();
         :key="gItem.groupKey"
         :header="gItem.groupName"
       >
-        <div v-for="compKey in gItem.comps"
-          :key="compKey"
-          class="comp-snap-wrapper flex-column"
+        <div v-for="(compKey, index) in gItem.comps"
+          :key="compKey + index"
+          class="comp-snap-wrapper flex-column flex-center"
+          draggable="true"
+          unselectable="on"
+          @dragstart="onDragStart(compKey)"
         >
-          <AppstoreAddOutlined />
+          <AppstoreAddOutlined class="snap-icon" />
           <div>{{get(compConfigMap, [compKey, 'name'])}}</div>
         </div>
       </ACollapsePanel>
@@ -71,6 +78,38 @@ init();
 </template>
 <style scoped>
 .comp-selector-section {
-  width: 280px;
+  width: 269px;
+  overflow-y: scroll;
+  padding-top: 1px;
+  box-shadow: 1px 0 1px #d9d9d9, 1px 0 5px #f1f1f1;
+
+  :deep(.ant-collapse) {
+    border-right: 0;
+
+    .ant-collapse-content-box {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+
+  .comp-snap-wrapper {
+    width: 60px;
+    height: 60px;
+    border: 1px dashed #aaa;
+    margin: 8px;
+    border-radius: 4px;
+    opacity: 0.7;
+    user-select: none;
+
+    &:hover {
+      opacity: 1;
+      cursor: move;
+      border-color: #666;
+    }
+  }
+
+  .snap-icon {
+    font-size: 26px;
+  }
 }
 </style>

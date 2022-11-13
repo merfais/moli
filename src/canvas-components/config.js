@@ -85,6 +85,12 @@ export async function getCompGroupConfig() {
     comps: [
       COMP_KEY.INPUT,
       COMP_KEY.SELECT,
+      COMP_KEY.INPUT,
+      COMP_KEY.SELECT,
+      COMP_KEY.INPUT,
+      COMP_KEY.SELECT,
+      COMP_KEY.INPUT,
+      COMP_KEY.SELECT,
     ],
   }, {
     groupKey: COMP_GROUP_KEY.CHART,
