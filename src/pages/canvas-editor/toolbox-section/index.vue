@@ -17,17 +17,21 @@ import {
   getCompConfig,
   COMP_GROUP_KEY,
 } from '@/canvas-components';
+import {
+  useCanvasEditorStore,
+} from '../use-canvas-editor';
+
+const store = useCanvasEditorStore();
 
 const activeKey = ref([
   COMP_GROUP_KEY.CHART,
   COMP_GROUP_KEY.INTERACT,
 ]);
-
 const compGroup = ref([]);
 const compConfigMap = reactive({});
 
 function onDragStart(compKey) {
-  console.info('onDragStart', compKey);
+  store.draggingCompKey = compKey;
 }
 
 async function init() {

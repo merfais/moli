@@ -2,6 +2,7 @@
 import HeaderSection from './header-section';
 import ToolboxSection from './toolbox-section';
 import CanvasSection from './canvas-section';
+
 </script>
 <template>
   <div class="height-100">

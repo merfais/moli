@@ -25,9 +25,11 @@ app.use(pinia);
 app.use(router);
 
 Promise.all([
-  import(/* webpackChunkName: "antv" */'ant-design-vue'),
-]).then(([{ install }]) => {
-  app.use(install);
+  import(/* webpackChunkName: "antd" */'ant-design-vue'),
+  import(/* webpackChunkName: "grid-layout" */'vue-grid-layout-v3'),
+]).then(([antd, gridLayout]) => {
+  app.use(antd);
+  app.use(gridLayout);
   app.use(components);
 
   const mountPoint = document.getElementById('app');

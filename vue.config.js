@@ -10,32 +10,16 @@ const devServer = {
 };
 
 const chainWebpack = (config) => {
+  config.resolve.symlinks(false);
   config.resolve.alias
-    .set('@', path.resolve(__dirname, 'src'));
+    .set('@', path.resolve(__dirname, 'src'))
+    .set('vue', path.resolve('./node_modules/vue'));
 
-  // 关闭 sourceMap 生成
-  config.devtool(false);
-
-  // 关闭压缩
-  if (process.env.NODE_ENV !== 'development') {
-    config.plugin('html-index')
-      .tap(([params]) => {
-        Object.assign(params, { minify: false });
-        return [params];
-      });
-
-    config.optimization
-      .minimizer('terser')
-      .tap(([params]) => {
-        Object.assign(params.terserOptions, {
-          compress: false,
-        });
-        return [params];
-      });
-    config.optimization
-      .minimize(false)
-      .splitChunks({});
-  }
+  config.watchOptions({
+    ignored: /node_modules([\\]+|\/)+(?!vue-grid-layout-v3)/,
+    //   /vue-grid-layout-v3([\\]+|\/)node_modules/
+    // ]
+  });
 
   // svg
   const svgRule = config.module.rule('svg');

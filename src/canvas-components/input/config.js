@@ -11,8 +11,8 @@ export default function genConf() {
     layout: {
       // 电脑端
       pc: {
-        w: 25,
-        h: 3,
+        w: 125,
+        h: 20,
         // 最小宽度和高度，单位px
         minWidth: 72,
         minHeight: 32,

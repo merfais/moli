@@ -92,10 +92,11 @@ if (process.env.NODE_ENV !== 'production') {
     'space-infix-ops': 1,
     'space-in-parens': 1,
     'max-len': [1, { code: 100 }],
-    'no-empty': 1,
-    'no-unused-vars': 1,
     'no-console': [1, { allow: ['warn', 'error', 'info'] }],
     'no-debugger': 1,
+    'no-empty': 1,
+    'no-empty-function': 1,
+    'no-unused-vars': 1,
     'no-multi-spaces': [1, { ignoreEOLComments: true }],
     'no-unreachable': 1,
   });
