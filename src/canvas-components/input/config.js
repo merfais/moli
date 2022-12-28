@@ -12,16 +12,34 @@ export default function genConf() {
       // 电脑端
       pc: {
         w: 125,
-        h: 20,
+        h: 32,
         // 最小宽度和高度，单位px
-        minWidth: 72,
-        minHeight: 32,
+        mw: 72,
+        mh: 32,
       },
       // 移动端初始高度，单位为像素
       mobile: {
         w: 30,
         h: 8,
+        mw: 15,
+        mh: 8,
       },
+    },
+    dftConf: {
+      withLabel: false,
+      label: undefined,
+      value: undefined,
+      valueType: 'string',
+    },
+    style: {
+      width: undefined,
+      height: undefined,
+      marginTop: undefined,
+      marginRight: undefined,
+      marginBottom: undefined,
+      marginLeft: undefined,
+      color: undefined,
+      backgroundColor: undefined,
     },
     component: 'stringTpl',
     props: {

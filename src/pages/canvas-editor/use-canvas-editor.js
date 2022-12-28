@@ -1,3 +1,7 @@
+import {
+  filter,
+  findIndex,
+} from 'lodash-es';
 import { defineStore } from 'pinia';
 
 export const useCanvasEditorStore = defineStore({
@@ -14,6 +18,9 @@ export const useCanvasEditorStore = defineStore({
       width: 1440,
       height: 1000,
     },
+    viewMap: {},
+    pcMainLayoutArr: [],
+    pcSubLayoutMap: {},
     // 从左侧组件区拖拽出来的组件的key
     draggingCompKey: '',
   }),
@@ -34,4 +41,46 @@ export async function save() {
   // TODO:
   store.loading = false;
 }
+
+export function addLayout(layoutItem) {
+  const store = useCanvasEditorStore();
+  const arr = [...store.pcMainLayoutArr];
+  arr.push(layoutItem);
+  store.pcMainLayoutArr = arr;
+}
+
+export function removeLayout(layoutItem) {
+  const store = useCanvasEditorStore();
+  store.pcMainLayoutArr = filter(store.pcMainLayoutArr, item => {
+    return item.i !== layoutItem.i;
+  });
+}
+
+export function updateLayout(layoutItem) {
+  const store = useCanvasEditorStore();
+  const arr = [...store.pcMainLayoutArr];
+  const index = findIndex(arr, { i: layoutItem.i });
+  if (index !== -1) {
+    arr.splice(index, 1, {
+      ...arr[index],
+      ...layoutItem,
+    });
+  }
+  store.pcMainLayoutArr = arr;
+}
+
+export function addView(conf = {}) {
+  const store = useCanvasEditorStore();
+  const { i } = conf;
+  store.viewMap[i] = conf;
+}
+
+export function removeView() {
+
+}
+
+export function updateView() {
+
+}
+
 

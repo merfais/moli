@@ -7,25 +7,32 @@ import {
 } from 'vue';
 import {
   get,
-  filter,
 } from 'lodash-es';
 import newId from '@/uses/id';
 import {
   getCompConfig,
 } from '@/canvas-components';
-import Toolbar from './toolbar';
 import {
   useCanvasEditorStore,
+  addLayout,
+  removeLayout,
+  addView,
 } from '../use-canvas-editor';
+import {
+  onClickSetting,
+} from './use-editor';
+import Toolbar from './toolbar';
+import View from './view';
+import Editor from './editor';
 
-let draggingConf = null;
+let draggingLayout = null;
+let draggingConf = {};
 
 const store = useCanvasEditorStore();
 
 const canvasDomRef = ref();
 const gridLayoutRef = ref();
 const gridItemsRef = ref();
-const layoutArr = ref([]);
 const contentStyle = computed(() => {
   const { height, width } = store.baseInfo || {};
   return {
@@ -38,10 +45,6 @@ const colNum = computed(() => {
   return width;
 });
 
-async function getLayout(compKey) {
-  const { layout } = await getCompConfig(compKey);
-  return get(layout, get(store, 'baseInfo.device') || 'pc') || {};
-}
 
 // function getView() {
 //
@@ -59,26 +62,24 @@ async function getLayout(compKey) {
 //
 // }
 
-function addLayout(layoutItem) {
-  const arr = [...unref(layoutArr)];
-  arr.push(layoutItem);
-  layoutArr.value = arr;
-}
-
-function removeLayout(layoutItem) {
-  layoutArr.value = filter(unref(layoutArr), item => item.i !== layoutItem.i);
-}
-
 async function onDragenter(e) {
-  draggingConf = {
+  const { layout, dftConf } = await getCompConfig(store.draggingCompKey);
+
+  draggingConf = dftConf;
+
+  const device = get(store, 'baseInfo.device') || 'pc';
+  const { w, h } = get(layout, device) || {};
+
+  draggingLayout = {
     i: newId(),
-    ...draggingConf,
+    ...draggingLayout,
     x: e.offsetX,
     y: e.offsetY,
-    ...await getLayout(store.draggingCompKey),
+    w,
+    h,
   };
-  removeLayout(draggingConf);
-  addLayout(draggingConf);
+  removeLayout(draggingLayout);
+  addLayout(draggingLayout);
 
   await nextTick();
   const latestRef = unref(gridItemsRef).slice(-1).pop() || {};
@@ -93,22 +94,22 @@ async function onDragenter(e) {
 
 function onDragleave(e) {
   const { relatedTarget } = e;
-  if (unref(canvasDomRef).contains(relatedTarget) || !draggingConf) {
+  if (unref(canvasDomRef).contains(relatedTarget) || !draggingLayout) {
     return;
   }
-  const { i, x, y, h, w } = draggingConf;
+  const { i, x, y, h, w } = draggingLayout;
   const { emitter } = unref(gridLayoutRef) || {};
   emitter.emit('dragEvent', ['dragend', i, x, y, h, w]);
-  removeLayout(draggingConf);
-  draggingConf = null;
+  removeLayout(draggingLayout);
+  draggingLayout = null;
 }
 
 function onDragover(e) {
-  if (!unref(canvasDomRef) || !draggingConf) {
+  if (!unref(canvasDomRef) || !draggingLayout) {
     return;
   }
   // TODO: 节流
-  const { i, h, w } = draggingConf;
+  const { i, h, w } = draggingLayout;
   // TODO
   // const children = _.get(this.$refs, 'gridlayout.$children', []);
   // if (children.length < 2) {
@@ -128,16 +129,23 @@ function onDragover(e) {
 }
 
 function onDrop() {
-  if (!draggingConf) {
+  if (!draggingLayout) {
     return;
   }
   // 隐藏vue-grid-layout的placeholder
-  const { i, x, y, h, w } = draggingConf;
+  const { i, x, y, h, w } = draggingLayout;
   const { emitter } = unref(gridLayoutRef) || {};
   emitter.emit('dragEvent', ['dragend', i, x, y, h, w]);
 
-  removeLayout(draggingConf);
-  addLayout({ ...draggingConf, i: newId() });
+  removeLayout(draggingLayout);
+  const newI = newId();
+  addLayout({ ...draggingLayout, i: newI });
+  addView({
+    i: newI,
+    compKey: store.draggingCompKey,
+    ...draggingConf,
+  });
+  onClickSetting(newI);
 
   // // 构造完整view config
   // const view = getView(store.draggingCompKey);
@@ -156,7 +164,9 @@ function onDrop() {
   // mergeState(['viewMap', { [id]: view }]);
 
   // 清理临时数据
-  draggingConf = null;
+  store.draggingCompKey = null;
+  draggingLayout = null;
+  draggingConf = {};
 }
 
 function onMove() {
@@ -182,7 +192,7 @@ function getToolbarPopupContainer(item) {
       <GridLayout
         class='grid-layout-wrapper height-100'
         ref="gridLayoutRef"
-        v-model:layout="layoutArr"
+        v-model:layout="store.pcMainLayoutArr"
         :colNum="colNum"
         :rowHeight="1"
         :margin="[0, 0]"
@@ -195,7 +205,7 @@ function getToolbarPopupContainer(item) {
         @dragleave.self="onDragleave"
         @drop="onDrop"
       >
-        <GridItem v-for="item in layoutArr"
+        <GridItem v-for="item in store.pcMainLayoutArr"
           :key="item.i"
           :id="`${item.i}_grid_item`"
           ref="gridItemsRef"
@@ -210,13 +220,14 @@ function getToolbarPopupContainer(item) {
             :getPopupContainer="() => getToolbarPopupContainer(item)"
           >
             <template #title>
-              <Toolbar />
+              <Toolbar :i="item.i" />
             </template>
-            <div>{{item}}</div>
+            <View :i="item.i" />
           </ATooltip>
         </GridItem>
       </GridLayout>
     </div>
+    <Editor />
   </div>
 </template>
 <style scoped>

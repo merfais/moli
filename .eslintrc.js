@@ -81,6 +81,7 @@ if (process.env.NODE_ENV !== 'production') {
     indent: [1, 2, { SwitchCase: 1 }],
     'key-spacing': 1,
     'keyword-spacing': 1,
+    'object-curly-spacing': 1,
     'operator-linebreak': 1,
     'prefer-const': 1,
     'padded-blocks': 1,
