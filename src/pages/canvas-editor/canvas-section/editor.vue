@@ -7,11 +7,9 @@ import {
   shallowRef,
   onMounted,
 } from 'vue';
-import {
-  useViewEditorStore,
-} from './use-editor';
+import useCompEditorStore from './use-store';
 
-const store = useViewEditorStore();
+const store = useCompEditorStore();
 
 const selectedKeys = ref(['data']);
 const formRef = ref();
@@ -79,11 +77,16 @@ function genFormItems() {
     padding: 0px;
   }
 
+  :deep(.ant-menu) {
+    background: #fafafa;
+  }
+
   :deep(.ant-menu-item) {
     padding: 6px !important;
     margin: 0;
     height: 100px;
     line-height: 1.4em;
+    border-bottom: 1px solid #f0f0f0;
 
     .ant-menu-title-content {
       word-break: break-all;
