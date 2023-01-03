@@ -9,6 +9,7 @@ export default defineStore({
     clone: false,
     loading: false,
     i: undefined,
+    compKey: undefined,
     viewConf: {},
   }),
   getters: {

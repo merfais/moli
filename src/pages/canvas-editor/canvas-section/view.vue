@@ -1,10 +1,12 @@
 <script setup>
 import {
   computed,
+  unref,
 } from 'vue';
 import {
   get,
   set,
+  omit,
 } from 'lodash-es';
 import compMap from '@/canvas-components/comp';
 import {
@@ -19,13 +21,18 @@ const store = useCanvasEditorStore();
 
 const comp = computed(() => get(store.viewMap, props.i) || {});
 
+const compProps = computed(() => omit(unref(comp), [
+  'withLabel',
+  'label',
+]));
+
 const compWrapperClass = computed(() => {
   return {};
 });
 
 function onUpdateValue(value) {
   // const compProps = get(store.viewMap, [props.i, 'compProps']) || {}
-  set(store.viewMap, [props.i, 'compProps', value], value);
+  set(store.viewMap, [props.i, 'value'], value);
 }
 
 function onUpdateVar() {
@@ -41,7 +48,7 @@ function onUpdateVar() {
     <component
       :is="compMap[comp.compKey]"
       class="comp"
-      v-bind="comp.compProps"
+      v-bind="compProps"
       @update:value="onUpdateValue"
       @update:var="onUpdateVar"
     />
@@ -49,7 +56,7 @@ function onUpdateVar() {
   <component v-else-if="compMap[comp.compKey]"
     :is="compMap[comp.compKey]"
     class="comp"
-    v-bind="comp.compProps"
+    v-bind="compProps"
     @update:value="onUpdateValue"
     @update:var="onUpdateVar"
   />

@@ -1,5 +1,9 @@
 <script setup>
 import {
+  set,
+  cloneDeep,
+} from 'lodash-es';
+import {
   ref,
   unref,
   watch,
@@ -7,11 +11,16 @@ import {
   shallowRef,
   onMounted,
 } from 'vue';
+import { message } from 'ant-design-vue';
+import { getConfEditorMap } from '@/canvas-components';
+import {
+  useCanvasEditorStore,
+} from '../use-canvas-editor';
 import useCompEditorStore from './use-store';
 
 const store = useCompEditorStore();
 
-const selectedKeys = ref(['data']);
+const selectedKeys = ref(['conf']);
 const formRef = ref();
 const compMap = shallowRef({});
 
@@ -34,11 +43,23 @@ watch(() => store.visible, () => {
 //   formItems.value = genFormItems();
 // });
 
-function genFormItems() {
-  // const genFn = getFormItems(props.item);
-  // if (genFn) {
-  //   return genFn(props.item);
-  // }
+async function genFormItems() {
+  const [conf] = await Promise.all([
+    getConfEditorMap(store.compKey),
+  ]);
+  compMap.value = { conf };
+}
+
+async function onOk() {
+  try {
+    await unref(formRef).validate();
+  } catch (e) {
+    console.warn('表单校验失败', e);
+    message.warn('校验未通过，请检查');
+  }
+  const canvasStore = useCanvasEditorStore();
+  set(canvasStore.viewMap, store.i, cloneDeep(store.viewConf));
+  store.visible = false;
 }
 
 </script>
@@ -47,6 +68,7 @@ function genFormItems() {
   <RDrawer
     v-model:visible="store.visible"
     :getContainer="() => $refs.domRef"
+    @ok="onOk"
   >
     <template #title>
       {{store.title}}
@@ -57,11 +79,13 @@ function genFormItems() {
         size="small"
         mode="inline"
       >
-        <AMenuItem key="data">数据</AMenuItem>
+        <AMenuItem key="conf">数据</AMenuItem>
         <AMenuItem key="style">样式</AMenuItem>
       </AMenu>
       <Form ref="formRef"
+        class="width-100 pt-20 pb-20"
         layout="horizontal"
+        :labelCol="{ span: 4, style: { minWidth: '150px' } }"
         :wrapperCol="{ span: 18 }"
         :loading="store.loading"
         :model="store.viewConf"

@@ -1,5 +1,6 @@
 import {
   get,
+  cloneDeep,
 } from 'lodash-es';
 import {
   useCanvasEditorStore,
@@ -14,6 +15,7 @@ export function onClickSetting(i) {
 
   const canvasStore = useCanvasEditorStore();
   const comp = get(canvasStore.viewMap, i) || {};
-  viewStore.viewConf = comp;
+  viewStore.viewConf = cloneDeep(comp);
+  viewStore.compKey = comp?.compKey;
 }
 

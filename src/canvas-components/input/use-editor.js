@@ -5,6 +5,10 @@ import {
 import {
   watch,
 } from 'vue';
+import {
+  useRules,
+  required,
+} from '@/uses/validate';
 import useCompEditorStore from '@/pages/canvas-editor/canvas-section/use-store';
 
 export function initConfForm(options = {}) {
@@ -31,8 +35,9 @@ function genFormItems() {
   const items = {
     value: {
       label: '默认值',
-      value: viewConf.vlaue,
+      value: viewConf.value,
       component: 'AInput',
+      rules: useRules(required),
       onUpdate,
     },
   };
