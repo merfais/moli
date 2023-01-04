@@ -17,6 +17,7 @@ const props = defineProps({
   label: [Object, String],
   // 使用什么组件渲染
   component: [String, Object],
+  path: [String, Array],
   // 组件的值
   value: {},
   // 组件除了值以外的其他props参数
@@ -58,7 +59,19 @@ const restCompProps = computed(() => {
 });
 
 const label = computed(() => get(props.label, 'text', props.label));
-const title = computed(() => get(props.label, 'title', props.label));
+const title = computed(() => {
+  const t = get(props.label, 'title');
+  if (t) {
+    return t;
+  }
+  if (props.path) {
+    if (Array.isArray(props.path)) {
+      return `${props.path.join('.')}`;
+    }
+    return props.path;
+  }
+  return unref(label);
+});
 
 const className = computed(() => {
   if (!props.class) {
@@ -142,6 +155,7 @@ function getPopupContainer() {
         {{compInnerText}}
       </template>
     </component>
+    <slot />
   </AFormItem>
 </template>
 <style scoped>

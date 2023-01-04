@@ -6,6 +6,7 @@ import {
   watch,
 } from 'vue';
 import {
+  set,
   omit,
   pick,
   forEach,
@@ -55,6 +56,14 @@ watch(() => props.items, () => {
 
       Object.assign(compValueMap, { [key]: value });
     } else {
+      const { label } = item;
+      if (compProps?.placeholder === undefined) {
+        if (/^a-?(input(-?(search|number))?|textarea)$/i.test(item.component)) {
+          set(compProps, 'placeholder', `请输入${label}`);
+        } else if (/^(a|r)-?select|cascader$/i.test(item.component)) {
+          set(compProps, 'placeholder', `请选择${label}`);
+        }
+      }
       // formProps只对formItem生效
       Object.assign(formItems[key], {
         formProps: {
@@ -64,6 +73,7 @@ watch(() => props.items, () => {
             'value',
             'path',
           ]),
+          path: formItems[key].path,
           compSlots,
           compProps,
         },
@@ -113,7 +123,8 @@ function onUpdate(value, item) {
     />
     <slot v-else-if="item.slot"
       :name="item.slot"
-      :value="item.value"
+      :value="compItemValueMap[key]"
+      :text="item.compInnerText"
       v-bind="item.compProps"
     />
     <component v-else

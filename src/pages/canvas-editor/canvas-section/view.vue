@@ -19,15 +19,26 @@ const props = defineProps({
 
 const store = useCanvasEditorStore();
 
-const comp = computed(() => get(store.viewMap, props.i) || {});
-
-const compProps = computed(() => omit(unref(comp), [
-  'withLabel',
-  'label',
-]));
-
+const compKey = computed(() => get(store.viewMap, [props.i, 'compKey']));
+const compProps = computed(() => {
+  const comp = get(store.viewMap, props.i) || {};
+  return omit(unref(comp), [
+    'withLabel',
+  ]);
+});
+const label = computed(() => {
+  const comp = get(store.viewMap, props.i) || {};
+  return comp.withLabel && comp.label;
+});
 const compWrapperClass = computed(() => {
-  return {};
+  const comp = get(store.viewMap, props.i) || {};
+  if (comp.labelPos === 'left') {
+    return [
+      'align-center',
+    ];
+  }
+  return {
+  };
 });
 
 function onUpdateValue(value) {
@@ -41,20 +52,20 @@ function onUpdateVar() {
 
 </script>
 <template>
-  <div v-if="compMap[comp.compKey] && comp.label"
+  <div v-if="compMap[compKey] && label"
     :class="compWrapperClass"
     >
-    <div>{{comp.label}}</div>
+    <div>{{label}}：</div>
     <component
-      :is="compMap[comp.compKey]"
+      :is="compMap[compKey]"
       class="comp"
       v-bind="compProps"
       @update:value="onUpdateValue"
       @update:var="onUpdateVar"
     />
   </div>
-  <component v-else-if="compMap[comp.compKey]"
-    :is="compMap[comp.compKey]"
+  <component v-else-if="compMap[compKey]"
+    :is="compMap[compKey]"
     class="comp"
     v-bind="compProps"
     @update:value="onUpdateValue"

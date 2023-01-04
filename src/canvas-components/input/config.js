@@ -28,8 +28,10 @@ export default function genConf() {
     dftConf: {
       withLabel: false,
       label: undefined,
+      labelPos: 'left',
       value: undefined,
       valueType: 'string',
+      placeholder: undefined,
     },
     style: {
       width: undefined,

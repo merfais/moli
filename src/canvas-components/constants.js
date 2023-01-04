@@ -15,9 +15,15 @@ export const COMP_GROUP_KEY = {
 
 // 值类型
 export const VALUE_TYPE = {
-  NUMBER: 'number',
   STRING: 'string',
+  NUMBER: 'number',
   BOOLEAN: 'boolean',
+};
+
+export const VALUE_TYPE_NANE = {
+  [VALUE_TYPE.STRING]: '字符串',
+  [VALUE_TYPE.NUMBER]: '数字',
+  [VALUE_TYPE.BOOLEAN]: '布尔',
 };
 
 export const DATA_SOURCE_TYPE = {

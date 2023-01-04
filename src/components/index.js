@@ -18,6 +18,7 @@ import CompSelector from './comp-selector';
 import CompareDate from './compare-date';
 import CompareNumber from './compare-number';
 import CompareSelect from './compare-select';
+import BoolSelector from './bool-selector';
 import HelpLink from './help-link';
 import ToolBox from './tool-box';
 import FoldButton from './fold-button';
@@ -49,6 +50,7 @@ export default function install(app) {
     CompareDate,
     CompareNumber,
     CompareSelect,
+    BoolSelector,
     HelpLink,
     HelpTip,
     // eslint-disable-next-line max-len

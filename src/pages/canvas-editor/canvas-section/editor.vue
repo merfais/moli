@@ -12,6 +12,9 @@ import {
   onMounted,
 } from 'vue';
 import { message } from 'ant-design-vue';
+import {
+  CloseOutlined,
+} from '@ant-design/icons-vue';
 import { getConfEditorMap } from '@/canvas-components';
 import {
   useCanvasEditorStore,
@@ -56,6 +59,7 @@ async function onOk() {
   } catch (e) {
     console.warn('表单校验失败', e);
     message.warn('校验未通过，请检查');
+    return;
   }
   const canvasStore = useCanvasEditorStore();
   set(canvasStore.viewMap, store.i, cloneDeep(store.viewConf));
@@ -68,37 +72,47 @@ async function onOk() {
   <RDrawer
     v-model:visible="store.visible"
     :getContainer="() => $refs.domRef"
+    :closable="false"
     @ok="onOk"
   >
     <template #title>
-      {{store.title}}
-    </template>
-    <div class="d-flex height-100">
       <AMenu v-model:selectedKeys="selectedKeys"
         class="menu"
         size="small"
-        mode="inline"
+        mode="horizontal"
       >
-        <AMenuItem key="conf">数据</AMenuItem>
-        <AMenuItem key="style">样式</AMenuItem>
+        <AMenuItem key="conf">基础配置</AMenuItem>
+        <AMenuItem key="label">Label 配置</AMenuItem>
+        <AMenuItem key="var">变量配置</AMenuItem>
+        <AMenuItem key="layout">布局配置</AMenuItem>
+        <AMenuItem key="style">样式配置</AMenuItem>
       </AMenu>
-      <Form ref="formRef"
-        class="width-100 pt-20 pb-20"
-        layout="horizontal"
-        :labelCol="{ span: 4, style: { minWidth: '150px' } }"
-        :wrapperCol="{ span: 18 }"
-        :loading="store.loading"
-        :model="store.viewConf"
-      >
-        <component :is="is" />
-      </Form>
-    </div>
+    </template>
+    <template #extra>
+      <button class="ant-drawer-close" @click="store.visible = false">
+        <CloseOutlined />
+      </button>
+    </template>
+    <Form ref="formRef"
+      class="width-100 pt-10 pb-20"
+      layout="horizontal"
+      :labelCol="{ span: 4, style: { minWidth: '150px' } }"
+      :wrapperCol="{ span: 18 }"
+      :loading="store.loading"
+      :model="store.viewConf"
+    >
+      <component :is="is" />
+    </Form>
   </RDrawer>
 </template>
 <style scoped>
 .editor-drawer-container {
+  :deep(.ant-drawer-header) {
+    background: #fafafa;
+    padding: 0;
+  }
   :deep(.ant-drawer-body) {
-    padding: 0px;
+    padding: 0;
   }
 
   :deep(.ant-menu) {
@@ -106,21 +120,23 @@ async function onOk() {
   }
 
   :deep(.ant-menu-item) {
-    padding: 6px !important;
-    margin: 0;
-    height: 100px;
-    line-height: 1.4em;
-    border-bottom: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
 
-    .ant-menu-title-content {
-      word-break: break-all;
-      word-wrap: break-word;
-      white-space: normal;
+    &:after {
+      left: 1px;
+      right: 1px;
+    }
+
+    &.ant-menu-item-selected {
+      background: var(--ant-primary-1);
     }
   }
 
+  .ant-drawer-close {
+    background: #fafafa;
+  }
+
   .menu {
-    width: 30px;
   }
 }
 </style>

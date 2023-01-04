@@ -3,27 +3,13 @@ import {
   set,
 } from 'lodash-es';
 import {
-  watch,
-} from 'vue';
-import {
-  useRules,
-  required,
-} from '@/uses/validate';
-import useCompEditorStore from '@/pages/canvas-editor/canvas-section/use-store';
+  getTitleFormItems,
+  getValueTypeFormItems,
+  getPlaceholderFormItems,
+} from '../use-common';
 
-export function initConfForm(options = {}) {
-  const { formItems } = options;
-  const editor = useCompEditorStore();
-
-  watch(() => editor.visible, () => {
-    if (editor.visible) {
-      formItems.value = genFormItems();
-    }
-  }, { immediate: true });
-}
-
-function genFormItems() {
-  const editor = useCompEditorStore();
+export function genFormItems(options = {}) {
+  const { editor } = options;
   const viewConf = get(editor, 'viewConf', {});
 
   function onUpdate(options = {}) {
@@ -33,16 +19,21 @@ function genFormItems() {
   }
 
   const items = {
+    baseDivider: {
+      slot: 'divider',
+      compInnerText: '基础配置',
+    },
     value: {
       label: '默认值',
       value: viewConf.value,
       component: 'AInput',
-      rules: useRules(required),
       onUpdate,
     },
+    ...getValueTypeFormItems({ viewConf, onUpdate }),
+    ...getPlaceholderFormItems({ viewConf, onUpdate }),
+    ...getTitleFormItems({ viewConf, onUpdate }),
   };
 
   return items;
 }
-
 
