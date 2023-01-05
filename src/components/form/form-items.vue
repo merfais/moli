@@ -28,7 +28,7 @@ const formItemValueMap = ref({});
 const compItemValueMap = ref({});
 const innerFormItems = shallowRef({});
 
-watch(() => props.items, () => {
+watch(() => unref(props.items), () => {
   const formItems = {};
   const formValueMap = {};
   const compValueMap = {};

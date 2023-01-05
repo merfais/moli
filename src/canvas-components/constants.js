@@ -30,3 +30,19 @@ export const DATA_SOURCE_TYPE = {
   STATIC: 'static',
   DYNAMIC: 'dynamic',
 };
+
+export const EDITOR_MENU = {
+  BASIC: 'basic',
+  LABEL: 'label',
+  VARS: 'vars',
+  LAYOUT: 'layout',
+  STYLE: 'style',
+};
+
+export const EDITOR_MENU_NAME = {
+  [EDITOR_MENU.BASIC]: '基础配置',
+  [EDITOR_MENU.LABEL]: 'Label 配置',
+  [EDITOR_MENU.VARS]: '变量配置',
+  [EDITOR_MENU.LAYOUT]: '布局配置',
+  [EDITOR_MENU.STYLE]: '样式配置',
+};

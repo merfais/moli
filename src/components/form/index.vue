@@ -26,7 +26,7 @@ const emit = defineEmits([
 
 const antdFormModel = ref({});
 
-watch(() => props.formItems, () => {
+watch(() => unref(props.formItems), () => {
   const valueMap = {};
   forEach(unref(props.formItems), (item, key) => {
     const { value } = item;

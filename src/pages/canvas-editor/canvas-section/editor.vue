@@ -2,12 +2,13 @@
 import {
   set,
   cloneDeep,
+  map,
+  get,
 } from 'lodash-es';
 import {
   ref,
   unref,
   watch,
-  computed,
   shallowRef,
   onMounted,
 } from 'vue';
@@ -15,62 +16,62 @@ import { message } from 'ant-design-vue';
 import {
   CloseOutlined,
 } from '@ant-design/icons-vue';
-import { getConfEditorMap } from '@/canvas-components';
+import {
+  editorConfMap,
+  EDITOR_MENU,
+  EDITOR_MENU_NAME,
+} from '@/canvas-components';
 import {
   useCanvasEditorStore,
 } from '../use-canvas-editor';
 import useCompEditorStore from './use-store';
 
-const store = useCompEditorStore();
+const editor = useCompEditorStore();
 
-const selectedKeys = ref(['conf']);
+const selectedKeys = ref([EDITOR_MENU.BASIC]);
 const formRef = ref();
-const compMap = shallowRef({});
-
-const is = computed(() => {
-  const [key] = unref(selectedKeys) || [];
-  return unref(compMap)[key] || 'div';
-});
+const editorConf = shallowRef({});
 
 onMounted(() => {
-  genFormItems();
 });
 
-watch(() => store.visible, () => {
-  if (store.visible) {
-    genFormItems();
+watch(() => editor.visible, () => {
+  if (editor.visible) {
+    selectedKeys.value = [EDITOR_MENU.BASIC];
+
+    const getEditorConf = editorConfMap[editor.compKey];
+    if (getEditorConf) {
+      editorConf.value = getEditorConf(editor);
+    } else {
+      editorConf.value = { [editorConfMap.BASIC]: {} };
+    }
+  } else {
+    editorConf.value = {};
   }
 });
-
-// addWatch(props.item, () => {
-//   formItems.value = genFormItems();
-// });
-
-async function genFormItems() {
-  const [conf] = await Promise.all([
-    getConfEditorMap(store.compKey),
-  ]);
-  compMap.value = { conf };
-}
 
 async function onOk() {
   try {
-    await unref(formRef).validate();
+    await Promise.all(map(unref(formRef), item => item.validate()));
   } catch (e) {
     console.warn('表单校验失败', e);
     message.warn('校验未通过，请检查');
+    const formKey = get(e, 'values.formKey');
+    if (EDITOR_MENU_NAME[formKey]) {
+      selectedKeys.value = [formKey];
+    }
     return;
   }
   const canvasStore = useCanvasEditorStore();
-  set(canvasStore.viewMap, store.i, cloneDeep(store.viewConf));
-  store.visible = false;
+  set(canvasStore.viewMap, editor.i, cloneDeep(editor.viewConf));
+  editor.visible = false;
 }
 
 </script>
 <template>
   <div ref="domRef" class="editor-drawer-container"/>
   <RDrawer
-    v-model:visible="store.visible"
+    v-model:visible="editor.visible"
     :getContainer="() => $refs.domRef"
     :closable="false"
     @ok="onOk"
@@ -81,28 +82,37 @@ async function onOk() {
         size="small"
         mode="horizontal"
       >
-        <AMenuItem key="conf">基础配置</AMenuItem>
-        <AMenuItem key="label">Label 配置</AMenuItem>
-        <AMenuItem key="var">变量配置</AMenuItem>
-        <AMenuItem key="layout">布局配置</AMenuItem>
-        <AMenuItem key="style">样式配置</AMenuItem>
+        <AMenuItem v-for="(item, key) in editorConf"
+          :key="key"
+        >
+          {{EDITOR_MENU_NAME[key]}}
+        </AMenuItem>
       </AMenu>
     </template>
     <template #extra>
-      <button class="ant-drawer-close" @click="store.visible = false">
+      <button class="ant-drawer-close" @click="editor.visible = false">
         <CloseOutlined />
       </button>
     </template>
-    <Form ref="formRef"
-      class="width-100 pt-10 pb-20"
-      layout="horizontal"
-      :labelCol="{ span: 4, style: { minWidth: '150px' } }"
-      :wrapperCol="{ span: 18 }"
-      :loading="store.loading"
-      :model="store.viewConf"
+    <template v-for="(formItems, key) in editorConf"
+      :key="key"
     >
-      <component :is="is" />
-    </Form>
+      <RForm v-show="key === selectedKeys[0]"
+        ref="formRef"
+        class="width-100 pt-10 pb-20"
+        layout="horizontal"
+        :labelCol="{ span: 4, style: { minWidth: '150px' } }"
+        :wrapperCol="{ span: 18 }"
+        :loading="editor.loading"
+        :formItems="formItems"
+      >
+        <template #divider="{ text }">
+          <div class="col-24 divider pl-20 p-relative">
+            {{text}}
+          </div>
+        </template>
+      </RForm>
+    </template>
   </RDrawer>
 </template>
 <style scoped>
@@ -137,6 +147,23 @@ async function onOk() {
   }
 
   .menu {
+  }
+
+  .divider {
+    font-size: 16px;
+    font-weight: 550;
+    margin: 0 20px 10px 10px;
+    overflow: hidden;
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 5px solid transparent;
+      border-left: 10px solid #aaa;
+    }
   }
 }
 </style>

@@ -3,37 +3,48 @@ import {
   set,
 } from 'lodash-es';
 import {
-  getTitleFormItems,
+  shallowRef,
+} from 'vue';
+import {
+  EDITOR_MENU,
+} from '../constants';
+import {
+  getLabel,
   getValueTypeFormItems,
   getPlaceholderFormItems,
-} from '../use-common';
+} from '../use-editor';
 
-export function genFormItems(options = {}) {
-  const { editor } = options;
-  const viewConf = get(editor, 'viewConf', {});
-
-  function onUpdate(options = {}) {
-    const { path, payload } = options;
-
-    set(viewConf, path, payload);
-  }
-
-  const items = {
-    baseDivider: {
-      slot: 'divider',
-      compInnerText: '基础配置',
-    },
+function getBasic(options = {}) {
+  const { viewConf, onUpdate } = options;
+  const formItems = shallowRef({
+    formKey: { value: EDITOR_MENU.BASIC, class: 'd-none' },
     value: {
       label: '默认值',
       value: viewConf.value,
       component: 'AInput',
       onUpdate,
     },
-    ...getValueTypeFormItems({ viewConf, onUpdate }),
-    ...getPlaceholderFormItems({ viewConf, onUpdate }),
-    ...getTitleFormItems({ viewConf, onUpdate }),
-  };
+    ...getValueTypeFormItems(options),
+    ...getPlaceholderFormItems(options),
+  });
 
-  return items;
+  return formItems;
+}
+
+export default function getInputFormItems(editor) {
+  const viewConf = get(editor, 'viewConf', {});
+
+  function onUpdate(options = {}) {
+    const { path, payload } = options;
+    set(viewConf, path, payload);
+  }
+
+  return {
+    [EDITOR_MENU.BASIC]: getBasic({ viewConf, onUpdate, editor }),
+    [EDITOR_MENU.LABEL]: getLabel({ viewConf, onUpdate, editor }),
+    [EDITOR_MENU.VARS]: {},
+    [EDITOR_MENU.LAYOUT]: {},
+    [EDITOR_MENU.STYLE]: {},
+  };
 }
 

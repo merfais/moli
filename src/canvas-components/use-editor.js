@@ -1,5 +1,6 @@
 import {
   watch,
+  shallowRef,
 } from 'vue';
 import {
   map,
@@ -8,34 +9,26 @@ import {
   useRules,
   required,
 } from '@/uses/validate';
-import useCompEditorStore from '@/pages/canvas-editor/canvas-section/use-store';
 import {
   VALUE_TYPE_NANE,
+  EDITOR_MENU,
 } from './constants';
 
-export function initConfForm(options = {}) {
-  const { formItems, genFormItems } = options;
-  const editor = useCompEditorStore();
+export function getLabel(options = {}) {
+  const formItems = shallowRef(getLabelFormItems(options))
 
-  watch(() => editor.visible, () => {
-    if (editor.visible) {
-      formItems.value = genFormItems({ editor });
-    }
-  }, { immediate: true });
-
-  watch(() => editor.viewConf?.withLabel, () => {
-    formItems.value = genFormItems({ editor });
+  watch(() => options.editor.viewConf?.withLabel, () => {
+    formItems.value = getLabelFormItems(options);
   });
+
+  return formItems
 }
 
-export function getTitleFormItems(options = {}) {
+export function getLabelFormItems(options = {}) {
   const { viewConf, onUpdate } = options;
 
   const items = {
-    labelDivider: {
-      slot: 'divider',
-      compInnerText: 'label配置',
-    },
+    formKey: { value: EDITOR_MENU.LABEL, class: 'd-none' },
     withLabel: {
       label: '是否显示label',
       value: viewConf.withLabel,
