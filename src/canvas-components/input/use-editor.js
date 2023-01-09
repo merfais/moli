@@ -12,6 +12,7 @@ import {
   getLabel,
   getValueTypeFormItems,
   getPlaceholderFormItems,
+  getDisabledFormItems,
 } from '../use-editor';
 
 function getBasic(options = {}) {
@@ -26,6 +27,7 @@ function getBasic(options = {}) {
     },
     ...getValueTypeFormItems(options),
     ...getPlaceholderFormItems(options),
+    ...getDisabledFormItems(options),
   });
 
   return formItems;

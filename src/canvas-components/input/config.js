@@ -32,6 +32,7 @@ export default function genConf() {
       value: undefined,
       valueType: 'string',
       placeholder: undefined,
+      disabled: false,
     },
     style: {
       width: undefined,

@@ -99,7 +99,7 @@ async function onOk() {
     >
       <RForm v-show="key === selectedKeys[0]"
         ref="formRef"
-        class="width-100 pt-10 pb-20"
+        class="width-100 pt-20 pb-20"
         layout="horizontal"
         :labelCol="{ span: 4, style: { minWidth: '150px' } }"
         :wrapperCol="{ span: 18 }"

@@ -3,12 +3,15 @@ import { defineAsyncComponent } from 'vue';
 import * as icons from './icons';
 import RForm from './form';
 import FormItems from './form/form-items';
+import FormItem from './form/form-item';
 import Form from './form/form';
 import REmpty from './empty';
 import RButton from './button';
 import RDrawer from './drawer';
 import RModal from './modal';
 import RTable from './table';
+import RSelect from './select';
+import RemoveButton from './remove-button';
 import ButtonCheckbox from './button-checkbox';
 import ButtonCheckboxGroup from './button-checkbox-group';
 import ButtonRadioGroup from './button-radio-group';
@@ -19,6 +22,7 @@ import CompareDate from './compare-date';
 import CompareNumber from './compare-number';
 import CompareSelect from './compare-select';
 import BoolSelector from './bool-selector';
+import ImgLink from './img-link';
 import HelpLink from './help-link';
 import ToolBox from './tool-box';
 import FoldButton from './fold-button';
@@ -30,6 +34,8 @@ import DownloadButton from './download-button';
 import PhoneContainer from './phone-container';
 import ErrorCover from './error-cover';
 import LoadingCover from './loading-cover';
+import LogDiff from './log-diff';
+import Repeat from './repeat';
 
 export default function install(app) {
   const comps = {
@@ -39,8 +45,11 @@ export default function install(app) {
     RModal,
     RDrawer,
     REmpty,
+    RSelect,
+    RemoveButton,
     Form,
     FormItems,
+    FormItem,
     ButtonCheckbox,
     ButtonCheckboxGroup,
     ButtonRadioGroup,
@@ -51,6 +60,7 @@ export default function install(app) {
     CompareNumber,
     CompareSelect,
     BoolSelector,
+    ImgLink,
     HelpLink,
     HelpTip,
     // eslint-disable-next-line max-len
@@ -61,6 +71,7 @@ export default function install(app) {
     ToolBox,
     RChart: () => import(/* webpackChunkName: "chart-comp" */'./chart'),
     RangePicker: () => import(/* webpackChunkName: "element-plus-ui" */'./range-picker'),
+    ColorPicker: () => import(/* webpackChunkName: "element-plus-ui" */'./color-picker'),
     FoldButton,
     FoldTag,
     DropDownSelect,
@@ -69,6 +80,8 @@ export default function install(app) {
     RTooltip,
     ErrorCover,
     LoadingCover,
+    LogDiff,
+    Repeat,
   };
 
   forEach(comps, (comp, name) => {

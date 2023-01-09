@@ -9,19 +9,20 @@ import {
   useRules,
   required,
 } from '@/uses/validate';
+import DisabledFormItem from '@/canvas-components/common/disabled-form-item';
 import {
   VALUE_TYPE_NANE,
   EDITOR_MENU,
 } from './constants';
 
 export function getLabel(options = {}) {
-  const formItems = shallowRef(getLabelFormItems(options))
+  const formItems = shallowRef(getLabelFormItems(options));
 
   watch(() => options.editor.viewConf?.withLabel, () => {
     formItems.value = getLabelFormItems(options);
   });
 
-  return formItems
+  return formItems;
 }
 
 export function getLabelFormItems(options = {}) {
@@ -78,6 +79,32 @@ export function getValueTypeFormItems(options = {}) {
 
   return items;
 }
+
+export function getDisabledFormItems(options = {}) {
+  const { viewConf, onUpdate } = options;
+
+  const items = {
+    disabled: {
+      label: '是否禁用',
+      value: viewConf.disabled,
+      component: DisabledFormItem,
+      rules: useRules(validateDisabledValue),
+      onUpdate,
+    },
+  };
+
+  return items;
+}
+
+function validateDisabledValue(value) {
+  if (value === false) {
+    return;
+  }
+  if (!value) {
+    return '请控制禁用状态的变量';
+  }
+}
+
 export function getPlaceholderFormItems(options = {}) {
   const { viewConf, onUpdate } = options;
 

@@ -6,7 +6,7 @@ import {
   reactive,
   computed,
   unref,
-  onUnmounted,
+  onBeforeUnmount,
 } from 'vue';
 import {
   has,
@@ -40,7 +40,9 @@ let modifiedModel;
 const dftOptions = {
   readOnly: true,
   contextmenu: false,
+  showFoldingControls: 'always',
 };
+let ro;
 const domRef = ref();
 const exposeObj = reactive({
   resize,
@@ -131,10 +133,17 @@ function resize() {
 
 onMounted(() => {
   init();
+  window.addEventListener('resize', resize);
+  ro = new ResizeObserver(() => {
+    resize();
+  });
+  ro.observe(unref(domRef));
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   dispose();
+  window.removeEventListener('resize', resize);
+  ro.disconnect();
 });
 
 defineExpose(exposeObj);
