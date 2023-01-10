@@ -33,6 +33,7 @@ const store = useCanvasEditorStore();
 const canvasDomRef = ref();
 const gridLayoutRef = ref();
 const gridItemsRef = ref();
+const gridItemsClass = ref('');
 const contentStyle = computed(() => {
   const { height, width } = store.baseInfo || {};
   return {
@@ -66,6 +67,7 @@ async function onDragenter(e) {
   const { layout, dftConf } = await getCompConfig(store.draggingCompKey);
 
   draggingConf = dftConf;
+  gridItemsClass.value = 'dragging';
 
   const device = get(store, 'baseInfo.device') || 'pc';
   const { w, h } = get(layout, device) || {};
@@ -93,6 +95,7 @@ async function onDragenter(e) {
 }
 
 function onDragleave(e) {
+  gridItemsClass.value = '';
   const { relatedTarget } = e;
   if (unref(canvasDomRef).contains(relatedTarget) || !draggingLayout) {
     return;
@@ -129,6 +132,7 @@ function onDragover(e) {
 }
 
 function onDrop() {
+  gridItemsClass.value = '';
   if (!draggingLayout) {
     return;
   }
@@ -198,18 +202,19 @@ function getToolbarPopupContainer(item) {
         :margin="[0, 0]"
         isDraggable
         isResizable
-        :verticalCompact="false"
         :autoSize="false"
+        :verticalCompact="false"
         @dragenter.self="onDragenter"
         @dragover.prevent="onDragover"
         @dragleave.self="onDragleave"
-        @drop="onDrop"
+        @drop.stop="onDrop"
       >
         <GridItem v-for="item in store.pcMainLayoutArr"
           :key="item.i"
           :id="`${item.i}_grid_item`"
           ref="gridItemsRef"
           class='grid-item-wrapper'
+          :class="gridItemsClass"
           v-bind="item"
           @move="onMove"
           @moved="onMoved"
@@ -248,6 +253,10 @@ function getToolbarPopupContainer(item) {
 
   :deep(.vue-grid-layout) {
     height: 100%;
+
+    .vue-grid-placeholder {
+      pointer-events: none;
+    }
   }
 
   :deep(.ant-tooltip-content) {
@@ -265,11 +274,13 @@ function getToolbarPopupContainer(item) {
   }
 
   .grid-item-wrapper {
-
     &:hover {
       box-shadow: 0 0 1px 1px #0E73FF;
     }
 
+    &.dragging {
+      pointer-events: none;
+    }
   }
 }
 </style>
