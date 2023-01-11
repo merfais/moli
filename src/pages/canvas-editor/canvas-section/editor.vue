@@ -23,8 +23,8 @@ import {
 } from '@/canvas-components';
 import {
   useCanvasEditorStore,
-} from '../use-canvas-editor';
-import useCompEditorStore from './use-store';
+} from '../use-canvas-store';
+import useCompEditorStore from './use-comp-editor-store';
 
 const editor = useCompEditorStore();
 

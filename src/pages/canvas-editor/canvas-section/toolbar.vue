@@ -4,10 +4,11 @@ import {
   LockOutlined,
   UnlockOutlined,
   EllipsisOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons-vue';
 import {
   onClickSetting,
-} from './use-editor';
+} from './use-section';
 
 defineProps({
   i: String,
@@ -16,9 +17,23 @@ defineProps({
 function onClickLock() {
 
 }
+
+function onClickMenuItem(options = {}) {
+  const cbMap = {
+    remove: onClickRemove,
+  };
+  const { key } = options;
+  if (cbMap[key]) {
+    cbMap[key]();
+  }
+}
+
+function onClickRemove() {
+
+}
 </script>
 <template>
-  <div class="toolbar align-center p-absolute">
+  <div ref="domRef" class="toolbar align-center p-absolute">
     <AButton
       class="tool-btn"
       size="small"
@@ -34,12 +49,24 @@ function onClickLock() {
       <LockOutlined v-if="true" />
       <UnlockOutlined v-else />
     </AButton>
-    <AButton
+    <ADropdown
       class="tool-btn"
       size="small"
+      :trigger="['click']"
+      :getPopupContainer="() => $refs.domRef"
+      placement="bottomRight"
+      @click="onClickMenuItem"
     >
-      <EllipsisOutlined />
-    </AButton>
+      <AButton size="small"><EllipsisOutlined /></AButton>
+      <template #overlay>
+        <AMenu class="more-menu">
+          <AMenuItem :key="remove">
+            <DeleteOutlined />
+            删除
+          </AMenuItem>
+        </AMenu>
+      </template>
+    </ADropdown>
   </div>
 </template>
 <style scoped>
@@ -53,6 +80,10 @@ function onClickLock() {
     & + .tool-btn {
       margin-left: 3px;
     }
+  }
+
+  .more-menu {
+    width: 70px;
   }
 }
 </style>

@@ -1,7 +1,11 @@
 <script setup>
 import {
   computed,
+  ref,
+  watch,
+  unref,
 } from 'vue';
+import { useFocus } from '@vueuse/core';
 
 const props = defineProps({
   placeholder: String,
@@ -12,7 +16,11 @@ const props = defineProps({
 const emit = defineEmits([
   'update:value',
   'update:var',
+  'update:focused',
 ]);
+
+const inputDomRef = ref();
+const { focused } = useFocus(inputDomRef);
 
 const innerPlaceholder = computed(() => {
   if (props.placeholder) {
@@ -24,15 +32,33 @@ const innerPlaceholder = computed(() => {
     : `请输入${target}`;
 });
 
+watch(focused, () => {
+  emit('update:focused', unref(focused));
+});
+
 function onUpdateValue(value) {
   emit('update:value', value);
 }
+
+function onDbClick() {
+  focused.value = true;
+}
 </script>
+<script>export default { inheritAttrs: false }; </script>
 <template>
-  <AInput
+  <AInput ref="inputDomRef"
     :placeholder="innerPlaceholder"
+    v-bind="$attrs"
     @update:value="onUpdateValue"
+  />
+  <div v-if="!focused"
+    class="p-absolute width-100 height-100 input-cover"
+    @dblclick="onDbClick"
   />
 </template>
 <style scoped>
+.input-cover {
+  top: 0;
+  left: 0;
+}
 </style>

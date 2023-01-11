@@ -11,7 +11,8 @@ import {
 import compMap from '@/canvas-components/comp';
 import {
   useCanvasEditorStore,
-} from '../use-canvas-editor';
+  updateLayout,
+} from '../use-canvas-store';
 
 const props = defineProps({
   i: String,
@@ -50,6 +51,13 @@ function onUpdateVar() {
 
 }
 
+function onFocused(focused) {
+  updateLayout({
+    i: props.i,
+    isDraggable: !focused,
+  });
+}
+
 </script>
 <template>
   <div v-if="compMap[compKey] && label"
@@ -62,6 +70,7 @@ function onUpdateVar() {
       v-bind="compProps"
       @update:value="onUpdateValue"
       @update:var="onUpdateVar"
+      @update:focused="onFocused"
     />
   </div>
   <component v-else-if="compMap[compKey]"
@@ -70,6 +79,7 @@ function onUpdateVar() {
     v-bind="compProps"
     @update:value="onUpdateValue"
     @update:var="onUpdateVar"
+    @update:focused="onFocused"
   />
   <div v-else>未支持的组件</div>
 </template>

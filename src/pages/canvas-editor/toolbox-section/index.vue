@@ -19,7 +19,7 @@ import {
 } from '@/canvas-components';
 import {
   useCanvasEditorStore,
-} from '../use-canvas-editor';
+} from '../use-canvas-store';
 
 const store = useCanvasEditorStore();
 

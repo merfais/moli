@@ -6,7 +6,7 @@ import {
 import { message } from 'ant-design-vue';
 import { vElementHover } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
-import { useCanvasEditorStore } from '../use-canvas-editor';
+import { useCanvasEditorStore } from '../use-canvas-store';
 
 const store = useCanvasEditorStore();
 

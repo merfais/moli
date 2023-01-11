@@ -17,10 +17,10 @@ import {
   addLayout,
   removeLayout,
   addView,
-} from '../use-canvas-editor';
+} from '../use-canvas-store';
 import {
   onClickSetting,
-} from './use-editor';
+} from './use-section';
 import Toolbar from './toolbar';
 import View from './view';
 import Editor from './editor';
@@ -209,16 +209,7 @@ function getToolbarPopupContainer(item) {
         @dragleave.self="onDragleave"
         @drop.stop="onDrop"
       >
-        <GridItem v-for="item in store.pcMainLayoutArr"
-          :key="item.i"
-          :id="`${item.i}_grid_item`"
-          ref="gridItemsRef"
-          class='grid-item-wrapper'
-          :class="gridItemsClass"
-          v-bind="item"
-          @move="onMove"
-          @moved="onMoved"
-        >
+        <template v-for="item in store.pcMainLayoutArr" :key="item.i">
           <ATooltip
             placement="topRight"
             destroyTooltipOnHide
@@ -227,9 +218,19 @@ function getToolbarPopupContainer(item) {
             <template #title>
               <Toolbar :i="item.i" />
             </template>
-            <View :i="item.i" />
+            <GridItem
+              :id="`${item.i}_grid_item`"
+              ref="gridItemsRef"
+              class='grid-item-wrapper'
+              :class="gridItemsClass"
+              v-bind="item"
+              @move="onMove"
+              @moved="onMoved"
+            >
+              <View :i="item.i" />
+            </GridItem>
           </ATooltip>
-        </GridItem>
+        </template>
       </GridLayout>
     </div>
     <Editor />
