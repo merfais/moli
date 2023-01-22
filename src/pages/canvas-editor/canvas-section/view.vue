@@ -47,8 +47,7 @@ function onUpdateValue(value) {
   set(store.viewMap, [props.i, 'value'], value);
 }
 
-function onUpdateVar() {
-
+function onUpdateDataSource() {
 }
 
 function onFocused(focused) {
@@ -69,7 +68,7 @@ function onFocused(focused) {
       class="comp"
       v-bind="compProps"
       @update:value="onUpdateValue"
-      @update:var="onUpdateVar"
+      @update:ds="onUpdateDataSource"
       @update:focused="onFocused"
     />
   </div>
@@ -78,7 +77,7 @@ function onFocused(focused) {
     class="comp"
     v-bind="compProps"
     @update:value="onUpdateValue"
-    @update:var="onUpdateVar"
+    @update:ds="onUpdateDataSource"
     @update:focused="onFocused"
   />
   <div v-else>未支持的组件</div>

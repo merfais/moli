@@ -34,39 +34,30 @@ export default function genConf() {
       selectionType: DATA_SOURCE_TYPE.DYNAMIC,
       labelField: undefined,
       valueField: undefined,
-      variable: '',
     },
     propEditor: {
       component: 'selectEditor',
       destroyWhenHide: true,
     },
-    // 对外暴露的变量
-    variables: {
-      itemValue: {
-        key: 'value',
-        name: '值',
-        valueType: VALUE_TYPE.STRING,
-        default: {
-          value: '',
-          label: '',
-        },
-        // 下拉框的选项options可能会依赖其他变量，
-        // 记录在options中，用于收集变量的依赖关系
-        options: {
-          variable: '',
-          mode: 'default', // 选择模式
-          options: [], // 配置选项
-          specialValue: '',
-          labelField: 'label',
-          valueField: 'value',
-          total: {
-            enable: false,
-            label: '合计',
-            value: 'total',
-          },
-        },
+    // 对外暴露的数据源
+    dataSource: [{
+      key: 'value',
+      name: '值',
+      valueType: VALUE_TYPE.STRING,
+      default: {
+        value: '',
+        label: '',
       },
-    },
+      // 下拉框的选项options可能会依赖其他数据源，
+      // 记录在options中，用于收集数据源的依赖关系
+      options: {
+        mode: 'default', // 选择模式
+        options: [], // 配置选项
+        specialValue: '',
+        labelField: 'label',
+        valueField: 'value',
+      },
+    }],
   };
   return config;
 }

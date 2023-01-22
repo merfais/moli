@@ -101,7 +101,7 @@ function validateDisabledValue(value) {
     return;
   }
   if (!value) {
-    return '请控制禁用状态的变量';
+    return '请选择禁用状态的数据源';
   }
 }
 

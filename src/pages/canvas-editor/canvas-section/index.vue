@@ -7,6 +7,7 @@ import {
 } from 'vue';
 import {
   get,
+  forEach,
 } from 'lodash-es';
 import newId from '@/uses/id';
 import {
@@ -46,31 +47,13 @@ const colNum = computed(() => {
   return width;
 });
 
-
-// function getView() {
-//
-// }
-//
-// function getVariables() {
-//
-// }
-//
-// function registerViewVariable() {
-//
-// }
-//
-// function mergeState() {
-//
-// }
-
 async function onDragenter(e) {
-  const { layout, dftConf } = await getCompConfig(store.draggingCompKey);
+  const draggingConf = await getCompConfig(store.draggingCompKey);
 
-  draggingConf = dftConf;
   gridItemsClass.value = 'dragging';
 
   const device = get(store, 'baseInfo.device') || 'pc';
-  const { w, h } = get(layout, device) || {};
+  const { w, h } = get(draggingConf.layout, device) || {};
 
   draggingLayout = {
     i: newId(),
@@ -142,14 +125,23 @@ function onDrop() {
   emitter.emit('dragEvent', ['dragend', i, x, y, h, w]);
 
   removeLayout(draggingLayout);
-  const newI = newId();
-  addLayout({ ...draggingLayout, i: newI });
-  addView({
-    i: newI,
+
+  const viewConf = {
+    i: newId(),
     compKey: store.draggingCompKey,
-    ...draggingConf,
+    ...draggingConf.dftConf,
+    exportDSs: [],
+  };
+  forEach(draggingConf.dataSource, (item, index) => {
+    console.info(item, index);
+    // const dsId = registerViewDS(item)
+    // viewConf.exportDSs.push(varId)
+    // const k = `exportDS${index + 1}`
+    // viewConf[k] = dsId
   });
-  onClickSetting(newI);
+  addView(viewConf);
+  addLayout({ ...draggingLayout, i: viewConf.i });
+  onClickSetting(viewConf.i);
 
   // // 构造完整view config
   // const view = getView(store.draggingCompKey);
@@ -187,7 +179,7 @@ function getToolbarPopupContainer(item) {
 
 </script>
 <template>
-  <div class="canvas-section p-20 height-100 overflow-auto">
+  <div class="canvas-section p-20-10 height-100 overflow-auto">
     <div id="canvas_content"
       ref="canvasDomRef"
       class="canvas-bg height-100"

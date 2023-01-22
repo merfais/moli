@@ -30,7 +30,7 @@ export default function genConf() {
       label: undefined,
       labelPos: 'left',
       value: undefined,
-      valueType: 'string',
+      valueType: VALUE_TYPE.STRING,
       placeholder: undefined,
       disabled: false,
     },
@@ -44,24 +44,12 @@ export default function genConf() {
       color: undefined,
       backgroundColor: undefined,
     },
-    component: 'stringTpl',
-    props: {
-      label: '',
-      value: '',
-      enableMulti: false,
-    },
-    propEditor: {
-      component: 'stringEditor',
-    },
-    // 对外暴露的变量
-    variables: {
-      value: {
-        key: 'value',
-        name: '值',
-        valueType: VALUE_TYPE.STRING,
-        default: '',
-      },
-    },
+    dataSource: [{
+      keyDesc: 'inputValue',
+      nameDesc: '输入框的值',
+      valueType: VALUE_TYPE.STRING,
+      dftVal: '',
+    }],
   };
   return config;
 }

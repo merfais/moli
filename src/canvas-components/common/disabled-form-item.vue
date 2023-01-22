@@ -32,7 +32,7 @@ export default { inheritAttrs: false };
       <ARadio class="mr-0"
         :value="trueValue"
       >
-        当变量
+        当数据源
       </ARadio>
     </ARadioGroup>
     <RSelect class="var-selector mr-10"

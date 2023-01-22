@@ -11,6 +11,7 @@ const props = defineProps({
   placeholder: String,
   multiple: Boolean,
   label: String,
+  exportDS1: String,
 });
 
 const emit = defineEmits([
@@ -38,6 +39,10 @@ watch(focused, () => {
 
 function onUpdateValue(value) {
   emit('update:value', value);
+  emit('update:var', {
+    varId: props.exportDS1,
+    value,
+  });
 }
 
 function onDbClick() {

@@ -58,7 +58,7 @@ init();
 
 </script>
 <template>
-  <section class="comp-selector-section height-100 ">
+  <section class="comp-selector-section height-100 flex-0-0">
     <ACollapse
       v-model:activeKey="activeKey"
     >
@@ -82,7 +82,7 @@ init();
 </template>
 <style scoped>
 .comp-selector-section {
-  width: 269px;
+  width: 238px;
   overflow-y: scroll;
   padding-top: 1px;
   box-shadow: 1px 0 1px #d9d9d9, 1px 0 5px #f1f1f1;
@@ -93,6 +93,7 @@ init();
     .ant-collapse-content-box {
       display: flex;
       flex-wrap: wrap;
+      padding: 6px;
     }
   }
 
@@ -100,7 +101,7 @@ init();
     width: 60px;
     height: 60px;
     border: 1px dashed #aaa;
-    margin: 8px;
+    margin: 6px;
     border-radius: 4px;
     opacity: 0.7;
     user-select: none;
