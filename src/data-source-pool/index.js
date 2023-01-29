@@ -3,8 +3,9 @@ import {
   forEach,
 } from 'lodash-es';
 import MessageCenter from './msg-center';
+import DataSource from './data-source';
 
-export default class DataSource {
+export default class DataSourcePool {
   constructor(dataSources, opts = {}) {
     this.dsMap = {};
     this.commonOpts = {};
@@ -84,8 +85,7 @@ export default class DataSource {
     this.unRegister(dsId);
 
     const { dsMap, msgCenter } = this;
-    const Class = getDataSourceClass(config);
-    const dataSource = new Class({
+    const dataSource = new DataSource({
       ...config,
       dsMap,
       msgCenter,
@@ -180,13 +180,8 @@ export default class DataSource {
     if (oldId && oldId !== dsId) {
       delete dsConfMap[oldId];
     }
-    const Class = getDataSourceClass(item);
-    dsConfMap[dsId] = (new Class(item)).getConfig();
+    dsConfMap[dsId] = (new DataSource(item)).getConfig();
     return dsConfMap;
   }
-}
-
-function getDataSourceClass() {
-  // TODO
 }
 
