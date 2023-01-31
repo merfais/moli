@@ -3,6 +3,7 @@ import {
   findIndex,
 } from 'lodash-es';
 import { defineStore } from 'pinia';
+import DataSourcePool from '@/data-source-pool';
 
 export const useCanvasEditorStore = defineStore({
   id: 'canvasEditor',
@@ -23,6 +24,7 @@ export const useCanvasEditorStore = defineStore({
     pcSubLayoutMap: {},
     // 从左侧组件区拖拽出来的组件的key
     draggingCompKey: '',
+    pool: new DataSourcePool(),
   }),
   getters: {
   },

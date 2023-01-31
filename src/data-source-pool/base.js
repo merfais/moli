@@ -1,10 +1,10 @@
-// import {
-//   has,
-//   get,
-//   map,
-//   forEach,
-//   isEqual,
-// } from 'lodash-es';
+import {
+  has,
+  get,
+  map,
+  forEach,
+  isEqual,
+} from 'lodash-es';
 import {
   ASYNC_STATUS,
 } from './constants';
@@ -45,13 +45,13 @@ export default class Base {
   oldError = null;
 
   // 依赖的数据源列表，订阅这些数据源变化后执行同步逻辑
-  syncDepDSs = [];
+  syncDeps = [];
 
   // 上游数据源是否处于pending态
   syncUpperIsPending = false;
 
   // 依赖的数据源列表，订阅这些数据源变化后执行异步逻辑
-  asyncDepDSs = [];
+  asyncDeps = [];
 
   // 上游数据源是否处于pending态
   asyncUpperIsPending = false;
@@ -77,116 +77,181 @@ export default class Base {
 
     rest.tmpData = value;
     Object.assign(this, rest);
-    // Object.assign(this.options, options)
 
     // this.calculateValue = this.calculateValue.bind(this);
     // this.requestData = this.requestData.bind(this);
   }
 
+  // calculate = () => {};
+
+  // request = () => {};
+
+  // 数据源的值
+  setValue(value) {
+    this.tmpData = value;
+  }
+
+  getValue() {
+    // 当值为undefined时，这个id会在网络传输中被删除
+    // 因此，当没有值时，返回null， 而不是undefined
+    if (this.innerValue === undefined) {
+      return null;
+    }
+    return this.innerValue;
+  }
+
+  getSyncDeps() {
+    return this.syncDeps;
+  }
+
+  getAsyncDeps() {
+    return this.asyncDeps;
+  }
+
+  getDependents() {
+    return [...new Set([...this.syncDeps, ...this.asyncDeps])];
+  }
+
+  genDependents() {
+    this.genSyncDeps();
+    this.genAsyncDeps();
+  }
+
+  genSyncDeps() {
+    this.syncDeps = [];
+  }
+
+  genAsyncDeps() {
+    this.asyncDeps = [];
+  }
+
+  updateConfig(payload) {
+    const { value, ...conf } = payload;
+    Object.assign(this, conf);
+
+    if (has(payload, 'value')) {
+      this.source.setValue(value);
+    }
+    this.request();
+  }
+
+  async request() {
+    this.calculate();
+  }
+
+  calculate() {
+    this.updateValue();
+  }
+
   /**
-   * 注销数据源时，释放该数据源的引用
+   * 写数据源的值，如果值或状态发生变化会发布事件
    */
-  // destructor() {
-  //   this.hasDestroyed = true;
-  //   this.msgCenter.removeCb(this.calculateValue);
-  //   this.msgCenter.removeCb(this.requestData);
-  //   this.msgCenter.removeKey(this.id);
-  // }
+  updateValue(value) {
+    this.innerValue = value;
 
-  // calculateValue = () => {};
+    const newValue = this.getValue();
+    const newStatus = this.getStatus();
+    const newError = this.getError();
+    const valueHasChange = !isEqual(newValue, this.oldValue);
+    const statusHasChange = newStatus !== this.oldStatus;
+    const errorHasChange = !isEqual(newError, this.oldError);
 
-  // requestData = () => {};
+    this.oldValue = newValue;
+    this.oldStatus = newStatus;
+    this.oldError = newError;
 
-  // // 数据源的值
-  // setValue(value) {
-  //   // TODO
-  // }
-
-  // getValue() {
-  //   // 当值为undefined时，这个id会在网络传输中被删除
-  //   // 因此，当没有值时，返回null， 而不是undefined
-  //   if (this.innerValue === undefined) {
-  //     return null;
-  //   }
-  //   return this.innerValue;
-  // }
-
-  // // 此数据源的依赖数据源
-  // getDependents() {
-  //   // TODO:
-  //   // return [...new Set([
-  //   //   ...this.asyncDepDSs,
-  //   //   ...this.syncDepDSs,
-  //   // ])];
-  // }
+    // 做diff，避免频繁更新，也可阻挡一定的循环引用更新
+    if (valueHasChange || statusHasChange || errorHasChange) {
+      // 发布变化
+      // this.msgCenter.publish(this.id);
+    }
+  }
 
   // // 此数据源的状态，同时会计算上游的状态，形成依赖树
   // set status(value) {
   //   this.innerStatus = value;
   // }
 
-  // get status() {
-  //   if (this.syncUpperIsPending || this.asyncUpperIsPending) {
-  //     return ASYNC_STATUS.PENDING;
-  //   }
-  //   return this.innerStatus;
-  // }
+  getStatus() {
+    const pending = this.calcIsPending(this.getDependents());
+    if (pending) {
+      return ASYNC_STATUS.PENDING;
+    }
+    return this.innerStatus;
+  }
 
-  // // 上游数据源的错误栈。有两个作用。
-  // // 1、异步数据源求值时如果上游数据源有错误，有可能不发起请求。
-  // // 2、导出数据源的错误消息时，需要导出整个栈的错误
-  // getUpperError() {
-  //   const errorStack = [];
-  //   forEach(this.dependentDSs, (varKey) => {
-  //     const error = get(this.dsMap, `${varKey}.error`, []);
-  //     errorStack.concat(error);
-  //     // 数据源的依赖关系是树状结构，但错误存储结构是栈，
-  //     // 因此只考虑树的某一个局部深度，当收集到依赖的错误就不再继续查找了
-  //     if (errorStack.length) {
-  //       return false;
-  //     }
-  //   });
-  //   return errorStack;
-  // }
+  /**
+   * 用于计算上游数据源状态, 被子类调用
+   * 在不同的场景下，上游数据源不相同，
+   * 1. 同步数据源： 上游数据源是固定的，读syncDeps的值，决定是否更新value值
+   * 2. 异步数据源： 不固定，异步请求前判断 asyncDeps, 决定是否发起请求
+   *                       执行后置函数判断 syncDeps，决定是否更新value值
+   */
+  calcIsPending(dependents) {
+    // 上游数据源，被依赖的数据源是否是pending状态
+    let hasPending = false;
+    forEach(dependents, (depKey) => {
+      hasPending = get(this.dsMap, `${depKey}.status`) === ASYNC_STATUS.PENDING;
+      return !hasPending;
+    });
+    return hasPending;
+  }
 
-  // // 数据源的错误栈。这是一个反向的栈，此数据源的错误位于栈底，上游数据源的错误位于栈顶
-  // set error(value) {
-  //   let error = value;
-  //   if (typeof value === 'string') {
-  //     error = { message: value };
-  //   }
-  //   this.innerError = error;
-  // }
+  // 上游数据源的错误栈。有两个作用。
+  // 1、异步数据源求值时如果上游数据源有错误，有可能不发起请求。
+  // 2、导出数据源的错误消息时，需要导出整个栈的错误
+  getUpperError() {
+    const errorStack = [];
+    forEach(this.getDependents, (depKey) => {
+      const error = get(this.dsMap, `${depKey}.error`, []);
+      errorStack.concat(error);
+      // 数据源的依赖关系是树状结构，但错误存储结构是栈，
+      // 因此只考虑树的某一个局部深度，当收集到依赖的错误就不再继续查找了
+      if (errorStack.length) {
+        return false;
+      }
+    });
+    return errorStack;
+  }
 
-  // get error() {
-  //   const errorStack = [];
-  //   if (this.innerError) {
-  //     errorStack.push({
-  //       id: this.id,
-  //       error: this.innerError,
-  //     });
-  //   }
-  //   errorStack.concat(this.getUpperError());
-  //   return errorStack;
-  // }
+  // 数据源的错误栈。这是一个反向的栈，此数据源的错误位于栈底，上游数据源的错误位于栈顶
+  setError(value) {
+    let error = value;
+    if (typeof value === 'string') {
+      error = { message: value };
+    }
+    this.innerError = error;
+  }
 
-  // /**
-  //  * 读取数据源的错误消息
-  //  */
-  // getErrMsg() {
-  //   if (!this.error.length) {
-  //     return '';
-  //   }
-  //   const msgStack = map(this.upperError, ({ id, error } = {}) => {
-  //     const { message } = error;
-  //     return `上游数据源${id}计算出错: ${message}`;
-  //   });
-  //   if (this.innerError) {
-  //     const { message } = this.innerError;
-  //     msgStack.unshift(`${message}`);
-  //   }
-  //   return `数据源${this.id}计算出错: ${msgStack.join(';=>')}`;
-  // }
+  getError() {
+    const errorStack = [];
+    if (this.innerError) {
+      errorStack.push({
+        id: this.id,
+        error: this.innerError,
+      });
+    }
+    errorStack.concat(this.getUpperError());
+    return errorStack;
+  }
+
+  /**
+   * 读取数据源的错误消息
+   */
+  getErrMsg() {
+    if (!this.getError().length) {
+      return '';
+    }
+    const msgStack = map(this.getUpperError, ({ id, error } = {}) => {
+      const { message } = error;
+      return `上游数据源${id}计算出错: ${message}`;
+    });
+    if (this.innerError) {
+      const { message } = this.innerError;
+      msgStack.unshift(`${message}`);
+    }
+    return `数据源${this.id}计算出错: ${msgStack.join(';=>')}`;
+  }
 
   // /**
   //  * 组装持久化的配置
@@ -199,20 +264,20 @@ export default class Base {
   //  * 更新同步依赖关系, 更新订阅
   //  */
   // updateSyncDepDSs() {
-  //   this.msgCenter.unSubscribe(this.syncDepDSs, this.calculateValue);
+  //   this.msgCenter.unSubscribe(this.syncDeps, this.calculateValue);
   //   const newDepDSs = this.genDependentDSs();
-  //   this.syncDepDSs = newDepDSs;
-  //   this.msgCenter.subscribe(this.syncDepDSs, this.calculateValue);
+  //   this.syncDeps = newDepDSs;
+  //   this.msgCenter.subscribe(this.syncDeps, this.calculateValue);
   // }
 
   // /**
   //  * 更新异步依赖关系, 更新订阅,
   //  */
-  // updateAsyncDepDSs() {
-  //   this.msgCenter.unSubscribe(this.asyncDepDSs, this.requestData);
+  // updateAsyncDeps() {
+  //   this.msgCenter.unSubscribe(this.asyncDeps, this.requestData);
   //   const newDepDSs = this.genDependentDSs();
-  //   this.asyncDepDSs = newDepDSs;
-  //   this.msgCenter.subscribe(this.asyncDepDSs, this.requestData);
+  //   this.asyncDeps = newDepDSs;
+  //   this.msgCenter.subscribe(this.asyncDeps, this.requestData);
   // }
 
   // /**
@@ -231,7 +296,7 @@ export default class Base {
   //   }
 
   //   if (this.isAsync) {
-  //     this.updateAsyncDepDSs();
+  //     this.updateAsyncDeps();
   //     this.requestData();
   //   } else {
   //     this.updateSyncDepDSs();
@@ -239,43 +304,6 @@ export default class Base {
   //   }
 
   //   this.msgCenter.publish(this.id, { toAll: true });
-  // }
-
-  // /**
-  //  * 写数据源的值，如果值或状态发生变化会发布事件
-  //  */
-  // updateValue(value) {
-  //   this.innerValue = value;
-  //   const tmpDataHasChange = !isEqual(this.value, this.oldValue);
-  //   const statusHasChange = this.status !== this.oldStatus;
-  //   const errorHasChange = !isEqual(this.error, this.oldError);
-
-  //   this.oldValue = this.value;
-  //   this.oldStatus = this.status;
-  //   this.oldError = this.error;
-
-  //   // 做diff，避免频繁更新，也可阻挡一定的循环引用更新
-  //   if (dataHasChange || statusHasChange || errorHasChange) {
-  //     // 发布变化
-  //     this.msgCenter.publish(this.id);
-  //   }
-  // }
-
-  // /**
-  //  * 用于计算上游数据源状态, 被子类调用
-  //  * 在不同的场景下，上游数据源不相同，
-  //  * 1. 同步数据源： 上游数据源是固定的，读syncDepDSs的值，决定是否更新value值
-  //  * 2. 异步数据源： 不固定，异步请求前判断 asyncDepDSs, 决定是否发起请求
-  //  *                       执行后置函数判断 syncDepDSs，决定是否更新value值
-  //  */
-  // calcUpperIsPending(depDSs) {
-  //   // 上游数据源，被依赖的数据源是否是pending状态
-  //   let hasPending = false;
-  //   forEach(depDSs, (varKey) => {
-  //     hasPending = get(this.dsMap, `${varKey}.status`) === ASYNC_STATUS.PENDING;
-  //     return !hasPending;
-  //   });
-  //   return hasPending;
   // }
 
   // /**
