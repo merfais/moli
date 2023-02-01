@@ -9,3 +9,10 @@ export const ASYNC_STATUS = {
   FULFILLED: 'fulfilled',
   REJECTED: 'rejected',
 };
+
+export const VALUE_TYPE = {
+  STRING: 'string',
+  NUMBER: 'number',
+  BOOLEAN: 'boolean',
+};
+

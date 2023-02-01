@@ -1,29 +1,25 @@
+import {
+  map,
+} from 'lodash-es';
 import Base from './base';
+import { convertValueType } from './use-helper';
+import { ASYNC_STATUS } from './constants';
 
 export default class InputLikeView extends Base {
-  // // 组件导出的变量可直接更新value
-  // set value(data) {
-  //   this.data = data
-  //   this.calculateValue();
-  // }
-
-  // /**
-  //  * 同步过程，计算value的值，用于响应依赖变量消息
-  //  */
-  // calculateValue() {
-  //   this.error = null
-  //   const { data } = this;
-  //   const { valueType } = this.options
-  //   try {
-  //     const value = Array.isArray(data)
-  //       ? map(data, item => convertValueType(item, valueType))
-  //       : convertValueType(data, valueType);
-  //     this.status = ASYNC_STATUS.FULFILLED
-  //     this.updateValue(value);
-  //   } catch (error) {
-  //     this.error = error
-  //     this.status = ASYNC_STATUS.REJECTED
-  //   }
-  // }
-
+  /**
+   * 重载父类方法
+   */
+  calculate() {
+    try {
+      const { tmpData, valueType } = this;
+      this.innerStatus = ASYNC_STATUS.FULFILLED;
+      this.innerValue = Array.isArray(tmpData)
+        ? map(tmpData, item => convertValueType(item, valueType))
+        : convertValueType(tmpData, valueType);
+    } catch (error) {
+      this.innerStatus = ASYNC_STATUS.REJECTED;
+      this.setError(error);
+    }
+    this.publish();
+  }
 }

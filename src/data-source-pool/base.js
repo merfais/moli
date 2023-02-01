@@ -47,17 +47,8 @@ export default class Base {
   // 依赖的数据源列表，订阅这些数据源变化后执行同步逻辑
   syncDeps = [];
 
-  // 上游数据源是否处于pending态
-  syncUpperIsPending = false;
-
   // 依赖的数据源列表，订阅这些数据源变化后执行异步逻辑
   asyncDeps = [];
-
-  // 上游数据源是否处于pending态
-  asyncUpperIsPending = false;
-
-  // 数据源组唯一id
-  sid = 'sid';
 
   // 标记数据源是否已经初始化
   hasInited = false;
@@ -66,14 +57,7 @@ export default class Base {
   hasDestroyed = false;
 
   constructor(info) {
-    const {
-      value,
-      // rest包含的字段
-      // type            数据源类型, 通用字段
-      // id,            数据源的id, 通用字段
-      // name,           数据源的名字, 通用字段
-      ...rest
-    } = info;
+    const { value, ...rest } = info;
 
     rest.tmpData = value;
     Object.assign(this, rest);
@@ -82,14 +66,18 @@ export default class Base {
     // this.requestData = this.requestData.bind(this);
   }
 
+  destructor() {
+    this.hasDestroyed = true;
+  }
+
+  init() {
+    this.hasInited = true;
+    this.request();
+  }
+
   // calculate = () => {};
 
   // request = () => {};
-
-  // 数据源的值
-  setValue(value) {
-    this.tmpData = value;
-  }
 
   getValue() {
     // 当值为undefined时，这个id会在网络传输中被删除
@@ -130,25 +118,32 @@ export default class Base {
     Object.assign(this, conf);
 
     if (has(payload, 'value')) {
-      this.source.setValue(value);
+      this.tmpData = value;
     }
     this.request();
   }
 
+  setValue(value) {
+    this.tmpData = value;
+    this.request();
+  }
+
   async request() {
+    this.innerStatus = ASYNC_STATUS.PENDING;
+    this.setError();
     this.calculate();
   }
 
   calculate() {
-    this.updateValue();
+    this.innerValue = this.tmpData;
+    this.innerStatus = ASYNC_STATUS.FULFILLED;
+    this.publish();
   }
 
   /**
-   * 写数据源的值，如果值或状态发生变化会发布事件
+   * 如果值或状态发生变化会发布事件
    */
-  updateValue(value) {
-    this.innerValue = value;
-
+  publish() {
     const newValue = this.getValue();
     const newStatus = this.getStatus();
     const newError = this.getError();
@@ -163,14 +158,9 @@ export default class Base {
     // 做diff，避免频繁更新，也可阻挡一定的循环引用更新
     if (valueHasChange || statusHasChange || errorHasChange) {
       // 发布变化
-      // this.msgCenter.publish(this.id);
+      this.msgCenter.publish(this.id);
     }
   }
-
-  // // 此数据源的状态，同时会计算上游的状态，形成依赖树
-  // set status(value) {
-  //   this.innerStatus = value;
-  // }
 
   getStatus() {
     const pending = this.calcIsPending(this.getDependents());
@@ -190,35 +180,18 @@ export default class Base {
   calcIsPending(dependents) {
     // 上游数据源，被依赖的数据源是否是pending状态
     let hasPending = false;
-    forEach(dependents, (depKey) => {
-      hasPending = get(this.dsMap, `${depKey}.status`) === ASYNC_STATUS.PENDING;
+    forEach(dependents, (depId) => {
+      hasPending = get(this.dsMap, `${depId}.status`) === ASYNC_STATUS.PENDING;
       return !hasPending;
     });
     return hasPending;
   }
 
-  // 上游数据源的错误栈。有两个作用。
-  // 1、异步数据源求值时如果上游数据源有错误，有可能不发起请求。
-  // 2、导出数据源的错误消息时，需要导出整个栈的错误
-  getUpperError() {
-    const errorStack = [];
-    forEach(this.getDependents, (depKey) => {
-      const error = get(this.dsMap, `${depKey}.error`, []);
-      errorStack.concat(error);
-      // 数据源的依赖关系是树状结构，但错误存储结构是栈，
-      // 因此只考虑树的某一个局部深度，当收集到依赖的错误就不再继续查找了
-      if (errorStack.length) {
-        return false;
-      }
-    });
-    return errorStack;
-  }
-
   // 数据源的错误栈。这是一个反向的栈，此数据源的错误位于栈底，上游数据源的错误位于栈顶
-  setError(value) {
-    let error = value;
-    if (typeof value === 'string') {
-      error = { message: value };
+  setError(message) {
+    let error = message;
+    if (message && typeof message === 'string') {
+      error = { message };
     }
     this.innerError = error;
   }
@@ -235,6 +208,23 @@ export default class Base {
     return errorStack;
   }
 
+  // 上游数据源的错误栈。有两个作用。
+  // 1、异步数据源求值时如果上游数据源有错误，有可能不发起请求。
+  // 2、导出数据源的错误消息时，需要导出整个栈的错误
+  getUpperError() {
+    const errorStack = [];
+    forEach(this.getDependents, (depId) => {
+      const error = get(this.dsMap, `${depId}.error`, []);
+      errorStack.concat(error);
+      // 数据源的依赖关系是树状结构，但错误存储结构是栈，
+      // 因此只考虑树的某一个局部深度，当收集到依赖的错误就不再继续查找了
+      if (errorStack.length) {
+        return false;
+      }
+    });
+    return errorStack;
+  }
+
   /**
    * 读取数据源的错误消息
    */
@@ -242,7 +232,7 @@ export default class Base {
     if (!this.getError().length) {
       return '';
     }
-    const msgStack = map(this.getUpperError, ({ id, error } = {}) => {
+    const msgStack = map(this.getUpperError(), ({ id, error } = {}) => {
       const { message } = error;
       return `上游数据源${id}计算出错: ${message}`;
     });
@@ -252,84 +242,84 @@ export default class Base {
     }
     return `数据源${this.id}计算出错: ${msgStack.join(';=>')}`;
   }
-
-  // /**
-  //  * 组装持久化的配置
-  //  */
-  // getConfig() {
-  //   getConfig[this.type]();
-  // }
-
-  // /**
-  //  * 更新同步依赖关系, 更新订阅
-  //  */
-  // updateSyncDepDSs() {
-  //   this.msgCenter.unSubscribe(this.syncDeps, this.calculateValue);
-  //   const newDepDSs = this.genDependentDSs();
-  //   this.syncDeps = newDepDSs;
-  //   this.msgCenter.subscribe(this.syncDeps, this.calculateValue);
-  // }
-
-  // /**
-  //  * 更新异步依赖关系, 更新订阅,
-  //  */
-  // updateAsyncDeps() {
-  //   this.msgCenter.unSubscribe(this.asyncDeps, this.requestData);
-  //   const newDepDSs = this.genDependentDSs();
-  //   this.asyncDeps = newDepDSs;
-  //   this.msgCenter.subscribe(this.asyncDeps, this.requestData);
-  // }
-
-  // /**
-  //  * 被外部调用的，用于修改数据源属性配置,
-  //  * 会被子类调用，子类执行计算value的逻辑，触发publish
-  //  */
-  // update(payload = {}) {
-  //   // const { value, options = {}, ...rest } = payload
-  //   const { value, ...rest } = payload;
-  //   Object.assign(this, rest);
-  //   // if (options) {
-  //   //   Object.assign(this.options, options);
-  //   // }
-  //   if (has(payload, 'value')) {
-  //     this.tmpData = value;
-  //   }
-
-  //   if (this.isAsync) {
-  //     this.updateAsyncDeps();
-  //     this.requestData();
-  //   } else {
-  //     this.updateSyncDepDSs();
-  //     this.calculateValue();
-  //   }
-
-  //   this.msgCenter.publish(this.id, { toAll: true });
-  // }
-
-  // /**
-  //  * 被子类重写的多态接口
-  //  * 同步过程，计算value的值，用于响应依赖数据源消息
-  //  */
-  // calculateValue() { }
-
-  // /**
-  //  * 被子类重写的多态接口
-  //  * 异步过程，网络请求，用于响应依赖数据源消息
-  //  */
-  // requestData() { }
-
-  // /**
-  //  * 被子类重写的多态接口
-  //  * 计算生成该数据源的依赖数据源，
-  //  */
-  // genDependentDSs() {
-  //   return [];
-  // }
-
-  // /**
-  //  * 获取订阅了此数据源的所有的回调函数
-  //  */
-  // getCbList() {
-  //   return this.msgCenter.getCbList(this.id);
-  // }
 }
+
+// /**
+//  * 组装持久化的配置
+//  */
+// getConfig() {
+//   getConfig[this.type]();
+// }
+
+// /**
+//  * 更新同步依赖关系, 更新订阅
+//  */
+// updateSyncDepDSs() {
+//   this.msgCenter.unSubscribe(this.syncDeps, this.calculateValue);
+//   const newDepDSs = this.genDependentDSs();
+//   this.syncDeps = newDepDSs;
+//   this.msgCenter.subscribe(this.syncDeps, this.calculateValue);
+// }
+
+// /**
+//  * 更新异步依赖关系, 更新订阅,
+//  */
+// updateAsyncDeps() {
+//   this.msgCenter.unSubscribe(this.asyncDeps, this.requestData);
+//   const newDepDSs = this.genDependentDSs();
+//   this.asyncDeps = newDepDSs;
+//   this.msgCenter.subscribe(this.asyncDeps, this.requestData);
+// }
+
+// /**
+//  * 被外部调用的，用于修改数据源属性配置,
+//  * 会被子类调用，子类执行计算value的逻辑，触发publish
+//  */
+// update(payload = {}) {
+//   // const { value, options = {}, ...rest } = payload
+//   const { value, ...rest } = payload;
+//   Object.assign(this, rest);
+//   // if (options) {
+//   //   Object.assign(this.options, options);
+//   // }
+//   if (has(payload, 'value')) {
+//     this.tmpData = value;
+//   }
+
+//   if (this.isAsync) {
+//     this.updateAsyncDeps();
+//     this.requestData();
+//   } else {
+//     this.updateSyncDepDSs();
+//     this.calculateValue();
+//   }
+
+//   this.msgCenter.publish(this.id, { toAll: true });
+// }
+
+// /**
+//  * 被子类重写的多态接口
+//  * 同步过程，计算value的值，用于响应依赖数据源消息
+//  */
+// calculateValue() { }
+
+// /**
+//  * 被子类重写的多态接口
+//  * 异步过程，网络请求，用于响应依赖数据源消息
+//  */
+// requestData() { }
+
+// /**
+//  * 被子类重写的多态接口
+//  * 计算生成该数据源的依赖数据源，
+//  */
+// genDependentDSs() {
+//   return [];
+// }
+
+// /**
+//  * 获取订阅了此数据源的所有的回调函数
+//  */
+// getCbList() {
+//   return this.msgCenter.getCbList(this.id);
+// }

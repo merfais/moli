@@ -37,6 +37,7 @@ const config = {
     'consistent-return': 0,
     'class-methods-use-this': 0,
     'default-param-last': 0,
+    'getter-return': 0,
     'global-require': 0,
     'object-curly-newline': 0,
     'newline-per-chained-call': 0,

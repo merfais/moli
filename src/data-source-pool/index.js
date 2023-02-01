@@ -142,7 +142,7 @@ export default class DataSourcePool {
    * @param dsId string 数据源的dsId
    * @param payload Object 数据源的值描述数据
    */
-  setDataSourceValue(dsId, payload) {
+  setValue(dsId, payload) {
     const { dsMap } = this;
     if (dsMap[dsId]) {
       dsMap[dsId].setValue(payload);
