@@ -10,6 +10,7 @@ import {
 } from '../constants';
 import {
   getLabel,
+  getDataSource,
   getValueTypeFormItems,
   getPlaceholderFormItems,
   getDisabledFormItems,
@@ -34,7 +35,8 @@ function getBasic(options = {}) {
 }
 
 export default function getInputFormItems(editor) {
-  const viewConf = get(editor, 'viewConf', {});
+  const viewConf = get(editor, 'viewConf') || {};
+  const dataSource = get(editor, 'dataSource.exportDS1') || {};
 
   function onUpdate(options = {}) {
     const { path, payload } = options;
@@ -44,7 +46,7 @@ export default function getInputFormItems(editor) {
   return {
     [EDITOR_MENU.BASIC]: getBasic({ viewConf, onUpdate, editor }),
     [EDITOR_MENU.LABEL]: getLabel({ viewConf, onUpdate, editor }),
-    [EDITOR_MENU.VARS]: {},
+    [EDITOR_MENU.DS]: getDataSource({ dataSource, editor }),
     [EDITOR_MENU.LAYOUT]: {},
     [EDITOR_MENU.STYLE]: {},
   };

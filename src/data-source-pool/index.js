@@ -5,10 +5,11 @@ import {
 import MessageCenter from './msg-center';
 import DataSource from './data-source';
 
-export default class DataSourcePool {
+export * from './constants';
+
+export class DataSourcePool {
   constructor(dataSources, opts = {}) {
     this.dsMap = {};
-    this.commonOpts = {};
     this.msgCenter = new MessageCenter();  // 数据源模块通信的事件中心
 
     const {
@@ -16,12 +17,7 @@ export default class DataSourcePool {
       asyncInit,
       // 禁用初始化数据源值标识
       disableInit,
-      // 数据源通用参数
-      ...common
     } = opts;
-
-    // 公共参数
-    Object.assign(this.commonOpts, common);
 
     // 先完成所有数据源的注册，再统一初始化
     forEach(dataSources, (item) => {
@@ -69,8 +65,6 @@ export default class DataSourcePool {
     if (get(this.dsMap, dsId)) {
       const dataSource = this.dsMap[dsId];
       delete this.dsMap[dsId];
-      // 因为用到了事件中心，删除数据源引用后，要清理事件中心的引用关系
-      // 返回订阅该数据源的所有回调函数，用于修改数据源type时转录订阅关系
       dataSource.destructor();
     }
   }
@@ -81,8 +75,8 @@ export default class DataSourcePool {
    * @param extOpts Object 额外的参数
    */
   register(config, extOpts = {}) {
-    const { dsId } = config;
-    this.unRegister(dsId);
+    const { id } = config;
+    this.unRegister(id);
 
     const { dsMap, msgCenter } = this;
     const dataSource = new DataSource({
@@ -90,50 +84,34 @@ export default class DataSourcePool {
       dsMap,
       msgCenter,
     });
-    dsMap[dsId] = dataSource;
+    dsMap[id] = dataSource;
 
     // 需要先注册再初始化，否则在订阅变化的回调中拿不到数据源索引
     // 但初始化所有数据源时，不执行init，需要所有数据源都注册后再统一init
-    if (extOpts.withInit) {
+    if (extOpts.withInit !== false) {
       dataSource.init();
     }
-
-    // // 转录订阅关系，只在修改type时才会生效
-    // // 因为数据源注册后会发布消息，所以订阅关系要在数据源注册前完成，
-    // if (cbList) {
-    //   const msgCenter = getMsgCenter(sid);
-    //   msgCenter.addKey(dsId, cbList);
-    // }
   }
 
   /**
    * 更新数据源配置
-   * 因为每种数据源都有对应的类实现，所以修改数据源类型需要注销后再注册
    * @param item Object 数据源配置描述数据
    */
   update(item) {
-    const { oldId, oldType, ...rest } = item;
-    const { dsId } = rest;
-    // const { dsId, type } = rest;
+    const { oldId, ...restConf } = item;
+    const { id } = item;
     const { dsMap } = this;
-    // 修改dsId，丢弃所有依赖订阅关系
-    if (oldId && oldId !== dsId) {
+    // 修改id，丢弃所有依赖订阅关系
+    if (oldId && oldId !== id) {
       this.unRegister(oldId);
-      this.register(rest);
+      this.register(restConf);
       return;
     }
-    // // 修改类型，保留所有依赖订阅关系
-    // if (oldType && oldType !== type) {
-    //   const cbList = getMsgCenter(sid).getCbList(dsId)
-    //   unRegister(sid, oldId);
-    //   register(sid, rest, { cbList });
-    // }
-    if (dsMap[dsId]) {
-      // 修改其他字段，执行update
-      dsMap[dsId].update(rest);
+    if (dsMap[id]) {
+      dsMap[id].update(restConf);
     } else {
       // 数据源字典中没有找到，则执行注册
-      this.register(rest);
+      this.register(restConf);
     }
   }
 
@@ -142,11 +120,19 @@ export default class DataSourcePool {
    * @param dsId string 数据源的dsId
    * @param payload Object 数据源的值描述数据
    */
-  setValue(dsId, payload) {
+  setValue(dsId, ...args) {
     const { dsMap } = this;
     if (dsMap[dsId]) {
-      dsMap[dsId].setValue(payload);
+      dsMap[dsId].setValue(...args);
     }
+  }
+
+  getConfig(dsId) {
+    const { dsMap } = this;
+    if (dsMap[dsId]) {
+      return dsMap[dsId].getConfig();
+    }
+    return {};
   }
 
   /**
@@ -169,18 +155,18 @@ export default class DataSourcePool {
    * @return dsConfMap 全新的数据源配置描述字段
    */
   dryRunUpdate(item = {}) {
-    const { oldId, dsId } = item;
+    const { oldId, id } = item;
     const { dsMap } = this;
     const dsConfMap = {};
     forEach(dsMap, (item) => {
-      const { dsId, getConfig } = item;
-      dsConfMap[dsId] = getConfig();
+      const { id, getConfig } = item;
+      dsConfMap[id] = getConfig();
     });
-    // 修改dsId
-    if (oldId && oldId !== dsId) {
+    // 修改id
+    if (oldId && oldId !== id) {
       delete dsConfMap[oldId];
     }
-    dsConfMap[dsId] = (new DataSource(item)).getConfig();
+    dsConfMap[id] = (new DataSource(item)).getConfig();
     return dsConfMap;
   }
 }

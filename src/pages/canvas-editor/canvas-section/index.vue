@@ -18,6 +18,7 @@ import {
   addLayout,
   removeLayout,
   addView,
+  init,
 } from '../use-canvas-store';
 import {
   onClickSetting,
@@ -30,6 +31,8 @@ let draggingLayout = null;
 let draggingConf = {};
 
 const store = useCanvasEditorStore();
+
+init();
 
 const canvasDomRef = ref();
 const gridLayoutRef = ref();
@@ -48,7 +51,7 @@ const colNum = computed(() => {
 });
 
 async function onDragenter(e) {
-  const draggingConf = await getCompConfig(store.draggingCompKey);
+  draggingConf = await getCompConfig(store.draggingCompKey);
 
   gridItemsClass.value = 'dragging';
 
@@ -128,36 +131,23 @@ function onDrop() {
 
   const viewConf = {
     i: newId(),
+    name: draggingConf.name,
     compKey: store.draggingCompKey,
     ...draggingConf.dftConf,
     exportDSs: [],
   };
   forEach(draggingConf.dataSource, (item, index) => {
-    console.info(item, index);
-    // const dsId = registerViewDS(item)
-    // viewConf.exportDSs.push(varId)
-    // const k = `exportDS${index + 1}`
-    // viewConf[k] = dsId
+    const { idPrefix, ...restConf } = item;
+    const id = newId(item.idPrefix, 6);
+    const name = `${viewConf.name}${id}`;
+    store.dsPool.register({ id, name, ...restConf });
+    viewConf.exportDSs = [id];
+    const k = `exportDS${index + 1}`;
+    viewConf[k] = id;
   });
   addView(viewConf);
   addLayout({ ...draggingLayout, i: viewConf.i });
   onClickSetting(viewConf.i);
-
-  // // 构造完整view config
-  // const view = getView(store.draggingCompKey);
-  // const variables = getVariables(store.draggingCompKey);
-  // view.id = id;
-  // forEach(variables, item => {
-  //   const key = `${view.key}_${id}_${item.key}`;
-  //   const name = `${view.name}${id}的${item.name}`;
-  //   view.variables.push(key);
-  //   registerViewVariable({
-  //     ...item,
-  //     key,
-  //     name,
-  //   });
-  // });
-  // mergeState(['viewMap', { [id]: view }]);
 
   // 清理临时数据
   store.draggingCompKey = null;

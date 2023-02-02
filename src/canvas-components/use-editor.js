@@ -4,10 +4,12 @@ import {
 } from 'vue';
 import {
   map,
+  set,
 } from 'lodash-es';
 import {
   useRules,
   required,
+  isNormalChar,
 } from '@/uses/validate';
 import DisabledFormItem from '@/canvas-components/common/disabled-form-item';
 import {
@@ -16,13 +18,13 @@ import {
 } from './constants';
 
 export function getLabel(options = {}) {
-  const formItems = shallowRef(getLabelFormItems(options));
+  const items = shallowRef(getLabelFormItems(options));
 
   watch(() => options.editor.viewConf?.withLabel, () => {
-    formItems.value = getLabelFormItems(options);
+    items.value = getLabelFormItems(options);
   });
 
-  return formItems;
+  return items;
 }
 
 export function getLabelFormItems(options = {}) {
@@ -113,6 +115,35 @@ export function getPlaceholderFormItems(options = {}) {
       label: 'placeholder的值',
       value: viewConf.placeholder,
       component: 'AInput',
+      onUpdate,
+    },
+  };
+
+  return items;
+}
+
+export function getDataSource(options = {}) {
+  const { dataSource } = options;
+
+  function onUpdate(options = {}) {
+    const { path, payload } = options;
+    set(dataSource, path, payload);
+  }
+
+  const items = {
+    formKey: { value: EDITOR_MENU.DS, class: 'd-none' },
+    id: {
+      label: '数据源ID',
+      value: dataSource.id,
+      component: 'AInput',
+      rules: useRules([required, isNormalChar]),
+      onUpdate,
+    },
+    name: {
+      label: '数据源名字',
+      value: dataSource.name,
+      component: 'AInput',
+      rules: useRules(required),
       onUpdate,
     },
   };

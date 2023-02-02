@@ -43,7 +43,7 @@ watch(() => editor.visible, () => {
     if (getEditorConf) {
       editorConf.value = getEditorConf(editor);
     } else {
-      editorConf.value = { [editorConfMap.BASIC]: {} };
+      editorConf.value = { [EDITOR_MENU.BASIC]: {} };
     }
   } else {
     editorConf.value = {};

@@ -1,3 +1,4 @@
+import { DATA_SOURCE_TYPE } from '@/constants';
 import {
   COMP_KEY,
   VALUE_TYPE,
@@ -45,10 +46,9 @@ export default function genConf() {
       backgroundColor: undefined,
     },
     dataSource: [{
-      keyDesc: 'inputValue',
-      nameDesc: '输入框的值',
+      idPrefix: 'inputValue',
+      type: DATA_SOURCE_TYPE.INPUT_LIKE_VIEW,
       valueType: VALUE_TYPE.STRING,
-      dftVal: '',
     }],
   };
   return config;

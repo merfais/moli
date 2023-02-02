@@ -4,6 +4,7 @@ import {
   map,
   forEach,
   isEqual,
+  cloneDeep,
 } from 'lodash-es';
 import {
   ASYNC_STATUS,
@@ -18,9 +19,6 @@ export default class Base {
 
   // 数据源的名字
   name = '';
-
-  // 用于存储数据源的参数
-  // options = {};
 
   // 修改数据源时，修改的值存在tmpData字段，
   // 因为要在多个函数中传递此值，且可能会多次被调用执行，因此要缓存到this中
@@ -242,84 +240,15 @@ export default class Base {
     }
     return `数据源${this.id}计算出错: ${msgStack.join(';=>')}`;
   }
+
+  getConfig() {
+    return {
+      id: this.id,
+      name: this.name,
+      type: this.type,
+      valueType: this.valueType,
+      value: cloneDeep(this.getValue()),
+    };
+  }
 }
 
-// /**
-//  * 组装持久化的配置
-//  */
-// getConfig() {
-//   getConfig[this.type]();
-// }
-
-// /**
-//  * 更新同步依赖关系, 更新订阅
-//  */
-// updateSyncDepDSs() {
-//   this.msgCenter.unSubscribe(this.syncDeps, this.calculateValue);
-//   const newDepDSs = this.genDependentDSs();
-//   this.syncDeps = newDepDSs;
-//   this.msgCenter.subscribe(this.syncDeps, this.calculateValue);
-// }
-
-// /**
-//  * 更新异步依赖关系, 更新订阅,
-//  */
-// updateAsyncDeps() {
-//   this.msgCenter.unSubscribe(this.asyncDeps, this.requestData);
-//   const newDepDSs = this.genDependentDSs();
-//   this.asyncDeps = newDepDSs;
-//   this.msgCenter.subscribe(this.asyncDeps, this.requestData);
-// }
-
-// /**
-//  * 被外部调用的，用于修改数据源属性配置,
-//  * 会被子类调用，子类执行计算value的逻辑，触发publish
-//  */
-// update(payload = {}) {
-//   // const { value, options = {}, ...rest } = payload
-//   const { value, ...rest } = payload;
-//   Object.assign(this, rest);
-//   // if (options) {
-//   //   Object.assign(this.options, options);
-//   // }
-//   if (has(payload, 'value')) {
-//     this.tmpData = value;
-//   }
-
-//   if (this.isAsync) {
-//     this.updateAsyncDeps();
-//     this.requestData();
-//   } else {
-//     this.updateSyncDepDSs();
-//     this.calculateValue();
-//   }
-
-//   this.msgCenter.publish(this.id, { toAll: true });
-// }
-
-// /**
-//  * 被子类重写的多态接口
-//  * 同步过程，计算value的值，用于响应依赖数据源消息
-//  */
-// calculateValue() { }
-
-// /**
-//  * 被子类重写的多态接口
-//  * 异步过程，网络请求，用于响应依赖数据源消息
-//  */
-// requestData() { }
-
-// /**
-//  * 被子类重写的多态接口
-//  * 计算生成该数据源的依赖数据源，
-//  */
-// genDependentDSs() {
-//   return [];
-// }
-
-// /**
-//  * 获取订阅了此数据源的所有的回调函数
-//  */
-// getCbList() {
-//   return this.msgCenter.getCbList(this.id);
-// }

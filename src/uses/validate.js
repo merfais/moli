@@ -4,8 +4,8 @@ import { forEach } from 'lodash-es';
  * 校验普通字符，只能包含数字，字符，下划线
  */
 export function isNormalChar(value) {
-  if (/[^\w]/.test(value)) {
-    return '只能由数字、字母、下划线组成';
+  if (/[^\w]/.test(value) || /^\d/.test(value)) {
+    return '只能由数字、字母、下划线组成，且不能以数字开头';
   }
 }
 

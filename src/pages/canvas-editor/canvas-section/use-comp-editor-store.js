@@ -11,6 +11,7 @@ export default defineStore({
     i: undefined,
     compKey: undefined,
     viewConf: {},
+    dataSource: {},
   }),
   getters: {
   },

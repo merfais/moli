@@ -34,7 +34,7 @@ export const DATA_SOURCE_TYPE = {
 export const EDITOR_MENU = {
   BASIC: 'basic',
   LABEL: 'label',
-  EXPORT_DS: 'export_ds',
+  DS: 'ds',
   LAYOUT: 'layout',
   STYLE: 'style',
 };
@@ -42,7 +42,7 @@ export const EDITOR_MENU = {
 export const EDITOR_MENU_NAME = {
   [EDITOR_MENU.BASIC]: '基础配置',
   [EDITOR_MENU.LABEL]: 'Label 配置',
-  [EDITOR_MENU.VARS]: '导出数据配置',
+  [EDITOR_MENU.DS]: '导出数据配置',
   [EDITOR_MENU.LAYOUT]: '布局配置',
   [EDITOR_MENU.STYLE]: '样式配置',
 };
