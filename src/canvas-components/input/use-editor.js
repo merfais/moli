@@ -14,7 +14,7 @@ import {
   getValueTypeFormItems,
   getPlaceholderFormItems,
   getDisabledFormItems,
-} from '../use-editor';
+} from '../use-form-items';
 
 function getBasic(options = {}) {
   const { viewConf, onUpdate } = options;

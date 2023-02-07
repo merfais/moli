@@ -31,7 +31,7 @@ function convertToBool(value) {
 
 function convertToString(value) {
   if (value === null || value === undefined) {
-    return 'null';
+    return null;
   }
   return `${value}`;
 }

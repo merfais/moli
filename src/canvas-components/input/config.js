@@ -48,7 +48,6 @@ export default function genConf() {
     dataSource: [{
       idPrefix: 'inputValue',
       type: DATA_SOURCE_TYPE.INPUT_LIKE_VIEW,
-      valueType: VALUE_TYPE.STRING,
     }],
   };
   return config;

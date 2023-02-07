@@ -4,6 +4,7 @@ import {
   cloneDeep,
   map,
   get,
+  forEach,
 } from 'lodash-es';
 import {
   ref,
@@ -63,7 +64,23 @@ async function onOk() {
     return;
   }
   const canvasStore = useCanvasEditorStore();
-  set(canvasStore.viewMap, editor.i, cloneDeep(editor.viewConf));
+  const oldComp = get(canvasStore.viewMap, editor.i);
+  const comp = cloneDeep(editor.viewConf);
+  forEach(editor.dataSource, (item, expKey) => {
+    const oldId = oldComp[expKey];
+    canvasStore.dsPool.update({
+      oldId,
+      id: item.id,
+      name: item.name,
+      valueType: comp.valueType,
+    });
+
+    comp[expKey] = item.id;
+    if (comp?.exportDSs?.indexOf && comp.exportDSs.indexOf(oldId) !== -1) {
+      comp.exportDSs[comp.exportDSs.indexOf(oldId)] = item.id;
+    }
+  });
+  set(canvasStore.viewMap, editor.i, comp);
   editor.visible = false;
 }
 

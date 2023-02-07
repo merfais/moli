@@ -140,10 +140,17 @@ function onDrop() {
     const { idPrefix, ...restConf } = item;
     const id = newId(item.idPrefix, 6);
     const name = `${viewConf.name}${id}`;
-    store.dsPool.register({ id, name, ...restConf });
+
     viewConf.exportDSs = [id];
     const k = `exportDS${index + 1}`;
     viewConf[k] = id;
+
+    store.dsPool.register({
+      id,
+      name,
+      valueType: viewConf.valueType,
+      ...restConf,
+    });
   });
   addView(viewConf);
   addLayout({ ...draggingLayout, i: viewConf.i });

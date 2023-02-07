@@ -103,8 +103,12 @@ export class DataSourcePool {
     const { dsMap } = this;
     // 修改id，丢弃所有依赖订阅关系
     if (oldId && oldId !== id) {
-      this.unRegister(oldId);
-      this.register(restConf);
+      let config = { ...restConf };
+      if (dsMap[oldId]) {
+        config = { ...dsMap[oldId].getConfig(), ...restConf };
+        this.unRegister(oldId);
+      }
+      this.register(config);
       return;
     }
     if (dsMap[id]) {

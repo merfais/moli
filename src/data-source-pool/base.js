@@ -20,6 +20,9 @@ export default class Base {
   // 数据源的名字
   name = '';
 
+  // 数据源值类型
+  valueType = '';
+
   // 修改数据源时，修改的值存在tmpData字段，
   // 因为要在多个函数中传递此值，且可能会多次被调用执行，因此要缓存到this中
   tmpData = null;
@@ -59,9 +62,6 @@ export default class Base {
 
     rest.tmpData = value;
     Object.assign(this, rest);
-
-    // this.calculateValue = this.calculateValue.bind(this);
-    // this.requestData = this.requestData.bind(this);
   }
 
   destructor() {
@@ -72,10 +72,6 @@ export default class Base {
     this.hasInited = true;
     this.request();
   }
-
-  // calculate = () => {};
-
-  // request = () => {};
 
   getValue() {
     // 当值为undefined时，这个id会在网络传输中被删除
@@ -242,13 +238,14 @@ export default class Base {
   }
 
   getConfig() {
-    return {
+    const config = {
+      type: this.type,
       id: this.id,
       name: this.name,
-      type: this.type,
       valueType: this.valueType,
       value: cloneDeep(this.getValue()),
     };
+    return config;
   }
 }
 

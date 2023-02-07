@@ -50,7 +50,7 @@ export default class DataSource {
     this.source = null;
     this.msgCenter.removeCb(this.calculate);
     this.msgCenter.removeCb(this.request);
-    this.msgCenter.removeKey(this.id);
+    this.msgCenter.removeId(this.id);
   }
 
   init() {
@@ -65,11 +65,10 @@ export default class DataSource {
    */
   update(config = {}) {
     // 解除订阅关系
-    const { getSyncDeps, getAsyncDeps } = this.source;
-    this.msgCenter.unSubscribe(getSyncDeps(), this.calculate);
-    this.msgCenter.unSubscribe(getAsyncDeps(), this.request);
+    this.msgCenter.unSubscribe(this.source.getSyncDeps(), this.calculate);
+    this.msgCenter.unSubscribe(this.source.getAsyncDeps(), this.request);
 
-    if (config.type !== this.source.type) {
+    if (config.type && config.type !== this.source.type) {
       const DataSourceClass = getClass(config.type);
       this.source = new DataSourceClass(config);
       this.source.init();
@@ -79,8 +78,8 @@ export default class DataSource {
 
     // 重新生产依赖关系，重新订阅
     this.source.genDependents();
-    this.msgCenter.subscribe(getSyncDeps(), this.calculate);
-    this.msgCenter.subscribe(getAsyncDeps(), this.request);
+    this.msgCenter.subscribe(this.source.getSyncDeps(), this.calculate);
+    this.msgCenter.subscribe(this.source.getAsyncDeps(), this.request);
   }
 
   setValue(config) {
