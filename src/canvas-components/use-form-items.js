@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import {
   map,
-  set,
+  get,
 } from 'lodash-es';
 import {
   useRules,
@@ -17,18 +17,18 @@ import {
   EDITOR_MENU,
 } from './constants';
 
-export function getLabel(options = {}) {
-  const items = shallowRef(getLabelFormItems(options));
+export function getLabel(editor = {}, onUpdate) {
+  const items = shallowRef(getLabelFormItems(editor, onUpdate));
 
-  watch(() => options.editor.viewConf?.withLabel, () => {
-    items.value = getLabelFormItems(options);
+  watch(() => editor.viewConf?.withLabel, () => {
+    items.value = getLabelFormItems(editor, onUpdate);
   });
 
   return items;
 }
 
-export function getLabelFormItems(options = {}) {
-  const { viewConf, onUpdate } = options;
+export function getLabelFormItems(editor = {}, onUpdate) {
+  const viewConf = get(editor, 'viewConf') || {};
 
   const items = {
     formKey: { value: EDITOR_MENU.LABEL, class: 'd-none' },
@@ -64,8 +64,8 @@ export function getLabelFormItems(options = {}) {
   return items;
 }
 
-export function getValueTypeFormItems(options = {}) {
-  const { viewConf, onUpdate } = options;
+export function getValueTypeFormItems(editor = {}, onUpdate) {
+  const viewConf = get(editor, 'viewConf') || {};
 
   const items = {
     valueType: {
@@ -82,8 +82,8 @@ export function getValueTypeFormItems(options = {}) {
   return items;
 }
 
-export function getDisabledFormItems(options = {}) {
-  const { viewConf, onUpdate } = options;
+export function getDisabledFormItems(editor = {}, onUpdate) {
+  const viewConf = get(editor, 'viewConf') || {};
 
   const items = {
     disabled: {
@@ -107,8 +107,8 @@ function validateDisabledValue(value) {
   }
 }
 
-export function getPlaceholderFormItems(options = {}) {
-  const { viewConf, onUpdate } = options;
+export function getPlaceholderFormItems(editor = {}, onUpdate) {
+  const viewConf = get(editor, 'viewConf') || {};
 
   const items = {
     placeholder: {
@@ -122,14 +122,7 @@ export function getPlaceholderFormItems(options = {}) {
   return items;
 }
 
-export function getDataSource(options = {}) {
-  const { dataSource } = options;
-
-  function onUpdate(options = {}) {
-    const { path, payload } = options;
-    set(dataSource, path, payload);
-  }
-
+export function getDataSource(dataSource = {}, onUpdate) {
   const items = {
     formKey: { value: EDITOR_MENU.DS, class: 'd-none' },
     id: {
@@ -143,6 +136,44 @@ export function getDataSource(options = {}) {
       label: '数据源名字',
       value: dataSource.name,
       component: 'AInput',
+      rules: useRules(required),
+      onUpdate,
+    },
+  };
+
+  return items;
+}
+
+export function getLayout(editor = {}, onUpdate) {
+  const pcLayout = get(editor, 'pcLayout') || {};
+
+  const items = {
+    formKey: { value: EDITOR_MENU.LAYOUT, class: 'd-none' },
+    x: {
+      label: '组件位置 x',
+      value: pcLayout.x,
+      component: 'AInputNumber',
+      rules: useRules(required),
+      onUpdate,
+    },
+    y: {
+      label: '组件位置 y',
+      value: pcLayout.y,
+      component: 'AInputNumber',
+      rules: useRules(required),
+      onUpdate,
+    },
+    w: {
+      label: '组件宽度',
+      value: pcLayout.w,
+      component: 'AInputNumber',
+      rules: useRules(required),
+      onUpdate,
+    },
+    h: {
+      label: '组件高度',
+      value: pcLayout.h,
+      component: 'AInputNumber',
       rules: useRules(required),
       onUpdate,
     },

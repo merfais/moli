@@ -9,9 +9,11 @@ export default defineStore({
     clone: false,
     loading: false,
     i: undefined,
+    index: -1,
     compKey: undefined,
     viewConf: {},
     dataSource: {},
+    pcLayout: {},
   }),
   getters: {
   },

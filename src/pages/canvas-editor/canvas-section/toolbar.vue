@@ -12,6 +12,7 @@ import {
 
 defineProps({
   i: String,
+  index: Number,
 });
 
 function onClickLock() {
@@ -37,7 +38,7 @@ function onClickRemove() {
     <AButton
       class="tool-btn"
       size="small"
-      @click="onClickSetting(i)"
+      @click="onClickSetting(i, index)"
     >
       <SettingOutlined />
     </AButton>

@@ -22,18 +22,18 @@ const store = useCanvasEditorStore();
 
 const compKey = computed(() => get(store.viewMap, [props.i, 'compKey']));
 const compProps = computed(() => {
-  const comp = get(store.viewMap, props.i) || {};
-  return omit(unref(comp), [
+  const viewConf = get(store.viewMap, props.i) || {};
+  return omit(unref(viewConf), [
     'withLabel',
   ]);
 });
 const label = computed(() => {
-  const comp = get(store.viewMap, props.i) || {};
-  return comp.withLabel && comp.label;
+  const viewConf = get(store.viewMap, props.i) || {};
+  return viewConf.withLabel && viewConf.label;
 });
 const compWrapperClass = computed(() => {
-  const comp = get(store.viewMap, props.i) || {};
-  if (comp.labelPos === 'left') {
+  const viewConf = get(store.viewMap, props.i) || {};
+  if (viewConf.labelPos === 'left') {
     return [
       'align-center',
     ];
@@ -62,10 +62,9 @@ function onFocused(focused) {
   <div v-if="compMap[compKey] && label"
     :class="compWrapperClass"
     >
-    <div>{{label}}：</div>
+    <div class="flex-0-0">{{label}}：</div>
     <component
       :is="compMap[compKey]"
-      class="comp"
       v-bind="compProps"
       @update:value="onUpdateValue"
       @update:ds="onUpdateDataSource"
@@ -74,7 +73,6 @@ function onFocused(focused) {
   </div>
   <component v-else-if="compMap[compKey]"
     :is="compMap[compKey]"
-    class="comp"
     v-bind="compProps"
     @update:value="onUpdateValue"
     @update:ds="onUpdateDataSource"

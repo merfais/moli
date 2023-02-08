@@ -65,22 +65,29 @@ async function onOk() {
   }
   const canvasStore = useCanvasEditorStore();
   const oldComp = get(canvasStore.viewMap, editor.i);
-  const comp = cloneDeep(editor.viewConf);
+  const viewConf = cloneDeep(editor.viewConf);
+
   forEach(editor.dataSource, (item, expKey) => {
     const oldId = oldComp[expKey];
     canvasStore.dsPool.update({
       oldId,
       id: item.id,
       name: item.name,
-      valueType: comp.valueType,
+      valueType: viewConf.valueType,
     });
 
-    comp[expKey] = item.id;
-    if (comp?.exportDSs?.indexOf && comp.exportDSs.indexOf(oldId) !== -1) {
-      comp.exportDSs[comp.exportDSs.indexOf(oldId)] = item.id;
+    viewConf[expKey] = item.id;
+    if (viewConf?.exportDSs?.indexOf && viewConf.exportDSs.indexOf(oldId) !== -1) {
+      viewConf.exportDSs[viewConf.exportDSs.indexOf(oldId)] = item.id;
     }
   });
-  set(canvasStore.viewMap, editor.i, comp);
+
+  set(canvasStore.viewMap, editor.i, viewConf);
+
+  if (editor.index !== -1) {
+    set(canvasStore.pcMainLayoutArr, editor.index, editor.pcLayout);
+  }
+
   editor.visible = false;
 }
 

@@ -154,7 +154,8 @@ function onDrop() {
   });
   addView(viewConf);
   addLayout({ ...draggingLayout, i: viewConf.i });
-  onClickSetting(viewConf.i);
+  const len = store.pcMainLayoutArr?.length || 0;
+  onClickSetting(viewConf.i, len - 1);
 
   // 清理临时数据
   store.draggingCompKey = null;
@@ -198,14 +199,14 @@ function getToolbarPopupContainer(item) {
         @dragleave.self="onDragleave"
         @drop.stop="onDrop"
       >
-        <template v-for="item in store.pcMainLayoutArr" :key="item.i">
+        <template v-for="(item, index) in store.pcMainLayoutArr" :key="item.i">
           <ATooltip
             placement="topRight"
             destroyTooltipOnHide
             :getPopupContainer="() => getToolbarPopupContainer(item)"
           >
             <template #title>
-              <Toolbar :i="item.i" />
+              <Toolbar :i="item.i" :index="index" />
             </template>
             <GridItem
               :id="`${item.i}_grid_item`"
