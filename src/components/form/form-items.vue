@@ -60,7 +60,7 @@ watch(() => unref(props.items), () => {
       if (compProps?.placeholder === undefined) {
         if (/^a-?(input(-?(search|number))?|textarea)$/i.test(item.component)) {
           set(compProps, 'placeholder', `请输入${label}`);
-        } else if (/^(a|r)-?select|cascader$/i.test(item.component)) {
+        } else if (/^((a|r)-?(select|cascader)|color-?picker)$/i.test(item.component)) {
           set(compProps, 'placeholder', `请选择${label}`);
         }
       }

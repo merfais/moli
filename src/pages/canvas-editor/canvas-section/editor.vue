@@ -67,6 +67,7 @@ async function onOk() {
   const oldComp = get(canvasStore.viewMap, editor.i);
   const viewConf = cloneDeep(editor.viewConf);
 
+  // 保存DataSource
   forEach(editor.dataSource, (item, expKey) => {
     const oldId = oldComp[expKey];
     canvasStore.dsPool.update({
@@ -82,8 +83,10 @@ async function onOk() {
     }
   });
 
+  // 保存viewConf
   set(canvasStore.viewMap, editor.i, viewConf);
 
+  // 保存layout
   if (editor.index !== -1) {
     set(canvasStore.pcMainLayoutArr, editor.index, editor.pcLayout);
   }

@@ -12,6 +12,7 @@ import {
   getLabel,
   getDataSource,
   getLayout,
+  getStyle,
   getValueTypeFormItems,
   getPlaceholderFormItems,
   getDisabledFormItems,
@@ -37,8 +38,6 @@ function getBasic(editor, onUpdate) {
 }
 
 export default function getInputFormItems(editor) {
-  const dataSource = get(editor, 'dataSource.exportDS1') || {};
-
   function onUpdate(key) {
     return (options = {}) => {
       let { path } = options;
@@ -49,12 +48,14 @@ export default function getInputFormItems(editor) {
     };
   }
 
+  const dataSource = get(editor, 'dataSource.exportDS1') || {};
+
   return {
     [EDITOR_MENU.BASIC]: getBasic(editor, onUpdate('viewConf')),
     [EDITOR_MENU.LABEL]: getLabel(editor, onUpdate('viewConf')),
     [EDITOR_MENU.DS]: getDataSource(dataSource, onUpdate('dataSource.exportDS1')),
     [EDITOR_MENU.LAYOUT]: getLayout(editor, onUpdate('pcLayout')),
-    [EDITOR_MENU.STYLE]: {},
+    [EDITOR_MENU.STYLE]: getStyle(editor, onUpdate('viewConf.style')),
   };
 }
 

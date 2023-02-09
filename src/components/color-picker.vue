@@ -2,9 +2,11 @@
 import {
   ElColorPicker,
 } from 'element-plus';
+import 'element-plus/es/components/color-picker/style/css';
 
 defineProps({
   value: String,
+  placeholder: String,
 });
 const emit = defineEmits([
   'update:value',
@@ -28,6 +30,7 @@ export default {
     />
     <AInput
       :value="value"
+      :placeholder="placeholder"
       @update:value="onUpdateValue"
     />
   </div>

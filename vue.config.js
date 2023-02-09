@@ -1,5 +1,6 @@
 const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 const devServer = {
   host: '0.0.0.0',
@@ -20,6 +21,16 @@ const chainWebpack = (config) => {
     //   /vue-grid-layout-v3([\\]+|\/)node_modules/
     // ]
   });
+
+  // monaco
+  config.plugin('monaco')
+    .use(new MonacoWebpackPlugin({
+      languages: ['json'],
+    }));
+
+  // element-ui
+  config.plugin('element-ui')
+    .use(require('unplugin-element-plus/webpack')({}));
 
   // svg
   const svgRule = config.module.rule('svg');

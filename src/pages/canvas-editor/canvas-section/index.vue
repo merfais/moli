@@ -129,12 +129,14 @@ function onDrop() {
 
   removeLayout(draggingLayout);
 
+  const device = get(store, 'baseInfo.device') || 'pc';
   const viewConf = {
     i: newId(),
     name: draggingConf.name,
     compKey: store.draggingCompKey,
     ...draggingConf.dftConf,
     exportDSs: [],
+    style: get(draggingConf.style, device) || {},
   };
   forEach(draggingConf.dataSource, (item, index) => {
     const { idPrefix, ...restConf } = item;

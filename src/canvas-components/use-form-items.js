@@ -182,3 +182,65 @@ export function getLayout(editor = {}, onUpdate) {
   return items;
 }
 
+export function getStyle(editor = {}, onUpdate) {
+  const style = get(editor, 'viewConf.style') || {};
+
+  const items = {
+    formKey: { value: EDITOR_MENU.STYLE, class: 'd-none' },
+    inputArea: {
+      slot: 'divider',
+      compInnerText: 'input的样式',
+    },
+    width: {
+      label: '宽度',
+      value: style.width,
+      component: 'AInput',
+      onUpdate,
+    },
+    height: {
+      label: '高度',
+      value: style.height,
+      component: 'AInput',
+      onUpdate,
+    },
+    marginTop: {
+      label: '上外边距',
+      value: style.marginTop,
+      component: 'AInput',
+      onUpdate,
+    },
+    marginRight: {
+      label: '右外边距',
+      value: style.marginRight,
+      component: 'AInput',
+      onUpdate,
+    },
+    marginBottom: {
+      label: '下外边距',
+      value: style.marginBottom,
+      component: 'AInput',
+      onUpdate,
+    },
+    marginLeft: {
+      label: '左外边距',
+      value: style.marginLeft,
+      component: 'AInput',
+      onUpdate,
+    },
+    color: {
+      label: '字体颜色',
+      value: style.color,
+      component: 'ColorPicker',
+      onUpdate,
+    },
+    backgroundColor: {
+      label: '背景颜色',
+      value: style.backgroundColor,
+      component: 'ColorPicker',
+      onUpdate,
+    },
+  };
+
+  return items;
+}
+
