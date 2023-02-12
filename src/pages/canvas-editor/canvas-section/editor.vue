@@ -181,16 +181,6 @@ async function onOk() {
     font-weight: 550;
     margin: 0 20px 10px 10px;
     overflow: hidden;
-
-    &:before {
-      content: '';
-      position: absolute;
-      left: 5px;
-      top: 50%;
-      transform: translateY(-50%);
-      border: 5px solid transparent;
-      border-left: 10px solid #aaa;
-    }
   }
 }
 </style>

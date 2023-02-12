@@ -12,10 +12,10 @@ import {
   getLabel,
   getDataSource,
   getLayout,
-  getStyle,
   getValueTypeFormItems,
   getPlaceholderFormItems,
   getDisabledFormItems,
+  getViewStyleFormItems,
 } from '../use-form-items';
 
 function getBasic(editor, onUpdate) {
@@ -32,6 +32,19 @@ function getBasic(editor, onUpdate) {
     ...getValueTypeFormItems(editor, onUpdate),
     ...getPlaceholderFormItems(editor, onUpdate),
     ...getDisabledFormItems(editor, onUpdate),
+  });
+
+  return formItems;
+}
+
+function getStyle(editor, onUpdate) {
+  const formItems = shallowRef({
+    formKey: { value: EDITOR_MENU.STYLE, class: 'd-none' },
+    inputArea: {
+      slot: 'divider',
+      compInnerText: '输入框样式',
+    },
+    ...getViewStyleFormItems(editor, onUpdate),
   });
 
   return formItems;

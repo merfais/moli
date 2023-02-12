@@ -43,8 +43,6 @@ export default function genConf() {
         marginRight: undefined,
         marginBottom: undefined,
         marginLeft: undefined,
-        color: undefined,
-        backgroundColor: undefined,
       },
       mobile: {
         width: undefined,
@@ -53,8 +51,6 @@ export default function genConf() {
         marginRight: undefined,
         marginBottom: undefined,
         marginLeft: undefined,
-        color: undefined,
-        backgroundColor: undefined,
       },
     },
     dataSource: [{
