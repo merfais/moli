@@ -131,17 +131,18 @@ function onDrop() {
 
   const device = get(store, 'baseInfo.device') || 'pc';
   const viewConf = {
-    i: newId(),
-    name: draggingConf.name,
+    i: newId(store.draggingCompKey),
+    compName: draggingConf.name,
     compKey: store.draggingCompKey,
     ...draggingConf.dftConf,
     exportDSs: [],
     style: get(draggingConf.style, device) || {},
   };
+  viewConf.name = `${viewConf.compName}${viewConf.i}`;
   forEach(draggingConf.dataSource, (item, index) => {
     const { idPrefix, ...restConf } = item;
     const id = newId(item.idPrefix, 6);
-    const name = `${viewConf.name}${id}`;
+    const name = `${draggingConf.name}${id}`;
 
     viewConf.exportDSs = [id];
     const k = `exportDS${index + 1}`;

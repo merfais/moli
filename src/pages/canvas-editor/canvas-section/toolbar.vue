@@ -7,10 +7,13 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons-vue';
 import {
+  removeView,
+} from '../use-canvas-store';
+import {
   onClickSetting,
 } from './use-section';
 
-defineProps({
+const props = defineProps({
   i: String,
   index: Number,
 });
@@ -19,19 +22,21 @@ function onClickLock() {
 
 }
 
+const menuItems = {
+  remove: {
+    text: '删除',
+    cb: removeView,
+    icon: DeleteOutlined,
+  },
+};
+
 function onClickMenuItem(options = {}) {
-  const cbMap = {
-    remove: onClickRemove,
-  };
   const { key } = options;
-  if (cbMap[key]) {
-    cbMap[key]();
+  if (menuItems[key]?.cb) {
+    menuItems[key].cb(props.i);
   }
 }
 
-function onClickRemove() {
-
-}
 </script>
 <template>
   <div ref="domRef" class="toolbar align-center p-absolute">
@@ -56,14 +61,13 @@ function onClickRemove() {
       :trigger="['click']"
       :getPopupContainer="() => $refs.domRef"
       placement="bottomRight"
-      @click="onClickMenuItem"
     >
       <AButton size="small"><EllipsisOutlined /></AButton>
       <template #overlay>
-        <AMenu class="more-menu">
-          <AMenuItem :key="remove">
-            <DeleteOutlined />
-            删除
+        <AMenu class="more-menu" @click="onClickMenuItem">
+          <AMenuItem v-for="(item, key) in menuItems" :key="key">
+            <component :is="item.icon" />
+            {{item.text}}
           </AMenuItem>
         </AMenu>
       </template>

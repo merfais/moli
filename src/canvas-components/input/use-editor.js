@@ -23,6 +23,12 @@ function getBasic(editor, onUpdate) {
 
   const formItems = shallowRef({
     formKey: { value: EDITOR_MENU.BASIC, class: 'd-none' },
+    name: {
+      label: '组件名',
+      value: viewConf.name,
+      component: 'AInput',
+      onUpdate,
+    },
     value: {
       label: '默认值',
       value: viewConf.value,

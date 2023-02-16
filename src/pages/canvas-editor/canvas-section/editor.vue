@@ -27,7 +27,7 @@ import {
 } from '../use-canvas-store';
 import useCompEditorStore from './use-comp-editor-store';
 
-const editor = useCompEditorStore();
+const editorStore = useCompEditorStore();
 
 const selectedKeys = ref([EDITOR_MENU.BASIC]);
 const formRef = ref();
@@ -36,13 +36,13 @@ const editorConf = shallowRef({});
 onMounted(() => {
 });
 
-watch(() => editor.visible, () => {
-  if (editor.visible) {
+watch(() => editorStore.visible, () => {
+  if (editorStore.visible) {
     selectedKeys.value = [EDITOR_MENU.BASIC];
 
-    const getEditorConf = editorConfMap[editor.compKey];
+    const getEditorConf = editorConfMap[editorStore.compKey];
     if (getEditorConf) {
-      editorConf.value = getEditorConf(editor);
+      editorConf.value = getEditorConf(editorStore);
     } else {
       editorConf.value = { [EDITOR_MENU.BASIC]: {} };
     }
@@ -64,11 +64,11 @@ async function onOk() {
     return;
   }
   const canvasStore = useCanvasEditorStore();
-  const oldComp = get(canvasStore.viewMap, editor.i);
-  const viewConf = cloneDeep(editor.viewConf);
+  const oldComp = get(canvasStore.viewMap, editorStore.i);
+  const viewConf = cloneDeep(editorStore.viewConf);
 
   // 保存DataSource
-  forEach(editor.dataSource, (item, expKey) => {
+  forEach(editorStore.dataSource, (item, expKey) => {
     const oldId = oldComp[expKey];
     canvasStore.dsPool.update({
       oldId,
@@ -84,21 +84,21 @@ async function onOk() {
   });
 
   // 保存viewConf
-  set(canvasStore.viewMap, editor.i, viewConf);
+  set(canvasStore.viewMap, editorStore.i, viewConf);
 
   // 保存layout
-  if (editor.index !== -1) {
-    set(canvasStore.pcMainLayoutArr, editor.index, editor.pcLayout);
+  if (editorStore.index !== -1) {
+    set(canvasStore.pcMainLayoutArr, editorStore.index, editorStore.pcLayout);
   }
 
-  editor.visible = false;
+  editorStore.visible = false;
 }
 
 </script>
 <template>
   <div ref="domRef" class="editor-drawer-container"/>
   <RDrawer
-    v-model:visible="editor.visible"
+    v-model:visible="editorStore.visible"
     :getContainer="() => $refs.domRef"
     :closable="false"
     @ok="onOk"
@@ -117,7 +117,7 @@ async function onOk() {
       </AMenu>
     </template>
     <template #extra>
-      <button class="ant-drawer-close" @click="editor.visible = false">
+      <button class="ant-drawer-close" @click="editorStore.visible = false">
         <CloseOutlined />
       </button>
     </template>
@@ -130,7 +130,7 @@ async function onOk() {
         layout="horizontal"
         :labelCol="{ span: 4, style: { minWidth: '150px' } }"
         :wrapperCol="{ span: 18 }"
-        :loading="editor.loading"
+        :loading="editorStore.loading"
         :formItems="formItems"
       >
         <template #divider="{ text }">

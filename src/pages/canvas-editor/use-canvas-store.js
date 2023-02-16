@@ -1,8 +1,11 @@
 import {
   filter,
   findIndex,
+  get,
+  forEach,
 } from 'lodash-es';
 import { defineStore } from 'pinia';
+import { message } from 'ant-design-vue';
 import { DataSourcePool } from '@/data-source-pool';
 
 export const useCanvasEditorStore = defineStore({
@@ -78,8 +81,22 @@ export function addView(conf = {}) {
   store.viewMap[i] = conf;
 }
 
-export function removeView() {
+export function removeView(i) {
+  const store = useCanvasEditorStore();
+  const comp = get(store.viewMap, i);
+  if (!comp) {
+    message.warn('删除失败');
+    return;
+  }
+  delete store.viewMap[i];
+  removeLayout({ i });
 
+  if (store.dsPool?.unRegister) {
+    const { exportDSs } = comp;
+    forEach(exportDSs, dsId => {
+      store.dsPool.unRegister(dsId);
+    });
+  }
 }
 
 export function updateView() {
