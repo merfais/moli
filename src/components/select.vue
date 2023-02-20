@@ -11,7 +11,14 @@ defineProps({
     showSearch
     v-bind="$attrs"
   >
-    <slot />
+    <template v-for="(n, slotName) of $slots"
+      :key="slotName"
+      #[slotName]="slotProps"
+    >
+      <slot :name="slotName"
+        v-bind="{ ...slotProps }"
+      />
+    </template>
     <template v-if="loading" #notFoundContent>
       <div class="loading-wrapper d-flex">
         <ASpin class="flex-center flex-grow"/>
