@@ -1,9 +1,15 @@
 // 组件的key
 export const COMP_KEY = {
-  SELECT: 'select',
+  SINGLE_SELECT: 'singleSelect',
+  MULTI_SELECT: 'multiSelect',
+  BOOL_SELECT: 'boolSelect',
   INPUT: 'input',
-  RADIO: 'radio',
-  CHECKBOX: 'checkbox',
+  DATETIME: 'datetime',
+  DATETIME_RANGE: 'datetimeRange',
+  NUMBER: 'number',
+  TEXTAREA: 'textarea',
+  OP_NUMBER: 'opNumber',
+  OP_DATETIME: 'opDatetime',
 };
 
 export const COMP_GROUP_KEY = {

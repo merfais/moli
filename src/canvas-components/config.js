@@ -7,11 +7,13 @@ import {
   COMP_GROUP_KEY,
 } from './constants';
 import input from './input/config';
-import select from './select/config';
+import singleSelect from './single-select/config';
+import multiSelect from './multi-select/config';
 
 const compConfigMap = {
   input,
-  select,
+  singleSelect,
+  multiSelect,
 };
 
 /**
@@ -84,34 +86,33 @@ export async function getCompGroupConfig() {
     groupName: '交互组件',
     comps: [
       COMP_KEY.INPUT,
-      COMP_KEY.SELECT,
-      COMP_KEY.INPUT,
-      COMP_KEY.SELECT,
-      COMP_KEY.INPUT,
-      COMP_KEY.SELECT,
-      COMP_KEY.INPUT,
-      COMP_KEY.SELECT,
+      COMP_KEY.NUMBER,
+      COMP_KEY.TEXTAREA,
+      COMP_KEY.SINGLE_SELECT,
+      COMP_KEY.MULTI_SELECT,
+      COMP_KEY.BOOL_SELECT,
+      COMP_KEY.DATETIME,
+      COMP_KEY.DATETIME_RANGE,
+      COMP_KEY.OP_DATETIME,
+      COMP_KEY.OP_NUMBER,
     ],
   }, {
     groupKey: COMP_GROUP_KEY.CHART,
     groupName: '图表组件',
     comps: [
       COMP_KEY.INPUT,
-      COMP_KEY.SELECT,
     ],
   }, {
     groupKey: COMP_GROUP_KEY.RICH,
     groupName: '富组件',
     comps: [
       COMP_KEY.INPUT,
-      COMP_KEY.SELECT,
     ],
   }, {
     groupKey: COMP_GROUP_KEY.PANEL,
     groupName: '容器组件',
     comps: [
       COMP_KEY.INPUT,
-      COMP_KEY.SELECT,
     ],
   }];
 }

@@ -27,7 +27,7 @@ export function getLabel(editor = {}, onUpdate) {
   return items;
 }
 
-export function getLabelFormItems(editor = {}, onUpdate) {
+function getLabelFormItems(editor = {}, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
 
   const items = {

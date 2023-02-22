@@ -1,13 +1,12 @@
 import { DATA_SOURCE_TYPE } from '@/constants';
 import {
   COMP_KEY,
-  VALUE_TYPE,
 } from '../constants';
 
 export default function genConf() {
   const config = {
-    key: COMP_KEY.SELECT,
-    name: '下拉框',
+    key: COMP_KEY.MULTI_SELECT,
+    name: '多选器',
     snap: 'filters/icon-select',
     layout: {
       // 电脑端
@@ -32,10 +31,8 @@ export default function genConf() {
       labelPos: 'left',
       placeholder: undefined,
       disabled: false,
-      multiple: false,
       options: [],
       value: undefined,
-      valueType: VALUE_TYPE.STRING,
       enableSelectAll: false,
       specialValue: '',
       labelField: 'label',
@@ -60,7 +57,7 @@ export default function genConf() {
       },
     },
     dataSource: [{
-      idPrefix: 'selectValue',
+      idPrefix: 'multiValue',
       type: DATA_SOURCE_TYPE.SELECT_LIKE_VIEW,
     }],
   };
