@@ -17,12 +17,17 @@ import {
   getDisabledFormItems,
   getViewStyleFormItems,
 } from '../use-form-items';
+import InitValSelector from './init-val-selector';
 
 function getBasic(editor, onUpdate) {
   const items = shallowRef(genBasicFormItems(editor, onUpdate));
 
   watch(() => editor.viewConf?.depDS, () => {
     // TODO: watch dataSource变化，取dataSource的值
+    items.value = genBasicFormItems(editor, onUpdate);
+  });
+
+  watch(() => editor.viewConf.initVal, () => {
     items.value = genBasicFormItems(editor, onUpdate);
   });
 
@@ -43,7 +48,12 @@ function genBasicFormItems(editor, onUpdate) {
     value: {
       label: '默认值',
       value: viewConf.value,
-      component: 'RSelect',
+      component: InitValSelector,
+      compProps: {
+        initVal: viewConf.initVal,
+        depDS: viewConf.depDS,
+        onUpdateInitVal: (payload) => onUpdate({ path: 'initVal', payload }),
+      },
       onUpdate,
     },
     ...getPlaceholderFormItems(editor, onUpdate),

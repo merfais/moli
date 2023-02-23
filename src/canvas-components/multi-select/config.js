@@ -7,7 +7,6 @@ export default function genConf() {
   const config = {
     key: COMP_KEY.MULTI_SELECT,
     name: '多选器',
-    snap: 'filters/icon-select',
     layout: {
       // 电脑端
       pc: {
@@ -34,9 +33,10 @@ export default function genConf() {
       options: [],
       value: undefined,
       enableSelectAll: false,
-      specialValue: '',
+      initVal: 'static',
       labelField: 'label',
       valueField: 'value',
+      compType: 'select',
     },
     style: {
       pc: {

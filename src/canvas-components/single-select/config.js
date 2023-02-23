@@ -7,7 +7,6 @@ export default function genConf() {
   const config = {
     key: COMP_KEY.SINGLE_SELECT,
     name: '单选器',
-    snap: 'filters/icon-select',
     layout: {
       // 电脑端
       pc: {
@@ -33,8 +32,10 @@ export default function genConf() {
       disabled: false,
       options: [],
       value: undefined,
+      initVal: 'static',
       labelField: 'label',
       valueField: 'value',
+      compType: 'select',
     },
     style: {
       pc: {
