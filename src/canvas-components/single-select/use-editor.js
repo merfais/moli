@@ -1,13 +1,20 @@
 import {
   get,
   set,
+  map,
 } from 'lodash-es';
 import {
   shallowRef,
   watch,
 } from 'vue';
 import {
+  useRules,
+  required,
+} from '@/uses/validate';
+import {
   EDITOR_MENU,
+  SELECT_COMP_TYPE,
+  SELECT_COMP_TYPE_NAME,
 } from '../constants';
 import {
   getLabel,
@@ -42,6 +49,40 @@ function genBasicFormItems(editor, onUpdate) {
     name: {
       label: '组件名',
       value: viewConf.name,
+      component: 'AInput',
+      onUpdate,
+    },
+    compType: {
+      label: '组件形态',
+      value: viewConf.compType,
+      component: 'ButtonRadioGroup',
+      compProps: {
+        options: map([
+          SELECT_COMP_TYPE.SELECT,
+          SELECT_COMP_TYPE.RADIO,
+          SELECT_COMP_TYPE.BTN_RADIO,
+        ], value => ({ value, label: SELECT_COMP_TYPE_NAME[value] })),
+      },
+    },
+    depDS: {
+      label: '数据选项来源',
+      value: viewConf.depDS,
+      component: 'RSelect',
+      compProps: {
+        options: editor.dsPool.getDSList(editor.dataSource?.exportDS1?.id),
+      },
+      rules: useRules(required),
+      onUpdate,
+    },
+    labelField: {
+      label: '选项文字取自',
+      value: viewConf.labelField,
+      component: 'AInput',
+      onUpdate,
+    },
+    valueField: {
+      label: '选项值取自',
+      value: viewConf.valueField,
       component: 'AInput',
       onUpdate,
     },

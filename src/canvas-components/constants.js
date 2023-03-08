@@ -52,3 +52,19 @@ export const EDITOR_MENU_NAME = {
   [EDITOR_MENU.LAYOUT]: '布局配置',
   [EDITOR_MENU.STYLE]: '样式配置',
 };
+
+export const SELECT_COMP_TYPE = {
+  SELECT: 'select',
+  RADIO: 'radio',
+  CHECKBOX: 'checkbox',
+  BTN_RADIO: 'btn_radio',
+  BTN_CHECKBOX: 'btn_checkbox',
+};
+
+export const SELECT_COMP_TYPE_NAME = {
+  [SELECT_COMP_TYPE.SELECT]: '下拉框',
+  [SELECT_COMP_TYPE.RADIO]: '普通单选框',
+  [SELECT_COMP_TYPE.CHECKBOX]: '普通复选框',
+  [SELECT_COMP_TYPE.BTN_RADIO]: '按钮单选框',
+  [SELECT_COMP_TYPE.BTN_CHECKBOX]: '按钮复选框',
+};

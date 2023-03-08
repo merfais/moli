@@ -21,6 +21,7 @@ export function onClickSetting(i, index) {
   compEditorStore.viewConf = cloneDeep(viewConf);
   compEditorStore.compKey = viewConf?.compKey;
   compEditorStore.pcLayout = cloneDeep(get(canvasStore.pcMainLayoutArr, [index]));
+  compEditorStore.dsPool = canvasStore.dsPool;
 
   forEach(viewConf.exportDSs, (dsId, index) => {
     if (!canvasStore.dsPool?.getConfig) {

@@ -131,12 +131,31 @@ export class DataSourcePool {
     }
   }
 
+  /**
+   * 获取数据源配置
+   */
   getConfig(dsId) {
     const { dsMap } = this;
     if (dsMap[dsId]) {
       return dsMap[dsId].getConfig();
     }
     return {};
+  }
+
+  getDSList(exclude) {
+    const list = [];
+
+    forEach(this.dsMap, ({ id, name } = {}) => {
+      if (exclude === id) {
+        return;
+      }
+      list.push({
+        label: name,
+        value: id,
+      });
+    });
+
+    return list;
   }
 
   /**

@@ -100,6 +100,12 @@ export default class DataSource {
     }
   }
 
+  get name() {
+    if (this.source) {
+      return this.source.name;
+    }
+  }
+
   get value() {
     if (this.source) {
       return this.source.getValue();
