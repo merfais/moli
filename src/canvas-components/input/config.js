@@ -33,7 +33,7 @@ export default function genConf() {
       value: undefined,
       valueType: VALUE_TYPE.STRING,
       placeholder: undefined,
-      disabled: false,
+      disabledDS: '',
     },
     style: {
       pc: {

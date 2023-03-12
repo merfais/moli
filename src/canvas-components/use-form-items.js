@@ -11,7 +11,7 @@ import {
   required,
   isNormalChar,
 } from '@/uses/validate';
-import DisabledFormItem from '@/canvas-components/common/disabled-form-item';
+import { DisabledFormItem } from './common';
 import {
   VALUE_TYPE_NANE,
   EDITOR_MENU,
@@ -86,10 +86,13 @@ export function getDisabledFormItems(editor = {}, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
 
   const items = {
-    disabled: {
+    disabledDS: {
       label: '是否禁用',
-      value: viewConf.disabled,
+      value: viewConf.disabledDS,
       component: DisabledFormItem,
+      compProps: {
+        exportDSs: get(viewConf, 'exportDSs'),
+      },
       rules: useRules(validateDisabledValue),
       onUpdate,
     },
@@ -99,10 +102,10 @@ export function getDisabledFormItems(editor = {}, onUpdate) {
 }
 
 function validateDisabledValue(value) {
-  if (value === false) {
+  if (value === '') {
     return;
   }
-  if (!value) {
+  if (value === undefined) {
     return '请选择禁用状态的数据源';
   }
 }

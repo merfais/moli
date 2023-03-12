@@ -14,6 +14,9 @@ import {
   getCompConfig,
 } from '@/canvas-components';
 import {
+  registerEditorDS,
+} from '@/stores/ds-pool';
+import {
   useCanvasEditorStore,
   addLayout,
   removeLayout,
@@ -148,7 +151,7 @@ function onDrop() {
     const k = `exportDS${index + 1}`;
     viewConf[k] = id;
 
-    store.dsPool.register({
+    registerEditorDS({
       id,
       name,
       valueType: viewConf.valueType,

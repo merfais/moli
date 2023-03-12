@@ -6,7 +6,10 @@ import {
 } from 'lodash-es';
 import { defineStore } from 'pinia';
 import { message } from 'ant-design-vue';
-import { DataSourcePool } from '@/data-source-pool';
+import {
+  initEditorDSPool,
+  unRegisterEditorDS,
+} from '@/stores/ds-pool';
 
 export const useCanvasEditorStore = defineStore({
   id: 'canvasEditor',
@@ -27,7 +30,6 @@ export const useCanvasEditorStore = defineStore({
     pcSubLayoutMap: {},
     // 从左侧组件区拖拽出来的组件的key
     draggingCompKey: '',
-    dsPool: {},
   }),
   getters: {
   },
@@ -37,7 +39,7 @@ export async function init() {
   const store = useCanvasEditorStore();
   store.loading = true;
   // TODO:
-  store.dsPool = new DataSourcePool();
+  initEditorDSPool();
   store.loading = false;
 }
 
@@ -91,12 +93,10 @@ export function removeView(i) {
   delete store.viewMap[i];
   removeLayout({ i });
 
-  if (store.dsPool?.unRegister) {
-    const { exportDSs } = comp;
-    forEach(exportDSs, dsId => {
-      store.dsPool.unRegister(dsId);
-    });
-  }
+  const { exportDSs } = comp;
+  forEach(exportDSs, dsId => {
+    unRegisterEditorDS(dsId);
+  });
 }
 
 export function updateView() {

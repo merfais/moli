@@ -5,9 +5,12 @@ import {
   forEach,
 } from 'lodash-es';
 import {
+  getEditorDSConfig,
+} from '@/stores/ds-pool';
+import {
   useCanvasEditorStore,
 } from '../use-canvas-store';
-import useCompEditorStore from './use-comp-editor-store';
+import { useCompEditorStore } from './use-store';
 
 export function onClickSetting(i, index) {
   const compEditorStore = useCompEditorStore();
@@ -21,13 +24,13 @@ export function onClickSetting(i, index) {
   compEditorStore.viewConf = cloneDeep(viewConf);
   compEditorStore.compKey = viewConf?.compKey;
   compEditorStore.pcLayout = cloneDeep(get(canvasStore.pcMainLayoutArr, [index]));
-  compEditorStore.dsPool = canvasStore.dsPool;
+  compEditorStore.dataSource = {};
 
   forEach(viewConf.exportDSs, (dsId, index) => {
-    if (!canvasStore.dsPool?.getConfig) {
+    const dsConf = getEditorDSConfig(dsId);
+    if (!dsConf) {
       return;
     }
-    const dsConf = canvasStore.dsPool.getConfig(dsId);
     set(compEditorStore, ['dataSource', `exportDS${index + 1}`], dsConf);
   });
 }

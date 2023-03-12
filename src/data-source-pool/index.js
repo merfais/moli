@@ -146,7 +146,11 @@ export class DataSourcePool {
     const list = [];
 
     forEach(this.dsMap, ({ id, name } = {}) => {
-      if (exclude === id) {
+      if (Array.isArray(exclude)) {
+        if (exclude.indexOf(id) !== -1) {
+          return;
+        }
+      } else if (exclude === id) {
         return;
       }
       list.push({

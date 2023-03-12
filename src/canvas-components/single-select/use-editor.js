@@ -17,6 +17,9 @@ import {
   SELECT_COMP_TYPE_NAME,
 } from '../constants';
 import {
+  SelectOptionsFormItem,
+} from '../common';
+import {
   getLabel,
   getDataSource,
   getLayout,
@@ -64,12 +67,12 @@ function genBasicFormItems(editor, onUpdate) {
         ], value => ({ value, label: SELECT_COMP_TYPE_NAME[value] })),
       },
     },
-    depDS: {
+    optionsDS: {
       label: '数据选项来源',
-      value: viewConf.depDS,
-      component: 'RSelect',
+      value: viewConf.optionsDS,
+      component: SelectOptionsFormItem,
       compProps: {
-        options: editor.dsPool.getDSList(editor.dataSource?.exportDS1?.id),
+        exportDSs: get(viewConf, 'exportDSs'),
       },
       rules: useRules(required),
       onUpdate,
@@ -92,7 +95,7 @@ function genBasicFormItems(editor, onUpdate) {
       component: InitValSelector,
       compProps: {
         initVal: viewConf.initVal,
-        depDS: viewConf.depDS,
+        optionsDS: viewConf.optionsDS,
         onUpdateInitVal: (payload) => onUpdate({ path: 'initVal', payload }),
       },
       onUpdate,

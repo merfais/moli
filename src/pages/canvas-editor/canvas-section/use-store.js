@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-export default defineStore({
+export const useCompEditorStore = defineStore({
   id: 'canvasCompEditor',
   state: () => ({
     visible: false,

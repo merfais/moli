@@ -23,9 +23,12 @@ import {
   EDITOR_MENU_NAME,
 } from '@/canvas-components';
 import {
+  updateEditorDS,
+} from '@/stores/ds-pool';
+import {
   useCanvasEditorStore,
 } from '../use-canvas-store';
-import useCompEditorStore from './use-comp-editor-store';
+import { useCompEditorStore } from './use-store';
 
 const editorStore = useCompEditorStore();
 
@@ -70,7 +73,7 @@ async function onOk() {
   // 保存DataSource
   forEach(editorStore.dataSource, (item, expKey) => {
     const oldId = oldComp[expKey];
-    canvasStore.dsPool.update({
+    updateEditorDS({
       oldId,
       id: item.id,
       name: item.name,
