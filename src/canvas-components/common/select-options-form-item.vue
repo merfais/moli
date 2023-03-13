@@ -17,7 +17,7 @@ const options = computed(() => {
     const dsValue = getEditorDSValue(value);
     const disabled = !Array.isArray(dsValue);
     const title = disabled
-      ? `${value}，数据源的值类型必须是数组`
+      ? `${value}，数据源的值是非数组时不可用`
       : value;
     return { value, label, title, disabled };
   });

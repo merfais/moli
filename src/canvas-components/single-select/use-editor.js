@@ -68,7 +68,7 @@ function genBasicFormItems(editor, onUpdate) {
       },
     },
     optionsDS: {
-      label: '数据选项来源',
+      label: '单选选项来源',
       value: viewConf.optionsDS,
       component: SelectOptionsFormItem,
       compProps: {
