@@ -2,6 +2,10 @@
 defineProps({
   getPopupContainer: Function,
   placement: String,
+  confirmText: {
+    type: String,
+    default: '确认要删除吗？',
+  },
 });
 
 defineEmits([
@@ -9,20 +13,17 @@ defineEmits([
 ]);
 </script>
 <script>
-export default {
-  inheritAttrs: false,
-};
+export default { inheritAttrs: false };
 </script>
 <template>
   <APopconfirm
-    title="确认要删除吗？"
+    :title="confirmText"
     :getPopupContainer="getPopupContainer"
     :placement="placement"
     @confirm="$emit('click', $event)"
   >
     <RButton danger v-bind="$attrs">
       <slot />
-      删除
     </RButton>
   </APopconfirm>
 </template>

@@ -90,13 +90,14 @@ export default { inheritAttrs: false };
       <RButton
         class="ml-5 mt-5"
         size="small"
+        :disabled="$attrs.disabled"
         @click="onClickAdd(idx)"
       >
         <PlusOutlined />
       </RButton>
       <AButton
         class="mt-5"
-        :disabled="values.length === 1"
+        :disabled="values.length === 1 || $attrs.disabled"
         danger
         type="link"
         size="small"

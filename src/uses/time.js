@@ -1,8 +1,23 @@
-export function useDurationFormat(end, start, scale = 1) {
-  if (!end || !start) {
+/**
+ * end 结束时间戳
+ * start 开始时间戳
+ * scale 时间戳单位，x = 毫秒，X = 秒
+ */
+export function useDurationFormat(end, start = 'X', format = 'X') {
+  if (!end) {
+    return end;
+  }
+  let num;
+  let scale = format;
+  if (start === 'x' || start === 'X') {
+    num = end;
+    scale = start;
+  } else if (start) {
+    num = end - start;
+  } else {
     return;
   }
-  const num = (end - start) * scale;
+  num = scale === 'X' ? num * 1000 : num;
 
   // 小于1秒
   if (num < 1000) {

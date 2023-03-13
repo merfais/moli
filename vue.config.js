@@ -24,13 +24,9 @@ const chainWebpack = (config) => {
 
   // monaco
   config.plugin('monaco')
-    .use(new MonacoWebpackPlugin({
+    .use(MonacoWebpackPlugin, [{
       languages: ['json'],
-    }));
-
-  // element-ui
-  config.plugin('element-ui')
-    .use(require('unplugin-element-plus/webpack')({}));
+    }]);
 
   // svg
   const svgRule = config.module.rule('svg');

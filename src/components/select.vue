@@ -9,6 +9,7 @@ defineProps({
     optionFilterProp="label"
     allowClear
     showSearch
+    showArrow
     v-bind="$attrs"
   >
     <template v-for="(n, slotName) of $slots"

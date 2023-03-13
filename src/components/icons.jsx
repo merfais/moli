@@ -7,6 +7,7 @@ import SortAsc from '@/assets/sort-asc-icon.svg';
 import SortDesc from '@/assets/sort-desc-icon.svg';
 import Fullscreen from '@/assets/fullscreen-icon.svg';
 import ExitFullscreen from '@/assets/exit-fullscreen-icon.svg';
+import Link from '@/assets/link-icon.svg';
 
 export const RetentionIcon = () => <Icon component={Retention} />;
 export const DeleteIcon = () => <Icon component={Delete} />;
@@ -16,4 +17,5 @@ export const SortAscIcon = () => <Icon component={SortAsc} />;
 export const SortDescIcon = () => <Icon component={SortDesc} />;
 export const FullscreenIcon = () => <Icon component={Fullscreen} />;
 export const ExitFullscreenIcon = () => <Icon component={ExitFullscreen} />;
+export const LinkIcon = () => <Icon component={Link} />;
 

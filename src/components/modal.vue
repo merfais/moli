@@ -3,6 +3,7 @@
 <template>
   <AModal
     destroyOnClose
+    centered
   >
     <template v-for="(n, slotName) of $slots"
       :key="slotName"

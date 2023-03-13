@@ -9,9 +9,14 @@ import REmpty from './empty';
 import RButton from './button';
 import RDrawer from './drawer';
 import RModal from './modal';
-import RTable from './table';
+import RTable from './table/r-table';
+import VTable from './table/v-table';
 import RSelect from './select';
-import RemoveButton from './remove-button';
+import RInput from './input';
+import RTextarea from './textarea';
+import LabelValueInfo from './label-value-info';
+import LabelValueInfos from './label-value-infos';
+import ConfirmButton from './confirm-button';
 import ButtonCheckbox from './button-checkbox';
 import ButtonCheckboxGroup from './button-checkbox-group';
 import ButtonRadioGroup from './button-radio-group';
@@ -34,6 +39,9 @@ import DownloadButton from './download-button';
 import PhoneContainer from './phone-container';
 import ErrorCover from './error-cover';
 import LoadingCover from './loading-cover';
+import KeyValueInput from './key-value-input';
+import RangePicker from './range-picker';
+import ColorPicker from './color-picker';
 import LogDiff from './log-diff';
 import Repeat from './repeat';
 
@@ -41,12 +49,17 @@ export default function install(app) {
   const comps = {
     RForm,
     RTable,
+    VTable,
     RButton,
     RModal,
     RDrawer,
     REmpty,
     RSelect,
-    RemoveButton,
+    RInput,
+    RTextarea,
+    LabelValueInfo,
+    LabelValueInfos,
+    ConfirmButton,
     Form,
     FormItems,
     FormItem,
@@ -70,8 +83,8 @@ export default function install(app) {
     DiffViewer: () => import(/* webpackChunkName: "diff-viewer" */'./diff-viewer'),
     ToolBox,
     RChart: () => import(/* webpackChunkName: "chart-comp" */'./chart'),
-    RangePicker: () => import(/* webpackChunkName: "element-plus-ui" */'./range-picker'),
-    ColorPicker: () => import(/* webpackChunkName: "element-plus-ui" */'./color-picker'),
+    RangePicker,
+    ColorPicker,
     FoldButton,
     FoldTag,
     DropDownSelect,
@@ -81,6 +94,7 @@ export default function install(app) {
     ErrorCover,
     LoadingCover,
     LogDiff,
+    KeyValueInput,
     Repeat,
   };
 

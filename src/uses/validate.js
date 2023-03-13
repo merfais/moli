@@ -10,6 +10,7 @@ export function isNormalChar(value) {
 }
 
 export function isChinese(value) {
+  if (!value) return;
   if (!/.*[\u4e00-\u9fa5]+.*/.test(value)) {
     return '需要由中英文组成';
   }

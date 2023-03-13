@@ -5,7 +5,7 @@ export function errorLog(options = {}) {
   if (showTip !== false) {
     let errMessage = typeof e === 'string'
       ? e
-      : (e?.message || e?.err_msg || '');
+      : (e?.message || e?.err_msg || e?.msg || '');
     if (msg) {
       errMessage = `${msg}: ${errMessage}`;
     }

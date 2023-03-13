@@ -1,8 +1,4 @@
 <script setup>
-import {
-  ElDatePicker,
-} from 'element-plus';
-import 'element-plus/es/components/date-picker/style/css';
 import dayjs from 'dayjs';
 
 const props = defineProps({
