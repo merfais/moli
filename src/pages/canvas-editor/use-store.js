@@ -43,3 +43,17 @@ export const useCompEditorStore = defineStore({
   },
 });
 
+export const useDataSourceEditorStore = defineStore({
+  id: 'dataSourceEditor',
+  state: () => ({
+    visible: false,
+    title: '新建数据源',
+    // 是否是克隆
+    clone: false,
+    loading: false,
+    config: {},
+  }),
+  getters: {
+  },
+});
+

@@ -51,7 +51,7 @@ const headerStyle = computed(() => {
     <template v-if="!hasSlotFooter && !clearAll"
       #footer
     >
-      <div class="justify-end">
+      <div class="justify-end flex-grow">
         <AButton
           @click="$emit('cancel');$emit('update:visible', false);"
         >

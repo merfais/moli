@@ -25,6 +25,7 @@ import {
 import {
   updateEditorDS,
 } from '@/stores/ds-pool';
+import AddDataSourceBtn from './data-source/add-btn';
 import {
   useCanvasEditorStore,
   useCompEditorStore,
@@ -105,6 +106,7 @@ function onCancel() {
 <template>
   <div ref="domRef" class="editor-drawer-container"/>
   <ADrawer
+    class="comp-editor-drawer"
     destroyOnClose
     width="800px"
     :keyboard="false"
@@ -115,7 +117,6 @@ function onCancel() {
   >
     <template #title>
       <AMenu v-model:selectedKeys="selectedKeys"
-        class="menu"
         size="small"
         mode="horizontal"
       >
@@ -133,6 +134,9 @@ function onCancel() {
     </template>
     <template #footer>
       <div class="flex-grow">
+        <AddDataSourceBtn
+          :getContainer="() => $refs.domRef"
+        />
       </div>
       <AButton @click="onCancel">
         取消
@@ -167,24 +171,25 @@ function onCancel() {
   </ADrawer>
 </template>
 <style scoped>
-.editor-drawer-container {
-  :deep(.ant-drawer-header) {
+:deep(.comp-editor-drawer) {
+  .ant-drawer-header {
     background: #fafafa;
     padding: 0;
   }
-  :deep(.ant-drawer-body) {
+
+  .ant-drawer-body {
     padding: 0;
   }
 
-  :deep(.ant-drawer-footer) {
+  .ant-drawer-footer {
     display: flex;
   }
 
-  :deep(.ant-menu) {
+  .ant-menu {
     background: #fafafa;
   }
 
-  :deep(.ant-menu-item) {
+  .ant-menu-item {
     border-right: 1px solid #f0f0f0;
 
     &:after {
@@ -199,9 +204,6 @@ function onCancel() {
 
   .ant-drawer-close {
     background: #fafafa;
-  }
-
-  .menu {
   }
 
   .divider {
