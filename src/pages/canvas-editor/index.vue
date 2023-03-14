@@ -1,7 +1,7 @@
 <script setup>
 import HeaderSection from './header-section';
 import ToolboxSection from './toolbox-section';
-import CanvasSection from './canvas-section';
+import Canvas from './canvas';
 
 </script>
 <template>
@@ -9,7 +9,7 @@ import CanvasSection from './canvas-section';
     <HeaderSection />
     <section class="page-body height-100 d-flex">
       <ToolboxSection />
-      <CanvasSection class="flex-grow"/>
+      <Canvas class="flex-grow"/>
     </section>
   </div>
 </template>

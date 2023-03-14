@@ -15,20 +15,22 @@ import {
 } from '@/canvas-components';
 import {
   useCanvasEditorStore,
+} from './use-store';
+import {
   updateLayout,
-} from '../use-canvas-store';
+} from './use-canvas';
 
 const props = defineProps({
   i: String,
 });
 
-const store = useCanvasEditorStore();
+const canvasStore = useCanvasEditorStore();
 
 const domRef = ref();
 
-const compKey = computed(() => get(store.viewMap, [props.i, 'compKey']));
+const compKey = computed(() => get(canvasStore.viewMap, [props.i, 'compKey']));
 const compProps = computed(() => {
-  const viewConf = unref(get(store.viewMap, props.i) || {});
+  const viewConf = unref(get(canvasStore.viewMap, props.i) || {});
   const propObj = omit(viewConf, [
     'withLabel',
     'labelPos',
@@ -48,12 +50,12 @@ const compProps = computed(() => {
 });
 
 const label = computed(() => {
-  const viewConf = get(store.viewMap, props.i) || {};
+  const viewConf = get(canvasStore.viewMap, props.i) || {};
   return viewConf.withLabel && viewConf.label;
 });
 
 const compWrapperClass = computed(() => {
-  const viewConf = get(store.viewMap, props.i) || {};
+  const viewConf = get(canvasStore.viewMap, props.i) || {};
   if (unref(label)) {
     return viewConf.labelPos === 'left' ? 'align-center' : 'flex-column';
   }
@@ -65,8 +67,8 @@ function getPopupContainer() {
 }
 
 function onUpdateValue(value) {
-  // const compProps = get(store.viewMap, [props.i, 'compProps']) || {}
-  set(store.viewMap, [props.i, 'value'], value);
+  // const compProps = get(canvasStore.viewMap, [props.i, 'compProps']) || {}
+  set(canvasStore.viewMap, [props.i, 'value'], value);
 }
 
 function onUpdateDataSource() {

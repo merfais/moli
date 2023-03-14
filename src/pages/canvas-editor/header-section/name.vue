@@ -9,9 +9,9 @@ import {
 import { message } from 'ant-design-vue';
 import { vElementHover } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
-import { useCanvasEditorStore } from '../use-canvas-store';
+import { useCanvasEditorStore } from '../use-store';
 
-const store = useCanvasEditorStore();
+const canvasStore = useCanvasEditorStore();
 
 const name = ref('');
 const inputRef = ref();
@@ -19,7 +19,7 @@ const nameEdited = ref(false);
 
 function onHover() {
   nameEdited.value = true;
-  name.value = store.baseInfo?.name || '我的画布';
+  name.value = canvasStore.baseInfo?.name || '我的画布';
   useFocus(inputRef, { initialValue: true });
 }
 
@@ -30,7 +30,7 @@ function onSaveName() {
     message.warn('画布名字不能清空');
     return;
   }
-  set(store, 'baseInfo.name', nameStr);
+  set(canvasStore, 'baseInfo.name', nameStr);
 }
 
 </script>
@@ -46,7 +46,7 @@ function onSaveName() {
       class="name-text ellipsis"
       v-element-hover="onHover"
     >
-      {{store.baseInfo.name}}
+      {{canvasStore.baseInfo.name}}
     </div>
   </div>
 </template>

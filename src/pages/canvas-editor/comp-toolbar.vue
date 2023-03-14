@@ -8,10 +8,8 @@ import {
 } from '@ant-design/icons-vue';
 import {
   removeView,
-} from '../use-canvas-store';
-import {
   onClickSetting,
-} from './use-section';
+} from './use-canvas';
 
 const props = defineProps({
   i: String,

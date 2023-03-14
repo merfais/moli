@@ -19,9 +19,9 @@ import {
 } from '@/canvas-components';
 import {
   useCanvasEditorStore,
-} from '../use-canvas-store';
+} from '../use-store';
 
-const store = useCanvasEditorStore();
+const canvasStore = useCanvasEditorStore();
 
 const activeKey = ref([
   COMP_GROUP_KEY.CHART,
@@ -31,7 +31,7 @@ const compGroup = ref([]);
 const compConfigMap = reactive({});
 
 function onDragStart(compKey) {
-  store.draggingCompKey = compKey;
+  canvasStore.draggingCompKey = compKey;
 }
 
 async function init() {

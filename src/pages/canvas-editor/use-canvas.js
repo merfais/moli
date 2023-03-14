@@ -2,38 +2,20 @@ import {
   filter,
   findIndex,
   get,
+  set,
+  cloneDeep,
   forEach,
 } from 'lodash-es';
-import { defineStore } from 'pinia';
 import { message } from 'ant-design-vue';
 import {
+  getEditorDSConfig,
   initEditorDSPool,
   unRegisterEditorDS,
 } from '@/stores/ds-pool';
-
-export const useCanvasEditorStore = defineStore({
-  id: 'canvasEditor',
-  state: () => ({
-    // 画布编辑类型， 新建create，修改update
-    editType: 'create',
-    // 是否是克隆
-    clone: false,
-    loading: false,
-    baseInfo: {
-      name: '我我的画布我的画布我的画布我的画布我的画布的画布',
-      device: 'pc',
-      width: 1440,
-      height: 1000,
-    },
-    viewMap: {},
-    pcMainLayoutArr: [],
-    pcSubLayoutMap: {},
-    // 从左侧组件区拖拽出来的组件的key
-    draggingCompKey: '',
-  }),
-  getters: {
-  },
-});
+import {
+  useCompEditorStore,
+  useCanvasEditorStore,
+} from './use-store';
 
 export async function init() {
   const store = useCanvasEditorStore();
@@ -103,4 +85,27 @@ export function updateView() {
 
 }
 
+
+export function onClickSetting(i, index) {
+  const compEditorStore = useCompEditorStore();
+  compEditorStore.visible = true;
+  compEditorStore.title = '修改配置';
+  compEditorStore.i = i;
+  compEditorStore.index = index;
+
+  const canvasStore = useCanvasEditorStore();
+  const viewConf = get(canvasStore.viewMap, i) || {};
+  compEditorStore.viewConf = cloneDeep(viewConf);
+  compEditorStore.compKey = viewConf?.compKey;
+  compEditorStore.pcLayout = cloneDeep(get(canvasStore.pcMainLayoutArr, [index]));
+  compEditorStore.dataSource = {};
+
+  forEach(viewConf.exportDSs, (dsId, index) => {
+    const dsConf = getEditorDSConfig(dsId);
+    if (!dsConf) {
+      return;
+    }
+    set(compEditorStore, ['dataSource', `exportDS${index + 1}`], dsConf);
+  });
+}
 

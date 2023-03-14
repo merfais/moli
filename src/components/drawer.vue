@@ -51,15 +51,14 @@ const headerStyle = computed(() => {
     <template v-if="!hasSlotFooter && !clearAll"
       #footer
     >
-      <div class="drawer-footer">
+      <div class="justify-end">
         <AButton
-          class="footer-btn"
           @click="$emit('cancel');$emit('update:visible', false);"
         >
           取消
         </AButton>
         <AButton
-          class="footer-btn"
+          class="ml-10"
           type="primary"
           @click="$emit('ok')"
         >
@@ -70,13 +69,5 @@ const headerStyle = computed(() => {
   </ADrawer>
 </template>
 <style scoped>
-.drawer-footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.footer-btn {
-  margin-left: 10px;
-}
 </style>
 

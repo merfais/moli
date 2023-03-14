@@ -27,8 +27,8 @@ import {
 } from '@/stores/ds-pool';
 import {
   useCanvasEditorStore,
-} from '../use-canvas-store';
-import { useCompEditorStore } from './use-store';
+  useCompEditorStore,
+} from './use-store';
 
 const editorStore = useCompEditorStore();
 
@@ -94,17 +94,24 @@ async function onOk() {
     set(canvasStore.pcMainLayoutArr, editorStore.index, editorStore.pcLayout);
   }
 
-  editorStore.visible = false;
+  onCancel();
+}
+
+function onCancel() {
+  editorStore.$reset();
 }
 
 </script>
 <template>
   <div ref="domRef" class="editor-drawer-container"/>
-  <RDrawer
-    v-model:visible="editorStore.visible"
+  <ADrawer
+    destroyOnClose
+    width="800px"
+    :keyboard="false"
+    :visible="editorStore.visible"
     :getContainer="() => $refs.domRef"
     :closable="false"
-    @ok="onOk"
+    @close="onCancel"
   >
     <template #title>
       <AMenu v-model:selectedKeys="selectedKeys"
@@ -120,9 +127,23 @@ async function onOk() {
       </AMenu>
     </template>
     <template #extra>
-      <button class="ant-drawer-close" @click="editorStore.visible = false">
+      <button class="ant-drawer-close" @click="onCancel">
         <CloseOutlined />
       </button>
+    </template>
+    <template #footer>
+      <div class="flex-grow">
+      </div>
+      <AButton @click="onCancel">
+        取消
+      </AButton>
+      <AButton
+        class="ml-10"
+        type="primary"
+        @click="onOk"
+      >
+        确认
+      </AButton>
     </template>
     <template v-for="(formItems, key) in editorConf"
       :key="key"
@@ -143,7 +164,7 @@ async function onOk() {
         </template>
       </RForm>
     </template>
-  </RDrawer>
+  </ADrawer>
 </template>
 <style scoped>
 .editor-drawer-container {
@@ -153,6 +174,10 @@ async function onOk() {
   }
   :deep(.ant-drawer-body) {
     padding: 0;
+  }
+
+  :deep(.ant-drawer-footer) {
+    display: flex;
   }
 
   :deep(.ant-menu) {

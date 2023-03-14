@@ -18,22 +18,22 @@ import {
 } from '@/stores/ds-pool';
 import {
   useCanvasEditorStore,
+} from './use-store';
+import {
   addLayout,
   removeLayout,
   addView,
   init,
-} from '../use-canvas-store';
-import {
   onClickSetting,
-} from './use-section';
-import Toolbar from './toolbar';
-import View from './view';
-import Editor from './editor';
+} from './use-canvas';
+import CompToolbar from './comp-toolbar';
+import CompView from './comp-view';
+import CompEditor from './comp-editor';
 
 let draggingLayout = null;
 let draggingConf = {};
 
-const store = useCanvasEditorStore();
+const canvasStore = useCanvasEditorStore();
 
 init();
 
@@ -42,23 +42,23 @@ const gridLayoutRef = ref();
 const gridItemsRef = ref();
 const gridItemsClass = ref('');
 const contentStyle = computed(() => {
-  const { height, width } = store.baseInfo || {};
+  const { height, width } = canvasStore.baseInfo || {};
   return {
     width: `${width}px`,
     height: `${height}px`,
   };
 });
 const colNum = computed(() => {
-  const { width } = store.baseInfo || {};
+  const { width } = canvasStore.baseInfo || {};
   return width;
 });
 
 async function onDragenter(e) {
-  draggingConf = await getCompConfig(store.draggingCompKey);
+  draggingConf = await getCompConfig(canvasStore.draggingCompKey);
 
   gridItemsClass.value = 'dragging';
 
-  const device = get(store, 'baseInfo.device') || 'pc';
+  const device = get(canvasStore, 'baseInfo.device') || 'pc';
   const { w, h } = get(draggingConf.layout, device) || {};
 
   draggingLayout = {
@@ -132,11 +132,11 @@ function onDrop() {
 
   removeLayout(draggingLayout);
 
-  const device = get(store, 'baseInfo.device') || 'pc';
+  const device = get(canvasStore, 'baseInfo.device') || 'pc';
   const viewConf = {
-    i: newId(store.draggingCompKey),
+    i: newId(canvasStore.draggingCompKey),
     compName: draggingConf.name,
-    compKey: store.draggingCompKey,
+    compKey: canvasStore.draggingCompKey,
     ...draggingConf.dftConf,
     exportDSs: [],
     style: get(draggingConf.style, device) || {},
@@ -160,11 +160,11 @@ function onDrop() {
   });
   addView(viewConf);
   addLayout({ ...draggingLayout, i: viewConf.i });
-  const len = store.pcMainLayoutArr?.length || 0;
+  const len = canvasStore.pcMainLayoutArr?.length || 0;
   onClickSetting(viewConf.i, len - 1);
 
   // 清理临时数据
-  store.draggingCompKey = null;
+  canvasStore.draggingCompKey = null;
   draggingLayout = null;
   draggingConf = {};
 }
@@ -192,7 +192,7 @@ function getToolbarPopupContainer(item) {
       <GridLayout
         class='grid-layout-wrapper height-100'
         ref="gridLayoutRef"
-        v-model:layout="store.pcMainLayoutArr"
+        v-model:layout="canvasStore.pcMainLayoutArr"
         :colNum="colNum"
         :rowHeight="1"
         :margin="[0, 0]"
@@ -205,14 +205,16 @@ function getToolbarPopupContainer(item) {
         @dragleave.self="onDragleave"
         @drop.stop="onDrop"
       >
-        <template v-for="(item, index) in store.pcMainLayoutArr" :key="item.i">
+        <template v-for="(item, index) in canvasStore.pcMainLayoutArr"
+          :key="item.i"
+        >
           <ATooltip
             placement="topRight"
             destroyTooltipOnHide
             :getPopupContainer="() => getToolbarPopupContainer(item)"
           >
             <template #title>
-              <Toolbar :i="item.i" :index="index" />
+              <CompToolbar :i="item.i" :index="index" />
             </template>
             <GridItem
               :id="`${item.i}_grid_item`"
@@ -223,13 +225,13 @@ function getToolbarPopupContainer(item) {
               @move="onMove"
               @moved="onMoved"
             >
-              <View :i="item.i" />
+              <CompView :i="item.i" />
             </GridItem>
           </ATooltip>
         </template>
       </GridLayout>
     </div>
-    <Editor />
+    <CompEditor />
   </div>
 </template>
 <style scoped>
