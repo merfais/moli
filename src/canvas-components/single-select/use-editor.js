@@ -80,13 +80,21 @@ function genBasicFormItems(editor, onUpdate) {
     labelField: {
       label: '选项文字取自',
       value: viewConf.labelField,
-      component: 'AInput',
+      component: 'RInput',
+      compProps: {
+        preText: '数据的',
+        postText: '字段',
+      },
       onUpdate,
     },
     valueField: {
       label: '选项值取自',
       value: viewConf.valueField,
-      component: 'AInput',
+      component: 'RInput',
+      compProps: {
+        preText: '数据的',
+        postText: '字段',
+      },
       onUpdate,
     },
     value: {
