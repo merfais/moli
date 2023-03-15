@@ -58,7 +58,7 @@ watch(() => unref(props.items), () => {
     } else {
       const { label } = item;
       if (compProps?.placeholder === undefined) {
-        if (/^a-?(input(-?(search|number))?|textarea)$/i.test(item.component)) {
+        if (/^(a|r)-?(input(-?(search|number))?|textarea)$/i.test(item.component)) {
           set(compProps, 'placeholder', `请输入${label}`);
         } else if (/^((a|r)-?(select|cascader)|color-?picker)$/i.test(item.component)) {
           set(compProps, 'placeholder', `请选择${label}`);

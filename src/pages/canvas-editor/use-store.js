@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { DATA_SOURCE_TYPE } from '@/data-source-pool';
 
 export const useCanvasEditorStore = defineStore({
   id: 'canvasEditor',
@@ -51,7 +52,10 @@ export const useDataSourceEditorStore = defineStore({
     // 是否是克隆
     clone: false,
     loading: false,
-    config: {},
+    formItems: {},
+    record: {
+      type: DATA_SOURCE_TYPE.JS_FUNCTION,
+    },
   }),
   getters: {
   },

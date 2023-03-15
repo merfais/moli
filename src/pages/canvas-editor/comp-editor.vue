@@ -108,7 +108,7 @@ function onCancel() {
   <ADrawer
     class="comp-editor-drawer"
     destroyOnClose
-    width="800px"
+    width="1000px"
     :keyboard="false"
     :visible="editorStore.visible"
     :getContainer="() => $refs.domRef"
