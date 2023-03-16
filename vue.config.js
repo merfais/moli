@@ -25,7 +25,7 @@ const chainWebpack = (config) => {
   // monaco
   config.plugin('monaco')
     .use(MonacoWebpackPlugin, [{
-      languages: ['json'],
+      languages: ['json', 'javascript', 'sql', 'html', 'css', 'vue'],
     }]);
 
   // svg

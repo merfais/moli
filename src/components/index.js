@@ -80,7 +80,8 @@ export default function install(app) {
     JsonViewer: () => import(/* webpackChunkName: "json-viewer-comp" */'./json-viewer'),
     // eslint-disable-next-line max-len
     LargeJsonViewer: () => import(/* webpackChunkName: "json-viewer-comp" */'./large-json-viewer'),
-    DiffViewer: () => import(/* webpackChunkName: "diff-viewer" */'./diff-viewer'),
+    DiffViewer: () => import(/* webpackChunkName: "monaco" */'./diff-viewer'),
+    Monaco: () => import(/* webpackChunkName: "monaco" */'./monaco'),
     ToolBox,
     RChart: () => import(/* webpackChunkName: "chart-comp" */'./chart'),
     RangePicker,
