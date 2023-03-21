@@ -20,10 +20,8 @@ const props = defineProps({
 const emit = defineEmits([
   'inited',
   'input',
-  'blue',
+  'blur',
 ]);
-
-defineExpose(exposeObj);
 
 let editorIns;
 let valueModel;
@@ -41,6 +39,7 @@ const exposeObj = reactive({
   resize,
   focus,
 });
+defineExpose(exposeObj);
 
 onMounted(() => {
   init();
@@ -110,11 +109,15 @@ function init() {
 }
 </script>
 <template>
-<div class='monaco-wrapper height-100 width-100'>
+<div class='monaco-dom-wrapper height-100 width-100'>
   <div ref='domRef' class='height-100'/>
 </div>
 </template>
 <style scoped>
+.monaco-dom-wrapper {
+  border: 1px solid #ddd;
+}
+
 :deep(.monaco-editor) {
   height: 100%;
 }

@@ -4,6 +4,7 @@ import {
 } from 'lodash-es';
 import {
   markRaw,
+  watch,
 } from 'vue';
 import {
   useRules,
@@ -11,12 +12,25 @@ import {
 } from '@/uses/validate';
 import {
   MANUAL_DATA_SOURCE_TYPE_NAME,
+  MANUAL_DATA_SOURCE_TYPE,
 } from '@/data-source-pool';
 import {
   useDataSourceEditorStore,
 } from '../use-store';
+import JsFnEditor from './js-fn-editor';
 
-export function genFormItems() {
+export function setFormItems() {
+  const dsEditorStore = useDataSourceEditorStore();
+
+  dsEditorStore.formItems = genFormItems();
+
+  const { record } = dsEditorStore;
+  watch(() => record.type, () => {
+    dsEditorStore.formItems = genFormItems();
+  });
+}
+
+function genFormItems() {
   const dsEditorStore = useDataSourceEditorStore();
 
   const { record } = dsEditorStore;
@@ -25,7 +39,6 @@ export function genFormItems() {
     const { path, payload } = options;
     set(dsEditorStore.record, path, payload);
   }
-
 
   const items = {
     name: {
@@ -57,5 +70,13 @@ export function genFormItems() {
     },
   };
 
-  dsEditorStore.formItems = markRaw(items);
+  if (record.type === MANUAL_DATA_SOURCE_TYPE.JS_FUNCTION) {
+    items.jsFn = {
+      isNotFormItem: true,
+      component: JsFnEditor,
+      onUpdate,
+    };
+  }
+
+  return markRaw(items);
 }

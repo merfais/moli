@@ -3,7 +3,7 @@ import {
   useDataSourceEditorStore,
 } from '../use-store';
 import {
-  genFormItems,
+  setFormItems,
 } from './use-data-source';
 
 defineProps({
@@ -14,7 +14,7 @@ const dsEditorStore = useDataSourceEditorStore();
 function onClickAdd() {
   dsEditorStore.$reset();
   dsEditorStore.visible = true;
-  genFormItems();
+  setFormItems();
 }
 
 </script>

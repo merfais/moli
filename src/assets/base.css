@@ -200,8 +200,8 @@ em.highlight {
 }
 
 .no-border {
-  border: 0;
-  box-shadow: none;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 .d-none {
