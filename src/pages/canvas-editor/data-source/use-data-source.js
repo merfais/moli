@@ -15,6 +15,9 @@ import {
   MANUAL_DATA_SOURCE_TYPE,
 } from '@/data-source-pool';
 import {
+  PLACEHOLDER,
+} from '@/constants';
+import {
   useDataSourceEditorStore,
 } from '../use-store';
 import JsFnEditor from './js-fn-editor';
@@ -74,6 +77,10 @@ function genFormItems() {
     items.jsFn = {
       isNotFormItem: true,
       component: JsFnEditor,
+      compProps: {
+        value: PLACEHOLDER.JS_FN,
+        placeholder: PLACEHOLDER.JS_FN,
+      },
       onUpdate,
     };
   }

@@ -7,3 +7,17 @@ export const CMP_ORD = {
   BT: 'between',    // 之间
 };
 
+export const PLACEHOLDER = {
+  JS_FN: 'function get({ dataSource } = {}) {  // 这一行不要修改，也不要删除\n'
+    + '  // 在这里添加js逻辑，构造数据\n'
+    + '  let dataSource = []\n\n'
+    + '  // 函数必须包含return语句，返回数据源的值\n'
+    + '  return dataSource;\n\n'
+    + '} // 这一行不要修改，也不要删除',
+  POST_JS_FN: 'function get({ dataSource, data } = {}) {  // 这一行不要修改，也不要删除\n\n'
+    + '  // 在这里添加js逻辑，构造数据\n\n'
+    + '  // 函数必须包含return语句，返回数据源的值\n'
+    + '  return data;\n\n'
+    + '} // 这一行不要修改，也不要删除\n'
+    + '//若js配置无误，保存后，会将经过js处理的数据结果作为该数据的取值',
+};
