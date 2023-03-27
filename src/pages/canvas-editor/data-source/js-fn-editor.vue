@@ -9,18 +9,36 @@ import {
   LeftOutlined,
   RightOutlined,
 } from '@ant-design/icons-vue';
+import runInNewContext from '@/uses/vm';
 
-defineProps({
+const props = defineProps({
   value: String,
   placeholder: String,
 });
+
+const emit = defineEmits([
+  'update:value',
+  'input',
+  'change',
+]);
 
 const fullscreen = ref(false);
 const previewFold = ref(true);
 const preview = ref('');
 
-function onClickRun() {
+async function onClickRun() {
   previewFold.value = false;
+  try {
+    preview.value = JSON.stringify(await runInNewContext(props.value));
+  } catch (e) {
+    //
+  }
+}
+
+function onInput(value) {
+  emit('update:value', value);
+  emit('change', value);
+  emit('input', value);
 }
 
 </script>
@@ -56,6 +74,7 @@ function onClickRun() {
           :value="value"
           :placeholder="placeholder"
           @focus="() => previewFold = true"
+          @input="onInput"
         />
       </div>
       <div

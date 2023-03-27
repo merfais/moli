@@ -76,9 +76,9 @@ function genFormItems() {
   if (record.type === MANUAL_DATA_SOURCE_TYPE.JS_FUNCTION) {
     items.jsFn = {
       isNotFormItem: true,
+      value: PLACEHOLDER.JS_FN,
       component: JsFnEditor,
       compProps: {
-        value: PLACEHOLDER.JS_FN,
         placeholder: PLACEHOLDER.JS_FN,
       },
       onUpdate,

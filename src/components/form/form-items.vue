@@ -89,7 +89,7 @@ watch(() => unref(props.items), () => {
   compItemValueMap.value = compValueMap;
 }, { immediate: true });
 
-function onUpdate(value, item) {
+function onUpdateValue(value, item) {
   const { key, path, onUpdate, formProps } = item;
   let { compProps } = item;
   if (formProps) {
@@ -119,19 +119,19 @@ function onUpdate(value, item) {
       v-bind="item.formProps"
       :value="formItemValueMap[key]"
       :name="key"
-      @update:value="onUpdate($event, item)"
+      @update:value="onUpdateValue($event, item)"
     />
     <slot v-else-if="item.slot"
       :name="item.slot"
-      :value="compItemValueMap[key]"
       :text="item.compInnerText"
       v-bind="item.compProps"
+      :value="compItemValueMap[key]"
     />
     <component v-else
       :is="item.component"
-      :value="compItemValueMap[key]"
       v-bind="item.compProps"
-      @update:value="onUpdate($event, item)"
+      :value="compItemValueMap[key]"
+      @update:value="onUpdateValue($event, item)"
     >
       <template v-for="(slotItem, name) in item.compSlots"
         #[name]="slotProps"

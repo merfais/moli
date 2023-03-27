@@ -10,9 +10,9 @@ export const CMP_ORD = {
 export const PLACEHOLDER = {
   JS_FN: 'function get({ dataSource } = {}) {  // 这一行不要修改，也不要删除\n'
     + '  // 在这里添加js逻辑，构造数据\n'
-    + '  let dataSource = []\n\n'
+    + '  let result = []\n\n'
     + '  // 函数必须包含return语句，返回数据源的值\n'
-    + '  return dataSource;\n\n'
+    + '  return result;\n\n'
     + '} // 这一行不要修改，也不要删除',
   POST_JS_FN: 'function get({ dataSource, data } = {}) {  // 这一行不要修改，也不要删除\n\n'
     + '  // 在这里添加js逻辑，构造数据\n\n'
