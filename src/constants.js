@@ -20,4 +20,7 @@ export const PLACEHOLDER = {
     + '  return data;\n\n'
     + '} // 这一行不要修改，也不要删除\n'
     + '//若js配置无误，保存后，会将经过js处理的数据结果作为该数据的取值',
+  STATIC_DATA: 'const data = // 这一行不要修改，也不要删除\n'
+    + '// 在这里添加数据, 比如等于空数组\n'
+    + '[]',
 };

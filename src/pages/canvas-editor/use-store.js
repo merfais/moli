@@ -52,6 +52,7 @@ export const useDataSourceEditorStore = defineStore({
     // 是否是克隆
     clone: false,
     loading: false,
+    form: {},
     formItems: {},
     record: {
       type: DATA_SOURCE_TYPE.JS_FUNCTION,

@@ -9,6 +9,7 @@ import {
   LeftOutlined,
   RightOutlined,
 } from '@ant-design/icons-vue';
+import { errorLog } from '@/uses/log';
 import runInNewContext from '@/uses/vm';
 
 const props = defineProps({
@@ -31,7 +32,7 @@ async function onClickRun() {
   try {
     preview.value = JSON.stringify(await runInNewContext(props.value));
   } catch (e) {
-    //
+    errorLog({ e, msg: '执行js出错' });
   }
 }
 
@@ -90,7 +91,7 @@ function onInput(value) {
             :is="previewFold ? LeftOutlined : RightOutlined"
           />
         </AButton>
-        <div class="height-100 flex-grow">
+        <div v-if="!previewFold" class="height-100 flex-grow">
           <Monaco
             language="json"
             readonly

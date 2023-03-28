@@ -6,6 +6,7 @@ import {
   markRaw,
   watch,
 } from 'vue';
+import { message } from 'ant-design-vue';
 import {
   useRules,
   required,
@@ -21,6 +22,28 @@ import {
   useDataSourceEditorStore,
 } from '../use-store';
 import JsFnEditor from './js-fn-editor';
+
+export function onClickAdd() {
+  const dsEditorStore = useDataSourceEditorStore();
+  dsEditorStore.$reset();
+  dsEditorStore.visible = true;
+  setFormItems();
+}
+
+export async function onClickSave() {
+  const dsEditorStore = useDataSourceEditorStore();
+  try {
+    if (dsEditorStore?.form?.validate) {
+      await dsEditorStore.form.validate();
+    }
+  } catch (e) {
+    message.warn('校验未通过，请检查~');
+    console.warn('表单校验失败', e);
+    return;
+  }
+
+  dsEditorStore.visible = false;
+}
 
 export function setFormItems() {
   const dsEditorStore = useDataSourceEditorStore();
@@ -76,10 +99,22 @@ function genFormItems() {
   if (record.type === MANUAL_DATA_SOURCE_TYPE.JS_FUNCTION) {
     items.jsFn = {
       isNotFormItem: true,
-      value: PLACEHOLDER.JS_FN,
+      value: record.jsFn || PLACEHOLDER.JS_FN,
       component: JsFnEditor,
       compProps: {
         placeholder: PLACEHOLDER.JS_FN,
+      },
+      onUpdate,
+    };
+  } else if (record.type === MANUAL_DATA_SOURCE_TYPE.STATIC_DATA) {
+    items.value = {
+      isNotFormItem: true,
+      value: record.value || PLACEHOLDER.STATIC_DATA,
+      component: 'Monaco',
+      compProps: {
+        language: 'javascript',
+        style: { height: '500px' },
+        placeholder: PLACEHOLDER.STATIC_DATA,
       },
       onUpdate,
     };

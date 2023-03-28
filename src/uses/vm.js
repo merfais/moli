@@ -1,7 +1,8 @@
 export default async function runInNewContext(jsStr, context) {
   return new Promise((resolve, reject) => {
+    let iframe;
     try {
-      const iframe = document.createElement('iframe');
+      iframe = document.createElement('iframe');
       // 限制代码 iframe 代码执行能力
       iframe.sandbox = 'allow-same-origin allow-scripts';
 
@@ -10,19 +11,23 @@ export default async function runInNewContext(jsStr, context) {
 
         const result = iframe.contentWindow.get(context || {});
 
-        if (iframe.parentNode) {
-          iframe.parentNode.removeChild(iframe);
-        }
+        removeIframe(iframe);
 
         resolve(result);
       };
 
       document.body.appendChild(iframe);
     } catch (e) {
-      console.error('运行js出错', e);
+      removeIframe(iframe);
       reject(e);
     }
   });
+}
+
+function removeIframe(iframe) {
+  if (iframe?.parentNode) {
+    iframe.parentNode?.removeChild(iframe);
+  }
 }
 
 function appendScript(data, doc = document) {

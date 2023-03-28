@@ -3,19 +3,14 @@ import {
   useDataSourceEditorStore,
 } from '../use-store';
 import {
-  setFormItems,
+  onClickAdd,
+  onClickSave,
 } from './use-data-source';
 
 defineProps({
   getContainer: Function,
 });
 const dsEditorStore = useDataSourceEditorStore();
-
-function onClickAdd() {
-  dsEditorStore.$reset();
-  dsEditorStore.visible = true;
-  setFormItems();
-}
 
 </script>
 <script>export default { inheritAttrs: false }; </script>
@@ -31,8 +26,10 @@ function onClickAdd() {
     :title="dsEditorStore.title"
     :getContainer="getContainer"
     width="1100px"
+    @ok="onClickSave"
   >
     <RForm
+      :ref="el => dsEditorStore.form = el"
       :formItems="dsEditorStore.formItems"
     />
   </RDrawer>
