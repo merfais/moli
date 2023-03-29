@@ -29,6 +29,7 @@ const config = {
     'import/extensions': 0,
     'import/no-dynamic-require': 0,
     'import/no-unresolved': 0,
+    'import/no-named-as-default': 0,
     'import/prefer-default-export': 0,
 
     // 关闭airbnb规则
@@ -39,7 +40,7 @@ const config = {
     'default-param-last': 0,
     'getter-return': 0,
     'global-require': 0,
-    'object-curly-newline': 0,
+    'lines-between-class-members': 0,
     'newline-per-chained-call': 0,
     'no-bitwise': 0,
     'no-control-regex': 0,
@@ -49,6 +50,7 @@ const config = {
     'no-use-before-define': 0,
     'no-multiple-empty-lines': 0,
     'no-shadow': 0,
+    'object-curly-newline': 0,
 
     // 关闭其他规则
     'prettier/prettier': 0,

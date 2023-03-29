@@ -16,6 +16,9 @@ import {
   MANUAL_DATA_SOURCE_TYPE,
 } from '@/data-source-pool';
 import {
+  registerEditorDS,
+} from '@/stores/ds-pool';
+import {
   PLACEHOLDER,
 } from '@/constants';
 import {
@@ -43,6 +46,7 @@ export async function onClickSave() {
   }
 
   dsEditorStore.visible = false;
+  registerEditorDS(dsEditorStore.record);
 }
 
 export function setFormItems() {

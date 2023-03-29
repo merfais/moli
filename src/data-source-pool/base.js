@@ -11,6 +11,10 @@ import {
 } from './constants';
 
 export default class Base {
+  dsMap = {};
+
+  msgCenter = {};
+
   // 数据源类型
   type = '';
 
@@ -94,16 +98,16 @@ export default class Base {
     return [...new Set([...this.syncDeps, ...this.asyncDeps])];
   }
 
-  genDependents() {
+  async genDependents() {
     this.genSyncDeps();
-    this.genAsyncDeps();
+    await this.genAsyncDeps();
   }
 
   genSyncDeps() {
     this.syncDeps = [];
   }
 
-  genAsyncDeps() {
+  async genAsyncDeps() {
     this.asyncDeps = [];
   }
 
@@ -129,8 +133,10 @@ export default class Base {
   }
 
   calculate() {
-    this.innerValue = this.tmpData;
-    this.innerStatus = ASYNC_STATUS.FULFILLED;
+    if (this.innerStatus !== ASYNC_STATUS.REJECTED) {
+      this.innerValue = this.tmpData;
+      this.innerStatus = ASYNC_STATUS.FULFILLED;
+    }
     this.publish();
   }
 

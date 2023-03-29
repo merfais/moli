@@ -24,15 +24,12 @@ export default class MessageCenter {
     if (typeof cb !== 'function') {
       return;
     }
-    if (dsIds === '*') {
-      this.busSet.add(cb);
-      if (immediate) {
-        cb();
-      }
-      return;
-    }
     const ids = Array.isArray(dsIds) ? dsIds : [dsIds];
     forEach(ids, (dsId) => {
+      if (dsId === '*') {
+        this.busSet.add(cb);
+        return;
+      }
       if (!this.busMap.has(dsId)) {
         this.busMap.set(dsId, new Set());
       }
@@ -51,12 +48,12 @@ export default class MessageCenter {
     if (typeof cb !== 'function') {
       return;
     }
-    if (dsIds === '*') {
-      this.busSet.delete(cb);
-      return;
-    }
     const ids = Array.isArray(dsIds) ? dsIds : [dsIds];
     forEach(ids, (dsId) => {
+      if (dsId === '*') {
+        this.busSet.delete(cb);
+        return;
+      }
       if (this.busMap.has(dsId)) {
         const cbSet = this.busMap.get(dsId);
         cbSet.delete(cb);

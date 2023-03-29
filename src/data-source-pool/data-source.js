@@ -32,12 +32,7 @@ export default class DataSource {
 
     const DataSourceClass = getClass(info.type);
     this.source = new DataSourceClass(info);
-    this.source.genDependents();
-    this.msgCenter.subscribe(this.source.getSyncDeps(), this.calculate);
-    this.msgCenter.subscribe(this.source.getAsyncDeps(), this.request);
-
-    // this.calculateValue = this.calculateValue.bind(this);
-    // this.requestData = this.requestData.bind(this);
+    this.subscribe();
   }
 
   /**
@@ -77,7 +72,11 @@ export default class DataSource {
     }
 
     // 重新生产依赖关系，重新订阅
-    this.source.genDependents();
+    this.subscribe();
+  }
+
+  async subscribe() {
+    await this.source.genDependents();
     this.msgCenter.subscribe(this.source.getSyncDeps(), this.calculate);
     this.msgCenter.subscribe(this.source.getAsyncDeps(), this.request);
   }

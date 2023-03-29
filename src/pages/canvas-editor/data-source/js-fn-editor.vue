@@ -30,7 +30,8 @@ const preview = ref('');
 async function onClickRun() {
   previewFold.value = false;
   try {
-    preview.value = JSON.stringify(await runInNewContext(props.value));
+    const result = await runInNewContext(props.value);
+    preview.value = JSON.stringify(result);
   } catch (e) {
     errorLog({ e, msg: '执行js出错' });
   }

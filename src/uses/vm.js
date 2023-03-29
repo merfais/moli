@@ -1,3 +1,5 @@
+import newId from './id';
+
 export default async function runInNewContext(jsStr, context) {
   return new Promise((resolve, reject) => {
     let iframe;
@@ -9,7 +11,9 @@ export default async function runInNewContext(jsStr, context) {
       iframe.onload = function onload() {
         appendScript(jsStr, iframe.contentDocument);
 
-        const result = iframe.contentWindow.get(context || {});
+        const result = typeof iframe?.contentWindow?.get === 'function'
+          ? iframe.contentWindow.get(context || {})
+          : undefined;
 
         removeIframe(iframe);
 
@@ -31,8 +35,11 @@ function removeIframe(iframe) {
 }
 
 function appendScript(data, doc = document) {
+  if (!data) {
+    return newId();
+  }
   const script = doc.createElement('script');
-  script.id = Math.random().toString(36).slice(2);
+  script.id = newId();
   script.type = 'text/javascript';
   script.appendChild(doc.createTextNode(data));
   doc.head.appendChild(script);
