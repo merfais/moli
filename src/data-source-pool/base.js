@@ -50,10 +50,13 @@ export default class Base {
   oldError = null;
 
   // 依赖的数据源列表，订阅这些数据源变化后执行同步逻辑
-  syncDeps = [];
+  staticDeps = [];
 
-  // 依赖的数据源列表，订阅这些数据源变化后执行异步逻辑
-  asyncDeps = [];
+  // js中依赖的数据源
+  jsDeps = [];
+
+  // js中依赖的数据源，用于计算时存临时数据
+  jsDepSet = new Set();
 
   // 标记数据源是否已经初始化
   hasInited = false;
@@ -74,7 +77,7 @@ export default class Base {
 
   init() {
     this.hasInited = true;
-    this.request();
+    this.runProcess();
   }
 
   getValue() {
@@ -86,29 +89,29 @@ export default class Base {
     return this.innerValue;
   }
 
-  getSyncDeps() {
-    return this.syncDeps;
+  getStaticDeps() {
+    return this.staticDeps;
   }
 
-  getAsyncDeps() {
-    return this.asyncDeps;
+  getJsDeps() {
+    return this.jsDeps;
   }
 
   getDependents() {
-    return [...new Set([...this.syncDeps, ...this.asyncDeps])];
+    return [...new Set([...this.staticDeps, ...this.jsDeps])];
   }
 
   async genDependents() {
-    this.genSyncDeps();
-    await this.genAsyncDeps();
+    await this.genStaticDeps();
+    await this.genJsDeps();
   }
 
-  genSyncDeps() {
-    this.syncDeps = [];
+  async genStaticDeps() {
+    this.staticDeps = [];
   }
 
-  async genAsyncDeps() {
-    this.asyncDeps = [];
+  async genJsDeps() {
+    this.jsDeps = [];
   }
 
   updateConfig(payload) {
@@ -118,26 +121,56 @@ export default class Base {
     if (has(payload, 'value')) {
       this.tmpData = value;
     }
-    this.request();
+    this.runProcess();
   }
 
   setValue(value) {
     this.tmpData = value;
-    this.request();
+    this.runProcess();
   }
 
-  async request() {
+  async runProcess() {
     this.innerStatus = ASYNC_STATUS.PENDING;
     this.setError();
-    this.calculate();
+    await this.calculate();
+    await this.invokeJs();
+    this.publish();
   }
 
-  calculate() {
-    if (this.innerStatus !== ASYNC_STATUS.REJECTED) {
-      this.innerValue = this.tmpData;
-      this.innerStatus = ASYNC_STATUS.FULFILLED;
-    }
-    this.publish();
+  /**
+   * 执行计算逻辑，在子类中实现对应的逻辑
+   */
+  async calculate() {
+    // this.innerValue = this.tmpData;
+    // this.innerStatus = ASYNC_STATUS.FULFILLED;
+  }
+
+  /**
+   * 执行js逻辑，在子类中实现对应的逻辑
+   */
+  async invokeJs() {
+    // this.innerValue = this.tmpData;
+    // this.innerStatus = ASYNC_STATUS.FULFILLED;
+  }
+
+  getDSProxy() {
+    this.jsDepSet = new Set();
+    const { id, dsMap, jsDepSet } = this;
+    const idSet = new Set(Object.keys(dsMap || {}));
+    return new Proxy({}, {
+      get(target, name) {
+        // 引用自身，或引入不存在的id，返回undefined
+        if (name === id || !idSet.has(name)) {
+          return;
+        }
+        // 收集被引用的数据源id，用于生成dependents
+        jsDepSet.add(name);
+
+        const value = get(dsMap, `${name}.value`);
+        // 做深度克隆，防止用户篡改数据
+        return cloneDeep(value);
+      },
+    });
   }
 
   /**
@@ -163,7 +196,7 @@ export default class Base {
   }
 
   getStatus() {
-    const pending = this.calcIsPending(this.getDependents());
+    const pending = this.isPending(this.getDependents());
     if (pending) {
       return ASYNC_STATUS.PENDING;
     }
@@ -171,13 +204,9 @@ export default class Base {
   }
 
   /**
-   * 用于计算上游数据源状态, 被子类调用
-   * 在不同的场景下，上游数据源不相同，
-   * 1. 同步数据源： 上游数据源是固定的，读syncDeps的值，决定是否更新value值
-   * 2. 异步数据源： 不固定，异步请求前判断 asyncDeps, 决定是否发起请求
-   *                       执行后置函数判断 syncDeps，决定是否更新value值
+   * 计算上游数据源状态
    */
-  calcIsPending(dependents) {
+  isPending(dependents) {
     // 上游数据源，被依赖的数据源是否是pending状态
     let hasPending = false;
     forEach(dependents, (depId) => {

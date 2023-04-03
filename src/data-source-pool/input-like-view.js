@@ -9,7 +9,7 @@ export default class InputLikeView extends Base {
   /**
    * 重载父类方法
    */
-  calculate() {
+  async calculate() {
     try {
       const { tmpData, valueType } = this;
       this.innerStatus = ASYNC_STATUS.FULFILLED;
@@ -20,6 +20,5 @@ export default class InputLikeView extends Base {
       this.innerStatus = ASYNC_STATUS.REJECTED;
       this.setError(error);
     }
-    this.publish();
   }
 }

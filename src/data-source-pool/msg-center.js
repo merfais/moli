@@ -86,9 +86,7 @@ export default class MessageCenter {
 
   /**
    * 销毁订阅关系
-   * 返回值用于在修改数据源type时，转录该数据源的订阅关系
    * @param dsId 被销毁的发布变化对象
-   * @return cbList Array 订阅该对象的所有回调函数
    */
   removeId = (dsId) => {
     // 数据源被删除，触发观察任意数据源变化的的所有回调

@@ -22,9 +22,9 @@ export default class DataSource {
   // 数据源的id
   id = '';
 
-  calculate = () => this.source?.calculate && this.source.calculate();
+  runProcess = () => this.source?.runProcess && this.source.runProcess();
 
-  request = () => this.source?.request && this.source.request();
+  invokeJs = () => this.source?.invokeJs && this.source.invokeJs();
 
   constructor(info) {
     const { id, dsMap, msgCenter } = info;
@@ -43,8 +43,8 @@ export default class DataSource {
       this.source.destructor();
     }
     this.source = null;
-    this.msgCenter.removeCb(this.calculate);
-    this.msgCenter.removeCb(this.request);
+    this.msgCenter.removeCb(this.runProcess);
+    this.msgCenter.removeCb(this.invokeJs);
     this.msgCenter.removeId(this.id);
   }
 
@@ -60,8 +60,8 @@ export default class DataSource {
    */
   update(config = {}) {
     // 解除订阅关系
-    this.msgCenter.unSubscribe(this.source.getSyncDeps(), this.calculate);
-    this.msgCenter.unSubscribe(this.source.getAsyncDeps(), this.request);
+    this.msgCenter.unSubscribe(this.source.getStaticDeps(), this.runProcess);
+    this.msgCenter.unSubscribe(this.source.getJsDeps(), this.invokeJs);
 
     if (config.type && config.type !== this.source.type) {
       const DataSourceClass = getClass(config.type);
@@ -77,8 +77,8 @@ export default class DataSource {
 
   async subscribe() {
     await this.source.genDependents();
-    this.msgCenter.subscribe(this.source.getSyncDeps(), this.calculate);
-    this.msgCenter.subscribe(this.source.getAsyncDeps(), this.request);
+    this.msgCenter.subscribe(this.source.getStaticDeps(), this.runProcess);
+    this.msgCenter.subscribe(this.source.getJsDeps(), this.invokeJs);
   }
 
   setValue(config) {
