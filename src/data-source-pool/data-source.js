@@ -30,8 +30,17 @@ export default class DataSource {
     const { id, dsMap, msgCenter } = info;
     Object.assign(this, { id, dsMap, msgCenter });
 
+    function reSubscribeJsDeps(newDeps, oldDeps) {
+      this.msgCenter.unSubscribe(oldDeps, this.invokeJs);
+      this.msgCenter.subscribe(newDeps, this.invokeJs);
+    }
+
     const DataSourceClass = getClass(info.type);
-    this.source = new DataSourceClass(info);
+    this.source = new DataSourceClass({
+      ...info,
+      reSubscribeJsDeps,
+    });
+
     this.subscribe();
   }
 
@@ -56,7 +65,6 @@ export default class DataSource {
 
   /**
    * 被外部调用的，用于修改数据源属性配置,
-   * 会被子类调用，子类执行计算value的逻辑，触发publish
    */
   update(config = {}) {
     // 解除订阅关系

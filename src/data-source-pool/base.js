@@ -5,6 +5,7 @@ import {
   forEach,
   isEqual,
   cloneDeep,
+  xor,
 } from 'lodash-es';
 import {
   ASYNC_STATUS,
@@ -111,7 +112,16 @@ export default class Base {
   }
 
   async genJsDeps() {
-    this.jsDeps = [];
+    const dataSource = this.getDSProxy();
+    this.jsFnCtx = { dataSource };
+    try {
+      await this.runJs();
+    } catch (e) {
+      // 忽略错误
+      // 如果发生错误，否则订阅全部
+      this.jsDepSet = new Set('*');
+    }
+    this.jsDeps = [...this.jsDepSet];
   }
 
   updateConfig(payload) {
@@ -132,13 +142,25 @@ export default class Base {
   async runProcess() {
     this.innerStatus = ASYNC_STATUS.PENDING;
     this.setError();
+    if (this.upperIsPending()) {
+      return;
+    }
+
     await this.calculate();
-    await this.invokeJs();
+
+    if (this.innerError) {
+      this.publish();
+      return;
+    }
+
+    if (this.jsFn) {
+      await this.invokeJs();
+    }
     this.publish();
   }
 
   /**
-   * 执行计算逻辑，在子类中实现对应的逻辑
+   * 执行计算逻辑，在子类中重载实现对应的逻辑
    */
   async calculate() {
     // this.innerValue = this.tmpData;
@@ -146,11 +168,33 @@ export default class Base {
   }
 
   /**
-   * 执行js逻辑，在子类中实现对应的逻辑
+   * 执行js逻辑
    */
   async invokeJs() {
-    // this.innerValue = this.tmpData;
-    // this.innerStatus = ASYNC_STATUS.FULFILLED;
+    this.innerStatus = ASYNC_STATUS.PENDING;
+    const dataSource = this.getDSProxy();
+    this.jsFnCtx = { dataSource };
+    try {
+      this.innerValue = await this.runJs();
+      this.innerStatus = ASYNC_STATUS.FULFILLED;
+    } catch (e) {
+      this.innerStatus = ASYNC_STATUS.REJECTED;
+      this.setError(e);
+      // 如果发生错误，否则订阅全部
+      this.jsDepSet = new Set('*');
+    }
+    const newJsDeps = [...this.jsDepSet];
+
+    if (xor(newJsDeps, this.jsDeps)?.length) {
+      this.reSubscribeJsDeps(newJsDeps, this.jsDeps);
+    }
+    this.jsDeps = newJsDeps;
+  }
+
+  /**
+   * 执行js逻辑，在子类中实现对应的逻辑
+   */
+  async runJs() {
   }
 
   getDSProxy() {
@@ -196,7 +240,7 @@ export default class Base {
   }
 
   getStatus() {
-    const pending = this.isPending(this.getDependents());
+    const pending = this.upperIsPending();
     if (pending) {
       return ASYNC_STATUS.PENDING;
     }
@@ -206,10 +250,10 @@ export default class Base {
   /**
    * 计算上游数据源状态
    */
-  isPending(dependents) {
+  upperIsPending() {
     // 上游数据源，被依赖的数据源是否是pending状态
     let hasPending = false;
-    forEach(dependents, (depId) => {
+    forEach(this.getDependents(), (depId) => {
       hasPending = get(this.dsMap, `${depId}.status`) === ASYNC_STATUS.PENDING;
       return !hasPending;
     });
