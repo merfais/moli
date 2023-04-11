@@ -1,3 +1,6 @@
+import {
+  forEach,
+} from 'lodash-es';
 import { markRaw } from 'vue';
 import { defineStore } from 'pinia';
 import { DataSourcePool } from '@/data-source-pool';
@@ -6,6 +9,7 @@ export const useDSPoolStore = defineStore({
   id: 'dsPool',
   state: () => ({
     editorDSPool: {},
+    editorDSIdList: [],
   }),
   getters: {
   },
@@ -14,6 +18,9 @@ export const useDSPoolStore = defineStore({
 export function initEditorDSPool() {
   const store = useDSPoolStore();
   store.editorDSPool = markRaw(new DataSourcePool());
+  store.editorDSPool.subscribe('*', () => {
+    store.editorDSIdList = markRaw(Object.keys(store.editorDSPool.dsMap || {}));
+  });
 }
 
 export function registerEditorDS(conf) {
@@ -46,10 +53,24 @@ export function getEditorDSConfig(dsId) {
 
 export function getEditorDSList(exclude) {
   const store = useDSPoolStore();
-  if (store.editorDSPool?.getDSList) {
-    return store.editorDSPool.getDSList(exclude);
-  }
+
+  const list = [];
+
+  forEach(store.editorDSIdList, (id) => {
+    if (Array.isArray(exclude)) {
+      if (exclude.indexOf(id) !== -1) {
+        return;
+      }
+    } else if (exclude === id) {
+      return;
+    }
+    const { name } = store.editorDSPool.dsMap[id] || {};
+    list.push({ label: name, value: id });
+  });
+
+  return list;
 }
+
 export function getEditorDSValue(dsId) {
   const store = useDSPoolStore();
   if (store.editorDSPool?.dsMap) {

@@ -142,26 +142,6 @@ export class DataSourcePool {
     return {};
   }
 
-  getDSList(exclude) {
-    const list = [];
-
-    forEach(this.dsMap, ({ id, name } = {}) => {
-      if (Array.isArray(exclude)) {
-        if (exclude.indexOf(id) !== -1) {
-          return;
-        }
-      } else if (exclude === id) {
-        return;
-      }
-      list.push({
-        label: name,
-        value: id,
-      });
-    });
-
-    return list;
-  }
-
   /**
    * 订阅数据源变化, 需要指定被订阅的数据源dsId list
    */
