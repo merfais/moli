@@ -73,7 +73,7 @@ export function getEditorDSList(exclude) {
 
 export function getEditorDSValue(dsId) {
   const store = useDSPoolStore();
-  if (store.editorDSPool?.dsMap) {
+  if (store.editorDSPool?.dsMap?.[dsId]) {
     return store.editorDSPool.dsMap[dsId]?.value;
   }
 }

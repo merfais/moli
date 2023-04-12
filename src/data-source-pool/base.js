@@ -28,6 +28,9 @@ export default class Base {
   // 数据源值类型
   valueType = '';
 
+  // 数据源包含的js逻辑
+  jsFn = '';
+
   // 修改数据源时，修改的值存在tmpData字段，
   // 因为要在多个函数中传递此值，且可能会多次被调用执行，因此要缓存到this中
   tmpData = null;
@@ -153,9 +156,7 @@ export default class Base {
       return;
     }
 
-    if (this.jsFn) {
-      await this.invokeJs();
-    }
+    await this.invokeJs();
     this.publish();
   }
 

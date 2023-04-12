@@ -4,13 +4,17 @@ import {
   watch,
 } from 'vue';
 import { Form } from 'ant-design-vue';
+import {
+  getEditorDSValue,
+} from '@/stores/ds-pool';
+
 
 const formItemContext = Form.useInjectFormItemContext();
 
 const props = defineProps({
   value: {},
   initVal: String,
-  depDS: String,
+  optionsDS: String,
 });
 
 const emit = defineEmits([
@@ -25,8 +29,9 @@ const options = [
 
 const valueOptions = shallowRef([]);
 
-watch(() => props.depDS, () => {
-
+watch(() => props.optionsDS, () => {
+  const dsValue = getEditorDSValue(props.optionsDS);
+  valueOptions.value = dsValue;
 });
 
 function onUpdateValue(value) {

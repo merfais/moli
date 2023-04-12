@@ -16,7 +16,7 @@ const props = defineProps({
     default: 'value',
   },
   options: Array,
-  depDS: String,
+  optionsDS: String,
   compType: {
     type: String,
     default: 'select',

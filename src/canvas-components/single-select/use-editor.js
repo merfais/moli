@@ -32,7 +32,7 @@ import InitValSelector from './init-val-selector';
 function getBasic(editor, onUpdate) {
   const items = shallowRef(genBasicFormItems(editor, onUpdate));
 
-  watch(() => editor.viewConf?.depDS, () => {
+  watch(() => editor.viewConf?.optionsDS, () => {
     // TODO: watch dataSource变化，取dataSource的值
     items.value = genBasicFormItems(editor, onUpdate);
   });
