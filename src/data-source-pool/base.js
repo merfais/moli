@@ -324,6 +324,7 @@ export default class Base {
       name: this.name,
       valueType: this.valueType,
       value: cloneDeep(this.getValue()),
+      jsFn: this.jsFn,
     };
     return config;
   }

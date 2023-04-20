@@ -19,6 +19,9 @@ import {
   saveCanvas,
 } from '@/network';
 import {
+  MANUAL_DATA_SOURCE_TYPE_NAME,
+} from '@/constants';
+import {
   getEditorDSConfig,
   initEditorDSPool,
   unRegisterEditorDS,
@@ -58,6 +61,7 @@ export async function init() {
   } catch (e) {
     errorLog({ e, msg: '解析页面配置出错' });
   }
+  console.info('get', id, res);
   loadConf(res);
   store.id = id;
   store.editType = 'update';
@@ -89,6 +93,7 @@ export async function save() {
   const store = useCanvasEditorStore();
   store.loading = true;
   const info = formatConf();
+  console.info('save', store.id, info);
   const data = {
     id: store.id,
     info: JSON.stringify(info),
@@ -114,13 +119,10 @@ function formatConf() {
 
   const oldDS = getEditorDSConfig();
   forEach(oldDS, (item, key) => {
-    // 过滤掉组件导出的数据源
-    // if (item.type) {
-    //   return
-    // }
-
-    // 只保留自定义的数据源
-    info.dataSources[key] = item;
+    // 过滤掉组件导出的数据源，只保留自定义的数据源
+    if (MANUAL_DATA_SOURCE_TYPE_NAME[item.type]) {
+      info.dataSources[key] = item;
+    }
   });
 
   serialize({ ...info, oldDS, layoutType: 'pcLayoutMap', layoutKey: 'root' });
