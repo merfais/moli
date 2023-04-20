@@ -92,7 +92,7 @@ async function onOk() {
 
   // 保存layout
   if (editorStore.index !== -1) {
-    set(canvasStore.pcMainLayoutArr, editorStore.index, editorStore.pcLayout);
+    set(canvasStore.pcLayoutMap.root, editorStore.index, editorStore.pcLayout);
   }
 
   onCancel();

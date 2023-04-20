@@ -5,7 +5,7 @@ import {
   set,
   cloneDeep,
   forEach,
-  pick,
+  omit,
 } from 'lodash-es';
 import {
   unref,
@@ -58,32 +58,39 @@ export async function init() {
   } catch (e) {
     errorLog({ e, msg: '解析页面配置出错' });
   }
-  const { baseInfo = {}, dsPool, ...rest } = res;
-  Object.assign(store.baseInfo, baseInfo);
-  forEach(rest, (item, key) => {
-    store[key] = item;
-  });
-  initEditorDSPool(dsPool);
+  loadConf(res);
   store.id = id;
   store.editType = 'update';
   store.loading = false;
 }
 
+function loadConf(conf) {
+  const store = useCanvasEditorStore();
+  const { baseInfo } = conf;
+  Object.assign(store.baseInfo, baseInfo || {});
+  const { pcLayoutMap, h5LayoutMap } = conf;
+  forEach(pcLayoutMap, (item, key) => {
+    store.pcLayoutMap[key] = Array.isArray(item) ? item : [];
+  });
+  forEach(h5LayoutMap, (item, key) => {
+    store.h5LayoutMap[key] = Array.isArray(item) ? item : [];
+  });
+  if (!store.pcLayoutMap.root) {
+    store.pcLayoutMap.root = [];
+  }
+  if (!store.h5LayoutMap.root) {
+    store.h5LayoutMap.root = [];
+  }
+  store.viewMap = conf.viewMap || {};
+  initEditorDSPool(conf.dataSources);
+}
+
 export async function save() {
   const store = useCanvasEditorStore();
   store.loading = true;
-  const info = pick(store, [
-    'baseInfo',
-    'pcMainLayoutArr',
-    'pcSubLayoutMap',
-    'viewMap',
-  ]);
-
-  info.dsPool = getEditorDSConfig();
-  const { editType } = store;
-
+  const info = formatConf();
   const data = {
-    id: editType === 'create' ? newId(16) : store.id,
+    id: store.id,
     info: JSON.stringify(info),
   };
   try {
@@ -95,23 +102,73 @@ export async function save() {
   store.loading = false;
 }
 
+function formatConf() {
+  const store = useCanvasEditorStore();
+  const info = {
+    dataSources: {},
+    baseInfo: store.baseInfo,
+    pcLayoutMap: {},
+    h5LayoutMap: {},
+    viewMap: {},
+  };
+
+  const oldDS = getEditorDSConfig();
+  forEach(oldDS, (item, key) => {
+    // 过滤掉组件导出的数据源
+    // if (item.type) {
+    //   return
+    // }
+
+    // 只保留自定义的数据源
+    info.dataSources[key] = item;
+  });
+
+  serialize({ ...info, oldDS, layoutType: 'pcLayoutMap', layoutKey: 'root' });
+  serialize({ ...info, oldDS, layoutType: 'h5LayoutMap', layoutKey: 'root' });
+
+  return info;
+}
+
+function serialize(options = {}) {
+  const store = useCanvasEditorStore();
+  const arr = [];
+  const { layoutType, layoutKey } = options;
+  forEach(get(store, [layoutType, layoutKey]), (oldItem) => {
+    const view = store.viewMap?.[oldItem.i];
+    if (!view) {
+      return;
+    }
+    const item = omit(oldItem, ['moved']);
+    if (get(store, [layoutType, item.i, 'length'])) {
+      serialize({ ...options, layoutKey: item.i });
+    }
+    forEach(view?.exportDSs, key => {
+      set(options.dataSources, key, options.oldDS[key]);
+    });
+
+    set(options.viewMap, item.i, view);
+    arr.push(item);
+  });
+  set(options[layoutType], layoutKey, arr);
+}
+
 export function addLayout(layoutItem) {
   const store = useCanvasEditorStore();
-  const arr = [...store.pcMainLayoutArr];
+  const arr = [...store.pcRootLayout];
   arr.push(layoutItem);
-  store.pcMainLayoutArr = arr;
+  store.pcLayoutMap.root = arr;
 }
 
 export function removeLayout(layoutItem) {
   const store = useCanvasEditorStore();
-  store.pcMainLayoutArr = filter(store.pcMainLayoutArr, item => {
+  store.pcLayoutMap.root = filter(store.pcRootLayout, item => {
     return item.i !== layoutItem.i;
   });
 }
 
 export function updateLayout(layoutItem) {
   const store = useCanvasEditorStore();
-  const arr = [...store.pcMainLayoutArr];
+  const arr = [...store.pcRootLayout];
   const index = findIndex(arr, { i: layoutItem.i });
   if (index !== -1) {
     arr.splice(index, 1, {
@@ -119,7 +176,7 @@ export function updateLayout(layoutItem) {
       ...layoutItem,
     });
   }
-  store.pcMainLayoutArr = arr;
+  store.pcLayoutMap.root = arr;
 }
 
 export function addView(conf = {}) {
@@ -160,7 +217,7 @@ export function onClickSetting(i, index) {
   const viewConf = get(canvasStore.viewMap, i) || {};
   compEditorStore.viewConf = cloneDeep(viewConf);
   compEditorStore.compKey = viewConf?.compKey;
-  compEditorStore.pcLayout = cloneDeep(get(canvasStore.pcMainLayoutArr, [index]));
+  compEditorStore.pcLayout = cloneDeep(get(canvasStore.pcRootLayout, [index]));
   compEditorStore.dataSource = {};
 
   forEach(viewConf.exportDSs, (dsId, index) => {

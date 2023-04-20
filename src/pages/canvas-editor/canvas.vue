@@ -158,7 +158,7 @@ function onDrop() {
   });
   addView(viewConf);
   addLayout({ ...draggingLayout, i: viewConf.i });
-  const len = canvasStore.pcMainLayoutArr?.length || 0;
+  const len = canvasStore.pcRootLayout?.length || 0;
   onClickSetting(viewConf.i, len - 1);
 
   // 清理临时数据
@@ -190,7 +190,7 @@ function getToolbarPopupContainer(item) {
       <GridLayout
         class='grid-layout-wrapper height-100'
         ref="gridLayoutRef"
-        v-model:layout="canvasStore.pcMainLayoutArr"
+        v-model:layout="canvasStore.pcLayoutMap.root"
         :colNum="colNum"
         :rowHeight="1"
         :margin="[0, 0]"
@@ -203,7 +203,7 @@ function getToolbarPopupContainer(item) {
         @dragleave.self="onDragleave"
         @drop.stop="onDrop"
       >
-        <template v-for="(item, index) in canvasStore.pcMainLayoutArr"
+        <template v-for="(item, index) in canvasStore.pcRootLayout"
           :key="item.i"
         >
           <ATooltip

@@ -16,12 +16,22 @@ export const useCanvasEditorStore = defineStore({
       height: 1000,
     },
     viewMap: {},
-    pcMainLayoutArr: [],
-    pcSubLayoutMap: {},
+    pcLayoutMap: {
+      root: [],
+    },
+    h5LayoutMap: {
+      root: [],
+    },
     // 从左侧组件区拖拽出来的组件的key
     draggingCompKey: '',
   }),
   getters: {
+    pcRootLayout(state) {
+      return state?.pcLayoutMap?.root || [];
+    },
+    h5RootLayout(state) {
+      return state?.h5LayoutMap?.root || [];
+    },
   },
 });
 
