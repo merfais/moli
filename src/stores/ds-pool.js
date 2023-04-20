@@ -15,9 +15,9 @@ export const useDSPoolStore = defineStore({
   },
 });
 
-export function initEditorDSPool() {
+export function initEditorDSPool(dataSources) {
   const store = useDSPoolStore();
-  store.editorDSPool = markRaw(new DataSourcePool());
+  store.editorDSPool = markRaw(new DataSourcePool(dataSources));
   store.editorDSPool.subscribe('*', () => {
     store.editorDSIdList = markRaw(Object.keys(store.editorDSPool.dsMap || {}));
   });
@@ -46,8 +46,11 @@ export function updateEditorDS(conf) {
 
 export function getEditorDSConfig(dsId) {
   const store = useDSPoolStore();
-  if (store.editorDSPool?.getConfig) {
+  if (dsId && store.editorDSPool?.getConfig) {
     return store.editorDSPool.getConfig(dsId);
+  }
+  if (!dsId && store.editorDSPool.getDsConfig) {
+    return store.editorDSPool.getDsConfig();
   }
 }
 

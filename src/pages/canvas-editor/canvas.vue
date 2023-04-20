@@ -23,7 +23,6 @@ import {
   addLayout,
   removeLayout,
   addView,
-  init,
   onClickSetting,
 } from './use-canvas';
 import CompToolbar from './comp-toolbar';
@@ -35,12 +34,11 @@ let draggingConf = {};
 
 const canvasStore = useCanvasEditorStore();
 
-init();
-
 const canvasDomRef = ref();
 const gridLayoutRef = ref();
 const gridItemsRef = ref();
 const gridItemsClass = ref('');
+
 const contentStyle = computed(() => {
   const { height, width } = canvasStore.baseInfo || {};
   return {

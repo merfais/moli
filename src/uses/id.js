@@ -1,5 +1,17 @@
-export default function newId(prefix = 'id') {
-  return `${prefix}_${Math.random().toString(36).slice(2, 12)}`;
+function randomStr() {
+  return Math.random().toString(36).slice(2);
+}
+export default function newId(arg1 = 'id', arg2 = 8) {
+  let prefix = arg1;
+  let max = arg2;
+  if (/^\d+$/.test(prefix)) {
+    prefix = 'id';
+    max = Number(arg1);
+  }
+  const str = max > 16
+    ? `${randomStr()}${randomStr()}${randomStr()}`
+    : `${randomStr()}${randomStr()}`;
+  return `${prefix}_${str.slice(0, max)}`;
 }
 
 function random(iMax = 9) {

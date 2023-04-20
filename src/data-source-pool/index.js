@@ -142,6 +142,14 @@ export class DataSourcePool {
     return {};
   }
 
+  getDsConfig() {
+    const dsConfig = {};
+    forEach(this.dsMap, (item, key) => {
+      dsConfig[key] = item.getConfig();
+    });
+    return dsConfig;
+  }
+
   /**
    * 订阅数据源变化, 需要指定被订阅的数据源dsId list
    */

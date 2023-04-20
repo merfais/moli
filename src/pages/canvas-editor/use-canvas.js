@@ -5,8 +5,19 @@ import {
   set,
   cloneDeep,
   forEach,
+  pick,
 } from 'lodash-es';
+import {
+  unref,
+} from 'vue';
 import { message } from 'ant-design-vue';
+import newId from '@/uses/id';
+import { errorLog } from '@/uses/log';
+import router from '@/router';
+import {
+  getCanvas,
+  saveCanvas,
+} from '@/network';
 import {
   getEditorDSConfig,
   initEditorDSPool,
@@ -19,16 +30,67 @@ import {
 
 export async function init() {
   const store = useCanvasEditorStore();
+  store.$reset();
+  const route = unref(router.currentRoute);
+  let id = route.params?.id;
+
+  // 新建
+  if (!id) {
+    id = newId(16);
+    store.id = id;
+    store.editType = 'create';
+    initEditorDSPool();
+    router.push({ params: { id } });
+    return;
+  }
+
+  // 修改
   store.loading = true;
-  // TODO:
-  initEditorDSPool();
+  let res;
+  try {
+    res = await getCanvas(id);
+  } catch (e) {
+    errorLog({ e, msg: '获取页面配置失败' });
+  }
+  try {
+    res = res?.info || '{}';
+    res = JSON.parse(res);
+  } catch (e) {
+    errorLog({ e, msg: '解析页面配置出错' });
+  }
+  const { baseInfo = {}, dsPool, ...rest } = res;
+  Object.assign(store.baseInfo, baseInfo);
+  forEach(rest, (item, key) => {
+    store[key] = item;
+  });
+  initEditorDSPool(dsPool);
+  store.id = id;
+  store.editType = 'update';
   store.loading = false;
 }
 
 export async function save() {
   const store = useCanvasEditorStore();
   store.loading = true;
-  // TODO:
+  const info = pick(store, [
+    'baseInfo',
+    'pcMainLayoutArr',
+    'pcSubLayoutMap',
+    'viewMap',
+  ]);
+
+  info.dsPool = getEditorDSConfig();
+  const { editType } = store;
+
+  const data = {
+    id: editType === 'create' ? newId(16) : store.id,
+    info: JSON.stringify(info),
+  };
+  try {
+    await saveCanvas(data);
+  } catch (e) {
+    errorLog({ e, msg: '保存失败' });
+  }
   store.loading = false;
 }
 

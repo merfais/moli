@@ -4,14 +4,16 @@ import {
   SelectOutlined,
 } from '@ant-design/icons-vue';
 import Name from './name';
-
+import {
+  save,
+} from '../use-canvas';
 
 function onClickCancel() {
 
 }
 
 function onClickSave() {
-
+  save();
 }
 </script>
 <template>

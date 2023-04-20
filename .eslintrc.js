@@ -49,6 +49,7 @@ const config = {
     'no-param-reassign': 0,
     'no-use-before-define': 0,
     'no-multiple-empty-lines': 0,
+    'no-promise-executor-return': 0,
     'no-shadow': 0,
     'object-curly-newline': 0,
 
@@ -79,6 +80,7 @@ if (process.env.NODE_ENV !== 'production') {
     'import/newline-after-import': 1,
 
     'array-bracket-spacing': 1,
+    'arrow-spacing': 1,
     'brace-style': 1,
     'block-spacing': 1,
     'comma-dangle': 1,
@@ -90,6 +92,7 @@ if (process.env.NODE_ENV !== 'production') {
     'operator-linebreak': 1,
     'prefer-const': 1,
     'padded-blocks': 1,
+    'quotes': 1,
     'quote-props': 1,
     semi: 1,
     'spaced-comment': 1,

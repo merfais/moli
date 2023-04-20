@@ -2,6 +2,11 @@
 import HeaderSection from './header-section';
 import ToolboxSection from './toolbox-section';
 import Canvas from './canvas';
+import {
+  init,
+} from './use-canvas';
+
+init();
 
 </script>
 <template>

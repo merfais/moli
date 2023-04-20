@@ -10,7 +10,7 @@ export const useCanvasEditorStore = defineStore({
     clone: false,
     loading: false,
     baseInfo: {
-      name: '我我的画布我的画布我的画布我的画布我的画布的画布',
+      name: '我的画布',
       device: 'pc',
       width: 1440,
       height: 1000,
