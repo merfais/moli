@@ -138,6 +138,10 @@ body {
   background: #fff;
 }
 
+.white-025-bg {
+  background: rgb(255, 255, 255, 0.25);
+}
+
 .primary-bg {
   background: var(--primary-color);
 }

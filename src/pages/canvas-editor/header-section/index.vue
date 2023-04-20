@@ -3,10 +3,15 @@ import {
   SaveOutlined,
   SelectOutlined,
 } from '@ant-design/icons-vue';
-import Name from './name';
+import {
+  useCanvasEditorStore,
+} from '../use-store';
 import {
   save,
 } from '../use-canvas';
+import Name from './name';
+
+const canvasStore = useCanvasEditorStore();
 
 function onClickCancel() {
 
@@ -31,6 +36,7 @@ function onClickSave() {
       <AButton
         class="ml-20"
         type="primary"
+        :loading="canvasStore.loading"
         @click="onClickSave"
       >
         <SaveOutlined />

@@ -29,13 +29,11 @@ async function open(options = {}) {
     const req = window.indexedDB.open(dbName, version);
     req.onerror = onerror;
     req.onsuccess = (e) => {
-      console.info('onsuccess', e);
       const db = e.target.result;
       dbMap[dbKey] = db;
       resolve(db);
     };
     req.onupgradeneeded = (e) => {
-      console.info('onupgradeneeded', e);
       const db = e.target.result;
 
       db.onerror = onerror;

@@ -88,6 +88,7 @@ export async function save() {
   };
   try {
     await saveCanvas(data);
+    message.success('保存成功');
   } catch (e) {
     errorLog({ e, msg: '保存失败' });
   }
