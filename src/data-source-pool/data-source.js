@@ -113,6 +113,12 @@ export default class DataSource {
     }
   }
 
+  get type() {
+    if (this.source) {
+      return this.source.type;
+    }
+  }
+
   get value() {
     if (this.source) {
       return this.source.getValue();

@@ -1,5 +1,6 @@
 import {
   forEach,
+  map,
 } from 'lodash-es';
 import { markRaw } from 'vue';
 import { defineStore } from 'pinia';
@@ -52,6 +53,20 @@ export function getEditorDSConfig(dsId) {
   if (!dsId && store.editorDSPool.getDsConfig) {
     return store.editorDSPool.getDsConfig();
   }
+}
+
+export function getEditorDSInfo() {
+  const store = useDSPoolStore();
+  return map(store.editorDSPool.dsMap, item => {
+    return {
+      id: item.id,
+      name: item.name,
+      type: item.type,
+      value: item.value,
+      status: item.status,
+      errMsg: item.errMsg,
+    };
+  });
 }
 
 export function getEditorDSList(exclude) {

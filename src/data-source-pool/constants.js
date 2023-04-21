@@ -15,6 +15,12 @@ export const DATA_SOURCE_TYPE = {
   ...MANUAL_DATA_SOURCE_TYPE,
 };
 
+export const DATA_SOURCE_TYPE_NAME = {
+  [DATA_SOURCE_TYPE.INPUT_LIKE_VIEW]: '输入框导出',
+  [DATA_SOURCE_TYPE.SELECT_LIKE_VIEW]: '筛选器导出',
+  ...MANUAL_DATA_SOURCE_TYPE_NAME,
+};
+
 export const ASYNC_STATUS = {
   PENDING: 'pending',
   FULFILLED: 'fulfilled',

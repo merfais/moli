@@ -2,7 +2,9 @@
 import {
   SaveOutlined,
   SelectOutlined,
+  SettingOutlined,
 } from '@ant-design/icons-vue';
+import DataSourceList from '../data-source/list';
 import {
   useCanvasEditorStore,
 } from '../use-store';
@@ -20,6 +22,11 @@ function onClickCancel() {
 function onClickSave() {
   save();
 }
+
+function onClickSetting() {
+
+}
+
 </script>
 <template>
   <section class="header-section align-center p-10-20">
@@ -43,6 +50,12 @@ function onClickSave() {
         保存
       </AButton>
     </div>
+    <DataSourceList />
+    <RButton @click="onClickSetting">
+      <ATooltip title="页面配置" placement="bottomRight">
+        <SettingOutlined class="f-18" />
+      </ATooltip>
+    </RButton>
   </section>
 </template>
 <style scoped>

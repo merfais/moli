@@ -33,6 +33,9 @@ export function onClickAdd() {
   setFormItems();
 }
 
+export function onClickModify() {
+}
+
 export async function onClickSave() {
   const dsEditorStore = useDataSourceEditorStore();
   try {
