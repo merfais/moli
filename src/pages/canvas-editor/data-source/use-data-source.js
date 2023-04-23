@@ -19,6 +19,7 @@ import {
 import {
   registerEditorDS,
   updateEditorDS,
+  getEditorDSIdList,
 } from '@/stores/ds-pool';
 import {
   PLACEHOLDER,
@@ -100,16 +101,16 @@ function genFormItems() {
   }
 
   const items = {
-    name: {
-      label: '名字',
-      value: record.name,
-      component: 'RInput',
-      rules: useRules(required),
-      onUpdate,
-    },
     id: {
       label: 'ID',
       value: record.id,
+      component: 'RInput',
+      rules: useRules(required, validateId),
+      onUpdate,
+    },
+    name: {
+      label: '名字',
+      value: record.name,
       component: 'RInput',
       rules: useRules(required),
       onUpdate,
@@ -154,4 +155,18 @@ function genFormItems() {
   }
 
   return markRaw(items);
+}
+
+function validateId(value) {
+  const dsEditorStore = useDataSourceEditorStore();
+  const { editType, record } = dsEditorStore;
+  if (editType === 'update'
+    && record?.id === record?.oldId
+  ) {
+    return;
+  }
+  const list = getEditorDSIdList();
+  if (list.indexOf(value) !== -1) {
+    return `已经存在 id = ${value} 的数据源，不可重复`;
+  }
 }

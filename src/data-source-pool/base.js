@@ -81,6 +81,10 @@ export default class Base {
 
   init() {
     this.hasInited = true;
+
+    // 初始化数据源后，通知所有订阅者
+    this.msgCenter.publish(this.id, { onlyAll: true });
+
     this.runProcess();
   }
 
@@ -134,6 +138,10 @@ export default class Base {
     if (has(payload, 'value')) {
       this.tmpData = value;
     }
+
+    // 修改数据源后，通知所有订阅者
+    this.msgCenter.publish(this.id, { onlyAll: true });
+
     this.runProcess();
   }
 
@@ -172,6 +180,9 @@ export default class Base {
    * 执行js逻辑
    */
   async invokeJs() {
+    if (this.upperStaticIsPending()) {
+      return;
+    }
     this.innerStatus = ASYNC_STATUS.PENDING;
     const dataSource = this.getDSProxy();
     this.jsFnCtx = { dataSource };
@@ -249,12 +260,22 @@ export default class Base {
   }
 
   /**
-   * 计算上游数据源状态
+   * 上游数据源，被依赖的数据源是否是pending状态
    */
   upperIsPending() {
-    // 上游数据源，被依赖的数据源是否是pending状态
+    return this.getDepsIsPending(this.getDependents());
+  }
+
+  /**
+   * 上游静态依赖数据源是否是pending状态
+   */
+  upperStaticIsPending() {
+    return this.getDepsIsPending(this.getStaticDeps());
+  }
+
+  getDepsIsPending(deps) {
     let hasPending = false;
-    forEach(this.getDependents(), (depId) => {
+    forEach(deps, (depId) => {
       hasPending = get(this.dsMap, `${depId}.status`) === ASYNC_STATUS.PENDING;
       return !hasPending;
     });

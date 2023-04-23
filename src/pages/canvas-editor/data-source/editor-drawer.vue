@@ -1,5 +1,8 @@
 <script setup>
 import {
+  onBeforeUnmount,
+} from 'vue';
+import {
   useDataSourceEditorStore,
 } from '../use-store';
 import {
@@ -9,7 +12,12 @@ import {
 defineProps({
   uid: String,
 });
+
 const dsEditorStore = useDataSourceEditorStore();
+
+onBeforeUnmount(() => {
+  dsEditorStore.$reset();
+});
 
 </script>
 <template>

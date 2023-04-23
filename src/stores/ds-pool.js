@@ -48,16 +48,16 @@ export function updateEditorDS(conf) {
 export function getEditorDSConfig(dsId) {
   const store = useDSPoolStore();
   if (dsId && store.editorDSPool?.getConfig) {
-    return store.editorDSPool.getConfig(dsId);
+    return markRaw(store.editorDSPool.getConfig(dsId));
   }
   if (!dsId && store.editorDSPool.getDsConfig) {
-    return store.editorDSPool.getDsConfig();
+    return markRaw(store.editorDSPool.getDsConfig());
   }
 }
 
 export function getEditorDSInfo() {
   const store = useDSPoolStore();
-  return map(store.editorDSPool.dsMap, item => {
+  return markRaw(map(store.editorDSPool.dsMap, item => {
     return {
       id: item.id,
       name: item.name,
@@ -66,7 +66,7 @@ export function getEditorDSInfo() {
       status: item.status,
       errMsg: item.errMsg,
     };
-  });
+  }));
 }
 
 export function getEditorDSList(exclude) {
@@ -86,7 +86,12 @@ export function getEditorDSList(exclude) {
     list.push({ label: name, value: id });
   });
 
-  return list;
+  return markRaw(list);
+}
+
+export function getEditorDSIdList() {
+  const store = useDSPoolStore();
+  return markRaw(Object.keys(store.editorDSPool.dsMap || {}));
 }
 
 export function getEditorDSValue(dsId) {

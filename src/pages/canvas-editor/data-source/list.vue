@@ -159,7 +159,7 @@ function onClickRemove(options) {
       </div>
       <div class="align-center p-5 gray-bg">
         <div class="filter-desc mr-10">筛选条件</div>
-        <div class="flex-0-0">ID或名字：</div>
+        <div class="flex-0-0">名字或ID：</div>
         <RInput
           class="mr-20 filter-input"
           v-model:value="nameFilter"
