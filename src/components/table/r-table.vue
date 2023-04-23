@@ -345,11 +345,14 @@ function getOp({ column, record } = {}) {
       set(item, 'compProps.type', 'link');
     }
     // 如果是删除按钮，设置删除确认参数
-    if (item.isDelete && !item.popConfirmProps) {
-      item.popConfirmProps = {
-        title: '确认要删除吗？',
-        placement: 'left',
-      };
+    if (item.isDelete) {
+      if (!item.popConfirmProps) {
+        item.popConfirmProps = {
+          title: '确认要删除吗？',
+          placement: 'left',
+        };
+      }
+      set(item, 'compProps.danger', true);
     }
     const { popConfirmProps, onClick, onConfirm } = item;
     if (popConfirmProps) {

@@ -58,6 +58,8 @@ export const useDataSourceEditorStore = defineStore({
   id: 'dataSourceEditor',
   state: () => ({
     visible: false,
+    uid: undefined,
+    editType: 'create',
     title: '新建数据源',
     // 是否是克隆
     clone: false,

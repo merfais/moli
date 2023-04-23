@@ -1,38 +1,27 @@
 <script setup>
-import {
-  useDataSourceEditorStore,
-} from '../use-store';
+import EditorDrawer from './editor-drawer';
 import {
   onClickAdd,
-  onClickSave,
 } from './use-data-source';
 
-defineProps({
+const props = defineProps({
   getContainer: Function,
+  uid: String,
 });
-const dsEditorStore = useDataSourceEditorStore();
 
 </script>
 <script>export default { inheritAttrs: false }; </script>
 <template>
   <AButton
     v-bind="$attrs"
-    @click="onClickAdd"
+    @click="() => onClickAdd(props.uid)"
   >
     新建数据源
   </AButton>
-  <RDrawer
-    v-model:visible="dsEditorStore.visible"
-    :title="dsEditorStore.title"
+  <EditorDrawer
     :getContainer="getContainer"
-    width="1100px"
-    @ok="onClickSave"
-  >
-    <RForm
-      :ref="el => dsEditorStore.form = el"
-      :formItems="dsEditorStore.formItems"
-    />
-  </RDrawer>
+    :uid="uid"
+  />
 </template>
 <style scoped>
 </style>

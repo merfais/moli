@@ -1,6 +1,7 @@
 import {
   map,
   set,
+  cloneDeep,
 } from 'lodash-es';
 import {
   markRaw,
@@ -17,6 +18,7 @@ import {
 } from '@/data-source-pool';
 import {
   registerEditorDS,
+  updateEditorDS,
 } from '@/stores/ds-pool';
 import {
   PLACEHOLDER,
@@ -26,14 +28,34 @@ import {
 } from '../use-store';
 import JsFnEditor from './js-fn-editor';
 
-export function onClickAdd() {
+export function onClickAdd(uid) {
   const dsEditorStore = useDataSourceEditorStore();
   dsEditorStore.$reset();
   dsEditorStore.visible = true;
+  if (typeof uid === 'string') {
+    dsEditorStore.uid = uid;
+  }
   setFormItems();
 }
 
-export function onClickModify() {
+export function onClickClone(options = {}) {
+  const dsEditorStore = useDataSourceEditorStore();
+  dsEditorStore.$reset();
+  dsEditorStore.visible = true;
+  dsEditorStore.record = cloneDeep(options.record) || {};
+  dsEditorStore.record.oldId = dsEditorStore.record.id;
+  setFormItems();
+}
+
+export function onClickModify(options = {}) {
+  const dsEditorStore = useDataSourceEditorStore();
+  dsEditorStore.$reset();
+  dsEditorStore.visible = true;
+  dsEditorStore.title = '修改数据源';
+  dsEditorStore.record = cloneDeep(options.record) || {};
+  dsEditorStore.record.oldId = dsEditorStore.record.id;
+  dsEditorStore.editType = 'update';
+  setFormItems();
 }
 
 export async function onClickSave() {
@@ -48,11 +70,15 @@ export async function onClickSave() {
     return;
   }
 
+  if (dsEditorStore.editType === 'create') {
+    registerEditorDS(dsEditorStore.record);
+  } else {
+    updateEditorDS(dsEditorStore.record);
+  }
   dsEditorStore.visible = false;
-  registerEditorDS(dsEditorStore.record);
 }
 
-export function setFormItems() {
+function setFormItems() {
   const dsEditorStore = useDataSourceEditorStore();
 
   dsEditorStore.formItems = genFormItems();

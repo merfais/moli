@@ -136,6 +136,7 @@ function onCancel() {
       <div class="flex-grow">
         <AddDataSourceBtn
           :getContainer="() => $refs.domRef"
+          uid="inCompEditor"
         />
       </div>
       <AButton @click="onCancel">
