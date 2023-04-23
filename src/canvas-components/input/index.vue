@@ -16,7 +16,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:value',
-  'update:var',
+  'update:ds',
   'update:focused',
 ]);
 
@@ -39,8 +39,8 @@ watch(focused, () => {
 
 function onUpdateValue(value) {
   emit('update:value', value);
-  emit('update:var', {
-    varId: props.exportDS1,
+  emit('update:ds', {
+    dsId: props.exportDS1,
     value,
   });
 }

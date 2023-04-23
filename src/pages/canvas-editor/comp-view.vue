@@ -14,6 +14,9 @@ import {
   compMap,
 } from '@/canvas-components';
 import {
+  setEditorDSValue,
+} from '@/stores/ds-pool';
+import {
   useCanvasEditorStore,
 } from './use-store';
 import {
@@ -71,7 +74,8 @@ function onUpdateValue(value) {
   set(canvasStore.viewMap, [props.i, 'value'], value);
 }
 
-function onUpdateDataSource() {
+function onUpdateDataSource(options = {}) {
+  setEditorDSValue(options);
 }
 
 function onFocused(focused) {

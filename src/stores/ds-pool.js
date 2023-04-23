@@ -45,6 +45,13 @@ export function updateEditorDS(conf) {
   }
 }
 
+export function setEditorDSValue(...args) {
+  const store = useDSPoolStore();
+  if (store.editorDSPool?.setValue) {
+    store.editorDSPool.setValue(...args);
+  }
+}
+
 export function getEditorDSConfig(dsId) {
   const store = useDSPoolStore();
   if (dsId && store.editorDSPool?.getConfig) {

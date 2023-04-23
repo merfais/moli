@@ -207,6 +207,7 @@ export default class Base {
    * 执行js逻辑，在子类中实现对应的逻辑
    */
   async runJs() {
+    return this.innerValue;
   }
 
   getDSProxy() {
