@@ -2,7 +2,10 @@ import {
   forEach,
   map,
 } from 'lodash-es';
-import { markRaw } from 'vue';
+import {
+  markRaw,
+  onBeforeUnmount,
+} from 'vue';
 import { defineStore } from 'pinia';
 import { DataSourcePool } from '@/data-source-pool';
 
@@ -22,6 +25,15 @@ export function initEditorDSPool(dataSources) {
   store.editorDSPool.subscribe('*', () => {
     store.editorDSIdList = markRaw(Object.keys(store.editorDSPool.dsMap || {}));
   });
+}
+
+export function destroyEditorDSPool() {
+  const store = useDSPoolStore();
+  if (store.editorDSPool?.destructor) {
+    store.editorDSPool.destructor();
+  }
+  store.editorDSPool = {};
+  store.editorDSIdList = [];
 }
 
 export function registerEditorDS(conf) {
@@ -76,7 +88,7 @@ export function getEditorDSInfo() {
   }));
 }
 
-export function getEditorDSList(exclude) {
+export function getEditorDSOpts(exclude) {
   const store = useDSPoolStore();
 
   const list = [];
@@ -107,4 +119,13 @@ export function getEditorDSValue(dsId) {
     return store.editorDSPool.dsMap[dsId]?.value;
   }
 }
+
+export function watchEditorDS(...args) {
+  const store = useDSPoolStore();
+  const unwatch = store.editorDSPool.subscribe(...args);
+  onBeforeUnmount(() => {
+    unwatch();
+  });
+}
+
 

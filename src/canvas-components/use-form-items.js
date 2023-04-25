@@ -86,9 +86,10 @@ export function getDisabledFormItems(editor = {}, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
 
   const items = {
-    disabledDS: {
+    disabledDepDS: {
       label: '是否禁用',
-      value: viewConf.disabledDS,
+      value: viewConf.depDSs?.disabled || '',
+      path: 'depDSs.disabled',
       component: DisabledFormItem,
       compProps: {
         exportDSs: get(viewConf, 'exportDSs'),

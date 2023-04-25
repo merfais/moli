@@ -14,7 +14,7 @@ const formItemContext = Form.useInjectFormItemContext();
 const props = defineProps({
   value: {},
   initVal: String,
-  optionsDS: String,
+  depDSs: Object,
 });
 
 const emit = defineEmits([
@@ -29,8 +29,12 @@ const options = [
 
 const valueOptions = shallowRef([]);
 
-watch(() => props.optionsDS, () => {
-  const dsValue = getEditorDSValue(props.optionsDS);
+watch(() => props?.depDSs?.options, () => {
+  if (!props?.depDSs?.options) {
+    valueOptions.value = [];
+    return;
+  }
+  const dsValue = getEditorDSValue(props.depDSs.options);
   valueOptions.value = dsValue;
 });
 

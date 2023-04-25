@@ -6,6 +6,7 @@ import {
   cloneDeep,
   forEach,
   omit,
+  merge,
 } from 'lodash-es';
 import {
   unref,
@@ -26,6 +27,9 @@ import {
   initEditorDSPool,
   unRegisterEditorDS,
 } from '@/stores/ds-pool';
+import {
+  getCompConfig,
+} from '@/canvas-components';
 import {
   useCompEditorStore,
   useCanvasEditorStore,
@@ -62,16 +66,18 @@ export async function init() {
     errorLog({ e, msg: '解析页面配置出错' });
   }
   console.info('get', id, res);
-  loadConf(res);
+  await loadConf(res);
   store.id = id;
   store.editType = 'update';
   store.loading = false;
 }
 
-function loadConf(conf) {
+async function loadConf(conf) {
   const store = useCanvasEditorStore();
-  const { baseInfo } = conf;
+  const { baseInfo, dataSources } = conf;
+  initEditorDSPool(dataSources);
   Object.assign(store.baseInfo, baseInfo || {});
+
   const { pcLayoutMap, h5LayoutMap } = conf;
   forEach(pcLayoutMap, (item, key) => {
     store.pcLayoutMap[key] = Array.isArray(item) ? item : [];
@@ -85,8 +91,41 @@ function loadConf(conf) {
   if (!store.h5LayoutMap.root) {
     store.h5LayoutMap.root = [];
   }
-  store.viewMap = conf.viewMap || {};
-  initEditorDSPool(conf.dataSources);
+  const tmp = [];
+  forEach(conf.viewMap, (item, key) => {
+    tmp.push((async () => {
+      const { compKey } = item;
+      let conf = await getCompConfig(compKey);
+      conf = genViewConf({ conf, device: baseInfo.device || 'pc' });
+      store.viewMap[key] = merge(conf, item);
+    })());
+  });
+  try {
+    await Promise.all(tmp);
+  } catch (e) {
+    // 忽略
+  }
+}
+
+export function genViewConf(options = {}) {
+  const { conf, device } = options;
+  const viewConf = {
+    i: newId(conf.key),
+    compName: conf.name,
+    compKey: conf.key,
+    ...conf.dftConf,
+    exportDSs: [],
+    style: get(conf.style, device || 'pc') || {},
+  };
+  viewConf.name = `${viewConf.compName}${viewConf.i}`;
+  forEach(conf.dataSource, (item, index) => {
+    const { idPrefix } = item;
+    const id = newId(idPrefix, 6);
+    viewConf.exportDSs = [id];
+    const k = `exportDS${index + 1}`;
+    viewConf[k] = id;
+  });
+  return viewConf;
 }
 
 export async function save() {
@@ -211,7 +250,6 @@ export function updateView() {
 export function onClickSetting(i, index) {
   const compEditorStore = useCompEditorStore();
   compEditorStore.visible = true;
-  compEditorStore.title = '修改配置';
   compEditorStore.i = i;
   compEditorStore.index = index;
 

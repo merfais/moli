@@ -22,7 +22,7 @@ export default class MessageCenter {
    */
   subscribe = (dsIds, cb, { immediate = false } = {}) => {
     if (typeof cb !== 'function') {
-      return;
+      return () => this.unSubscribe(dsIds, cb);
     }
     const ids = Array.isArray(dsIds) ? dsIds : [dsIds];
     forEach(ids, (dsId) => {
@@ -39,6 +39,7 @@ export default class MessageCenter {
     if (immediate) {
       cb();
     }
+    return () => this.unSubscribe(dsIds, cb);
   };
 
   /**

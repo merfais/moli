@@ -1,7 +1,17 @@
 <script setup>
 import {
+  get,
+  forEach,
+} from 'lodash-es';
+import {
+  unref,
   computed,
+  shallowRef,
 } from 'vue';
+import {
+  watchEditorDS,
+  getEditorDSValue,
+} from '@/stores/ds-pool';
 
 const props = defineProps({
   placeholder: String,
@@ -15,18 +25,19 @@ const props = defineProps({
     type: String,
     default: 'value',
   },
-  options: Array,
-  optionsDS: String,
   compType: {
     type: String,
     default: 'select',
   },
+  depDSs: Object,
 });
 
 const emit = defineEmits([
   'update:value',
   'update:var',
 ]);
+
+const optionsDSValue = shallowRef([]);
 
 const innerPlaceholder = computed(() => {
   if (props.placeholder) {
@@ -37,8 +48,26 @@ const innerPlaceholder = computed(() => {
 });
 
 const innerOptions = computed(() => {
-  return props.options;
+  const list = [];
+  const valueMap = {};
+  forEach(unref(optionsDSValue), item => {
+    const value = get(item, props.valueField);
+    const label = get(item, props.labelField);
+    if (!valueMap[value]) {
+      valueMap[value] = true;
+      list.push({ label, value, title: `${label}(${value})` });
+    }
+  });
+  return list;
 });
+
+watchEditorDS(props.depDSs?.options, () => {
+  if (props.depDSs?.options) {
+    optionsDSValue.value = getEditorDSValue(props.depDSs.options);
+  } else {
+    optionsDSValue.value = [];
+  }
+}, { immediate: true });
 
 function onUpdateValue(value) {
   emit('update:value', value);

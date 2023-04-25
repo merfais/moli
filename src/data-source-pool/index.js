@@ -159,14 +159,14 @@ export class DataSourcePool {
    * 订阅数据源变化, 需要指定被订阅的数据源dsId list
    */
   subscribe(...args) {
-    this.msgCenter.subscribe(...args);
+    return this.msgCenter.subscribe(...args);
   }
 
   /**
    * 取消订阅数据源变化
    */
   unSubscribe(...args) {
-    this.msgCenter.unSubscribe(...args);
+    return this.msgCenter.unSubscribe(...args);
   }
 
   /**

@@ -32,7 +32,7 @@ import InitValSelector from './init-val-selector';
 function getBasic(editor, onUpdate) {
   const items = shallowRef(genBasicFormItems(editor, onUpdate));
 
-  watch(() => editor.viewConf?.optionsDS, () => {
+  watch(() => editor.viewConf.depDSs?.options, () => {
     // TODO: watch dataSource变化，取dataSource的值
     items.value = genBasicFormItems(editor, onUpdate);
   });
@@ -67,9 +67,10 @@ function genBasicFormItems(editor, onUpdate) {
         ], value => ({ value, label: SELECT_COMP_TYPE_NAME[value] })),
       },
     },
-    optionsDS: {
-      label: '单选选项来源',
-      value: viewConf.optionsDS,
+    optionsDepDS: {
+      label: '选项列表来源',
+      value: viewConf.depDSs?.options,
+      path: 'depDSs.options',
       component: SelectOptionsFormItem,
       compProps: {
         exportDSs: get(viewConf, 'exportDSs'),
@@ -103,7 +104,7 @@ function genBasicFormItems(editor, onUpdate) {
       component: InitValSelector,
       compProps: {
         initVal: viewConf.initVal,
-        optionsDS: viewConf.optionsDS,
+        depDSs: viewConf.depDSs,
         onUpdateInitVal: (payload) => onUpdate({ path: 'initVal', payload }),
       },
       onUpdate,

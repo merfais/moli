@@ -22,6 +22,7 @@ import {
 import {
   addLayout,
   removeLayout,
+  genViewConf,
   addView,
   onClickSetting,
 } from './use-canvas';
@@ -131,29 +132,15 @@ function onDrop() {
   removeLayout(draggingLayout);
 
   const device = get(canvasStore, 'baseInfo.device') || 'pc';
-  const viewConf = {
-    i: newId(canvasStore.draggingCompKey),
-    compName: draggingConf.name,
-    compKey: canvasStore.draggingCompKey,
-    ...draggingConf.dftConf,
-    exportDSs: [],
-    style: get(draggingConf.style, device) || {},
-  };
-  viewConf.name = `${viewConf.compName}${viewConf.i}`;
-  forEach(draggingConf.dataSource, (item, index) => {
-    const { idPrefix, ...restConf } = item;
-    const id = newId(item.idPrefix, 6);
+  const viewConf = genViewConf({ conf: draggingConf, device });
+
+  forEach(viewConf.exportDSs, (id, index) => {
     const name = `${draggingConf.name}${id}`;
-
-    viewConf.exportDSs = [id];
-    const k = `exportDS${index + 1}`;
-    viewConf[k] = id;
-
     registerEditorDS({
       id,
       name,
       valueType: viewConf.valueType,
-      ...restConf,
+      ...draggingConf.dataSource[index],
     });
   });
   addView(viewConf);

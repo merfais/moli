@@ -4,7 +4,7 @@ import {
   computed,
 } from 'vue';
 import { Form } from 'ant-design-vue';
-import { getEditorDSList } from '@/stores/ds-pool';
+import { getEditorDSOpts } from '@/stores/ds-pool';
 
 const formItemContext = Form.useInjectFormItemContext();
 
@@ -18,7 +18,7 @@ const emit = defineEmits([
 
 const trueValue = shallowRef();
 const options = computed(() => {
-  const list = getEditorDSList(props.exportDSs);
+  const list = getEditorDSOpts(props.exportDSs);
   return list;
 });
 

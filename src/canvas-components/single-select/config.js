@@ -29,8 +29,10 @@ export default function genConf() {
       label: undefined,
       labelPos: 'left',
       placeholder: undefined,
-      disabledDS: '',
-      optionsDS: undefined,
+      depDSs: {
+        options: undefined,
+        disabled: undefined,
+      },
       value: undefined,
       initVal: 'static',
       labelField: 'label',

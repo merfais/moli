@@ -1,18 +1,32 @@
 <script setup>
+import {
+  onBeforeUnmount,
+} from 'vue';
+import { destroyEditorDSPool } from '@/stores/ds-pool';
 import HeaderSection from './header-section';
 import ToolboxSection from './toolbox-section';
 import Canvas from './canvas';
 import {
   useCanvasEditorStore,
+  useCompEditorStore,
+  useDataSourceEditorStore,
 } from './use-store';
 import {
   init,
 } from './use-canvas';
 
 const canvasStore = useCanvasEditorStore();
+const compEditorStore = useCompEditorStore();
+const dsEditorStore = useDataSourceEditorStore();
 
 init();
 
+onBeforeUnmount(() => {
+  destroyEditorDSPool();
+  canvasStore.$reset();
+  compEditorStore.$reset();
+  dsEditorStore.$reset();
+});
 </script>
 <template>
   <div class="height-100">

@@ -95,7 +95,6 @@ function onFocused(focused) {
     <component
       :is="compMap[compKey]"
       v-bind="compProps"
-      :options="[{label: 'l', value: 'v'}]"
       @update:value="onUpdateValue"
       @update:ds="onUpdateDataSource"
       @update:focused="onFocused"

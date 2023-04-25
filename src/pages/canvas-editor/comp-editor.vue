@@ -12,6 +12,7 @@ import {
   watch,
   shallowRef,
   onMounted,
+  onBeforeUnmount,
 } from 'vue';
 import { message } from 'ant-design-vue';
 import {
@@ -38,6 +39,10 @@ const formRef = ref();
 const editorConf = shallowRef({});
 
 onMounted(() => {
+});
+
+onBeforeUnmount(() => {
+  editorStore.$reset();
 });
 
 watch(() => editorStore.visible, () => {

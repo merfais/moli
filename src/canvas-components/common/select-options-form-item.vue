@@ -1,8 +1,10 @@
 <script setup>
-import { map } from 'lodash-es';
+import {
+  forEach,
+} from 'lodash-es';
 import { computed } from 'vue';
 import {
-  getEditorDSList,
+  getEditorDSOpts,
   getEditorDSValue,
 } from '@/stores/ds-pool';
 
@@ -11,16 +13,23 @@ const props = defineProps({
 });
 
 const options = computed(() => {
-  const list = getEditorDSList(props.exportDSs);
-  return map(list, item => {
+  const list = getEditorDSOpts(props.exportDSs);
+  const arr = [];
+  const disabledArr = [];
+  forEach(list, item => {
     const { value, label } = item;
     const dsValue = getEditorDSValue(value);
     const disabled = !Array.isArray(dsValue);
     const title = disabled
       ? `${value}，数据源的值是非数组时不可用`
       : value;
-    return { value, label, title, disabled };
+    if (disabled) {
+      disabledArr.push({ value, label, title, disabled });
+    } else {
+      arr.push({ value, label, title });
+    }
   });
+  return [...arr, ...disabledArr];
 });
 </script>
 <script>export default { inheritAttrs: false }; </script>

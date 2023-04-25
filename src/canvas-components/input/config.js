@@ -33,7 +33,9 @@ export default function genConf() {
       value: undefined,
       valueType: VALUE_TYPE.STRING,
       placeholder: undefined,
-      disabledDS: '',
+      depDSs: {
+        disabled: undefined,
+      },
     },
     style: {
       pc: {
