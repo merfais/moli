@@ -12,6 +12,9 @@ import {
   watchEditorDS,
   getEditorDSValue,
 } from '@/stores/ds-pool';
+import {
+  SELECT_COMP_TYPE,
+} from '../constants';
 
 const props = defineProps({
   placeholder: String,
@@ -71,7 +74,7 @@ watchEditorDS(props.depDSs?.options, () => {
 
 function onUpdateValue(value) {
   emit('update:value', value);
-  emit('update:var', {
+  emit('update:ds', {
     varId: props.exportDS1,
     value,
   });
@@ -79,11 +82,11 @@ function onUpdateValue(value) {
 
 </script>
 <template>
-  <ButtonRadioGroup v-if="compType === 'buttonRadio'"
+  <ButtonRadioGroup v-if="compType === SELECT_COMP_TYPE.BTN_RADIO"
     :options="innerOptions"
     @update:value="onUpdateValue"
   />
-  <RadioGroup v-else-if="compType === 'radio'"
+  <RadioGroup v-else-if="compType === SELECT_COMP_TYPE.RADIO"
     :options="innerOptions"
     @update:value="onUpdateValue"
   />

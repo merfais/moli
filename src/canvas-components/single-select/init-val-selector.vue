@@ -7,6 +7,7 @@ import { Form } from 'ant-design-vue';
 import {
   getEditorDSValue,
 } from '@/stores/ds-pool';
+import SingleSelect from './index';
 
 
 const formItemContext = Form.useInjectFormItemContext();
@@ -15,6 +16,8 @@ const props = defineProps({
   value: {},
   initVal: String,
   depDSs: Object,
+  labelField: String,
+  valueField: String,
 });
 
 const emit = defineEmits([
@@ -63,10 +66,12 @@ function onUpdate(value) {
       />
     </div>
     <div class="flex-grow">
-      <RSelect
+      <SingleSelect
         :value="value"
-        :options="valueOptions"
         :disabled="initVal !== 'static'"
+        :depDSs="depDSs"
+        :labelField="labelField"
+        :valueField="valueField"
         placeholder="请选择默认值"
         @update:value="onUpdateValue"
       />

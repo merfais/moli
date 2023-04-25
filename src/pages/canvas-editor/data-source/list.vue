@@ -54,6 +54,10 @@ const columns = [{
 }, {
   dataIndex: 'valueStr',
   name: '值',
+  component: 'div',
+  compProps: {
+    class: 'ellipsis-2',
+  },
 }, {
   name: '操作',
   dataIndex: 'ops',

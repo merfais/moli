@@ -18,6 +18,7 @@ import {
 } from '../constants';
 import {
   SelectOptionsFormItem,
+  DsFieldSeletor,
 } from '../common';
 import {
   getLabel,
@@ -32,14 +33,14 @@ import InitValSelector from './init-val-selector';
 function getBasic(editor, onUpdate) {
   const items = shallowRef(genBasicFormItems(editor, onUpdate));
 
-  watch(() => editor.viewConf.depDSs?.options, () => {
-    // TODO: watch dataSource变化，取dataSource的值
+  watch(() => [
+    editor.viewConf.depDSs?.options,
+    editor.viewConf.initVal,
+    editor.viewConf.labelField,
+    editor.viewConf.valueField,
+  ], () => {
     items.value = genBasicFormItems(editor, onUpdate);
-  });
-
-  watch(() => editor.viewConf.initVal, () => {
-    items.value = genBasicFormItems(editor, onUpdate);
-  });
+  }, { deep: true });
 
   return items;
 }
@@ -66,6 +67,7 @@ function genBasicFormItems(editor, onUpdate) {
           SELECT_COMP_TYPE.BTN_RADIO,
         ], value => ({ value, label: SELECT_COMP_TYPE_NAME[value] })),
       },
+      onUpdate,
     },
     optionsDepDS: {
       label: '选项列表来源',
@@ -73,7 +75,7 @@ function genBasicFormItems(editor, onUpdate) {
       path: 'depDSs.options',
       component: SelectOptionsFormItem,
       compProps: {
-        exportDSs: get(viewConf, 'exportDSs'),
+        exportDSs: viewConf.exportDSs,
       },
       rules: useRules(required),
       onUpdate,
@@ -81,20 +83,18 @@ function genBasicFormItems(editor, onUpdate) {
     labelField: {
       label: '选项文字取自',
       value: viewConf.labelField,
-      component: 'RInput',
+      component: DsFieldSeletor,
       compProps: {
-        preText: '数据的',
-        postText: '字段',
+        depDSs: viewConf.depDSs,
       },
       onUpdate,
     },
     valueField: {
       label: '选项值取自',
       value: viewConf.valueField,
-      component: 'RInput',
+      component: DsFieldSeletor,
       compProps: {
-        preText: '数据的',
-        postText: '字段',
+        depDSs: viewConf.depDSs,
       },
       onUpdate,
     },
@@ -105,6 +105,8 @@ function genBasicFormItems(editor, onUpdate) {
       compProps: {
         initVal: viewConf.initVal,
         depDSs: viewConf.depDSs,
+        labelField: viewConf.labelField,
+        valueField: viewConf.valueField,
         onUpdateInitVal: (payload) => onUpdate({ path: 'initVal', payload }),
       },
       onUpdate,

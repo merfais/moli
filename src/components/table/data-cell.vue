@@ -36,6 +36,7 @@ const cellText = computed(() => {
   // dataSource中字段的值是 object，可能使用了component渲染
   // 判断component是否有值，取item.text 或固定值column.compInnerText
   if (typeof text === 'object'
+    && text
     && (props.column?.component || props.item?.component)
   ) {
     text = text.text || props.column?.compInnerText;

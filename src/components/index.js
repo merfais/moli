@@ -14,6 +14,7 @@ import VTable from './table/v-table';
 import RSelect from './select';
 import RInput from './input';
 import RTextarea from './textarea';
+import RAutoComplete from './auto-complete';
 import LabelValueInfo from './label-value-info';
 import LabelValueInfos from './label-value-infos';
 import ConfirmButton from './confirm-button';
@@ -57,6 +58,7 @@ export default function install(app) {
     RSelect,
     RInput,
     RTextarea,
+    RAutoComplete,
     LabelValueInfo,
     LabelValueInfos,
     ConfirmButton,
