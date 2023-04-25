@@ -6,6 +6,10 @@ import { convertValueType } from './use-helper';
 import { ASYNC_STATUS } from './constants';
 
 export default class InputLikeView extends Base {
+  constructor(info) {
+    super(info);
+    this.valueType = info.valueType;
+  }
   /**
    * 重载父类方法
    */
@@ -20,5 +24,11 @@ export default class InputLikeView extends Base {
       this.innerStatus = ASYNC_STATUS.REJECTED;
       this.setError(error);
     }
+  }
+
+  getAddonConfig() {
+    return {
+      valueType: this.valueType,
+    };
   }
 }

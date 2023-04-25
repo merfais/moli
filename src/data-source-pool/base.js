@@ -6,6 +6,7 @@ import {
   isEqual,
   cloneDeep,
   xor,
+  pick,
 } from 'lodash-es';
 import {
   ASYNC_STATUS,
@@ -24,12 +25,6 @@ export default class Base {
 
   // 数据源的名字
   name = '';
-
-  // 数据源值类型
-  valueType = '';
-
-  // 数据源包含的js逻辑
-  jsFn = '';
 
   // 修改数据源时，修改的值存在tmpData字段，
   // 因为要在多个函数中传递此值，且可能会多次被调用执行，因此要缓存到this中
@@ -69,10 +64,15 @@ export default class Base {
   hasDestroyed = false;
 
   constructor(info) {
-    const { value, ...rest } = info;
-
-    rest.tmpData = value;
-    Object.assign(this, rest);
+    this.tmpData = info.value;
+    Object.assign(this, pick(info, [
+      'id',
+      'name',
+      'type',
+      'dsMap',
+      'msgCenter',
+      'reSubscribeJsDeps',
+    ]));
   }
 
   destructor() {
@@ -339,14 +339,16 @@ export default class Base {
     return `数据源${this.id}计算出错: ${msgStack.join(';=>')}`;
   }
 
+  getAddonConfig() {
+  }
+
   getConfig() {
     const config = {
       type: this.type,
       id: this.id,
       name: this.name,
-      valueType: this.valueType,
       value: cloneDeep(this.getValue()),
-      jsFn: this.jsFn,
+      ...this.getAddonConfig(),
     };
     return config;
   }

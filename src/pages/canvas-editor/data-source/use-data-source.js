@@ -2,6 +2,7 @@ import {
   map,
   set,
   cloneDeep,
+  forEach,
 } from 'lodash-es';
 import {
   markRaw,
@@ -43,7 +44,7 @@ export function onClickClone(options = {}) {
   const dsEditorStore = useDataSourceEditorStore();
   dsEditorStore.$reset();
   dsEditorStore.visible = true;
-  dsEditorStore.record = cloneDeep(options.record) || {};
+  dsEditorStore.record = cloneDeep(options.record.metaItem) || {};
   dsEditorStore.record.oldId = dsEditorStore.record.id;
   setFormItems();
 }
@@ -53,7 +54,7 @@ export function onClickModify(options = {}) {
   dsEditorStore.$reset();
   dsEditorStore.visible = true;
   dsEditorStore.title = '修改数据源';
-  dsEditorStore.record = cloneDeep(options.record) || {};
+  dsEditorStore.record = cloneDeep(options.record.metaItem) || {};
   dsEditorStore.record.oldId = dsEditorStore.record.id;
   dsEditorStore.editType = 'update';
   setFormItems();
@@ -86,6 +87,11 @@ function setFormItems() {
 
   const { record } = dsEditorStore;
   watch(() => record.type, () => {
+    forEach(record, (v, k) => {
+      if (k !== 'id' && k !== 'name' && k !== 'type') {
+        record[k] = undefined;
+      }
+    });
     dsEditorStore.formItems = genFormItems();
   });
 }

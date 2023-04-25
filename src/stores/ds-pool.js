@@ -78,10 +78,7 @@ export function getEditorDSInfo() {
   const store = useDSPoolStore();
   return markRaw(map(store.editorDSPool.dsMap, item => {
     return {
-      id: item.id,
-      name: item.name,
-      type: item.type,
-      value: item.value,
+      ...item.getConfig(),
       status: item.status,
       errMsg: item.errMsg,
     };

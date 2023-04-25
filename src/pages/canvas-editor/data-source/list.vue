@@ -32,11 +32,11 @@ import {
 const dsPoolStore = useDSPoolStore();
 
 const columns = [{
-  dataIndex: 'id',
+  dataIndex: 'metaItem.id',
   name: '数据源ID',
   width: 220,
 }, {
-  dataIndex: 'name',
+  dataIndex: 'metaItem.name',
   name: '数据源名字',
   width: 220,
 }, {
@@ -44,11 +44,11 @@ const columns = [{
   name: '类型',
   width: 150,
 }, {
-  dataIndex: 'status',
+  dataIndex: 'metaItem.status',
   name: '状态',
   width: 150,
 }, {
-  dataIndex: 'errMsg',
+  dataIndex: 'metaItem.errMsg',
   name: '错误',
   width: 150,
 }, {
@@ -110,7 +110,7 @@ watch(() => [
     }
     const { value } = item;
     list.push({
-      ...item,
+      metaItem: item,
       typeName: DATA_SOURCE_TYPE_NAME[type] || type,
       valueStr: value ? JSON.stringify(value) : value,
       ops: (options) => {
