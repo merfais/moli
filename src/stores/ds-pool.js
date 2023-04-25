@@ -5,6 +5,7 @@ import {
 import {
   markRaw,
   onBeforeUnmount,
+  getCurrentInstance,
 } from 'vue';
 import { defineStore } from 'pinia';
 import { DataSourcePool } from '@/data-source-pool';
@@ -120,9 +121,12 @@ export function getEditorDSValue(dsId) {
 export function watchEditorDS(...args) {
   const store = useDSPoolStore();
   const unwatch = store.editorDSPool.subscribe(...args);
-  onBeforeUnmount(() => {
-    unwatch();
-  });
+  if (getCurrentInstance()) {
+    onBeforeUnmount(() => {
+      unwatch();
+    });
+  }
+  return unwatch;
 }
 
 

@@ -84,6 +84,7 @@ async function onOk() {
       id: item.id,
       name: item.name,
       valueType: viewConf.valueType,
+      value: viewConf.value,
     });
 
     viewConf[expKey] = item.id;

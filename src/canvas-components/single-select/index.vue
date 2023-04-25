@@ -7,6 +7,7 @@ import {
   unref,
   computed,
   shallowRef,
+  watch,
 } from 'vue';
 import {
   watchEditorDS,
@@ -37,8 +38,10 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:value',
-  'update:var',
+  'update:ds',
 ]);
+
+let unwatchOptionsDs;
 
 const optionsDSValue = shallowRef([]);
 
@@ -64,18 +67,23 @@ const innerOptions = computed(() => {
   return list;
 });
 
-watchEditorDS(props.depDSs?.options, () => {
-  if (props.depDSs?.options) {
-    optionsDSValue.value = getEditorDSValue(props.depDSs.options);
-  } else {
+watch(() => props?.depDSs?.options, () => {
+  if (!props?.depDSs?.options) {
     optionsDSValue.value = [];
+    if (unwatchOptionsDs) {
+      unwatchOptionsDs();
+    }
+    return;
   }
+  unwatchOptionsDs = watchEditorDS(props.depDSs.options, () => {
+    optionsDSValue.value = getEditorDSValue(props.depDSs.options);
+  }, { immediate: true });
 }, { immediate: true });
 
 function onUpdateValue(value) {
   emit('update:value', value);
   emit('update:ds', {
-    varId: props.exportDS1,
+    dsId: props.exportDS1,
     value,
   });
 }

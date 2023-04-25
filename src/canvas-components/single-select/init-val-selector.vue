@@ -1,18 +1,10 @@
 <script setup>
-import {
-  shallowRef,
-  watch,
-} from 'vue';
 import { Form } from 'ant-design-vue';
-import {
-  getEditorDSValue,
-} from '@/stores/ds-pool';
 import SingleSelect from './index';
-
 
 const formItemContext = Form.useInjectFormItemContext();
 
-const props = defineProps({
+defineProps({
   value: {},
   initVal: String,
   depDSs: Object,
@@ -29,17 +21,6 @@ const options = [
   { label: '使用静态值', value: 'static' },
   { label: '选中第一个', value: 'first' },
 ];
-
-const valueOptions = shallowRef([]);
-
-watch(() => props?.depDSs?.options, () => {
-  if (!props?.depDSs?.options) {
-    valueOptions.value = [];
-    return;
-  }
-  const dsValue = getEditorDSValue(props.depDSs.options);
-  valueOptions.value = dsValue;
-});
 
 function onUpdateValue(value) {
   onUpdate(value);
