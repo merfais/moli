@@ -5,13 +5,24 @@ import {
   watch,
   unref,
 } from 'vue';
+import {
+  isEmpty,
+} from 'lodash-es';
 import { useFocus } from '@vueuse/core';
+import {
+  watchEditorDS,
+  getEditorDSValue,
+} from '@/stores/ds-pool';
+import {
+  NOOP,
+} from '../constants';
 
 const props = defineProps({
   placeholder: String,
   multiple: Boolean,
   label: String,
   exportDS1: String,
+  depDSs: Object,
 });
 
 const emit = defineEmits([
@@ -20,6 +31,11 @@ const emit = defineEmits([
   'update:focused',
 ]);
 
+const unwatchMap = {
+  disabled: NOOP,
+};
+
+const disabled = ref(false);
 const inputDomRef = ref();
 const { focused } = useFocus(inputDomRef);
 
@@ -37,6 +53,22 @@ watch(focused, () => {
   emit('update:focused', unref(focused));
 });
 
+watch(() => props?.depDSs?.disabled, () => {
+  unwatchMap.disabled();
+  if (!props?.depDSs?.disabled) {
+    disabled.value = false;
+    return;
+  }
+  unwatchMap.disabled = watchEditorDS(props.depDSs.disabled, () => {
+    const value = getEditorDSValue(props.depDSs.disabled);
+    if (typeof value === 'object') {
+      disabled.value = !isEmpty(value);
+    } else {
+      disabled.value = !!value;
+    }
+  }, { immediate: true });
+}, { immediate: true });
+
 function onUpdateValue(value) {
   emit('update:value', value);
   emit('update:ds', {
@@ -53,6 +85,7 @@ function onDbClick() {
 <template>
   <AInput ref="inputDomRef"
     :placeholder="innerPlaceholder"
+    :disabled="disabled"
     v-bind="$attrs"
     @update:value="onUpdateValue"
   />

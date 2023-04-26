@@ -2,8 +2,10 @@
 import {
   get,
   forEach,
+  isEmpty,
 } from 'lodash-es';
 import {
+  ref,
   unref,
   computed,
   shallowRef,
@@ -15,6 +17,7 @@ import {
 } from '@/stores/ds-pool';
 import {
   SELECT_COMP_TYPE,
+  NOOP,
 } from '../constants';
 
 const props = defineProps({
@@ -41,9 +44,13 @@ const emit = defineEmits([
   'update:ds',
 ]);
 
-let unwatchOptionsDs;
+const unwatchMap = {
+  options: NOOP,
+  disabled: NOOP,
+};
 
 const optionsDSValue = shallowRef([]);
+const disabled = ref(false);
 
 const innerPlaceholder = computed(() => {
   if (props.placeholder) {
@@ -68,15 +75,29 @@ const innerOptions = computed(() => {
 });
 
 watch(() => props?.depDSs?.options, () => {
+  unwatchMap.options();
   if (!props?.depDSs?.options) {
     optionsDSValue.value = [];
-    if (unwatchOptionsDs) {
-      unwatchOptionsDs();
-    }
     return;
   }
-  unwatchOptionsDs = watchEditorDS(props.depDSs.options, () => {
+  unwatchMap.options = watchEditorDS(props.depDSs.options, () => {
     optionsDSValue.value = getEditorDSValue(props.depDSs.options);
+  }, { immediate: true });
+}, { immediate: true });
+
+watch(() => props?.depDSs?.disabled, () => {
+  unwatchMap.disabled();
+  if (!props?.depDSs?.disabled) {
+    disabled.value = false;
+    return;
+  }
+  unwatchMap.disabled = watchEditorDS(props.depDSs.disabled, () => {
+    const value = getEditorDSValue(props.depDSs.disabled);
+    if (typeof value === 'object') {
+      disabled.value = !isEmpty(value);
+    } else {
+      disabled.value = !!value;
+    }
   }, { immediate: true });
 }, { immediate: true });
 
@@ -92,16 +113,19 @@ function onUpdateValue(value) {
 <template>
   <ButtonRadioGroup v-if="compType === SELECT_COMP_TYPE.BTN_RADIO"
     :options="innerOptions"
+    :disabled="disabled"
     @update:value="onUpdateValue"
   />
   <RadioGroup v-else-if="compType === SELECT_COMP_TYPE.RADIO"
     :options="innerOptions"
+    :disabled="disabled"
     @update:value="onUpdateValue"
   />
   <RSelect v-else
     class="width-100"
     :placeholder="innerPlaceholder"
     :options="innerOptions"
+    :disabled="disabled"
     @update:value="onUpdateValue"
   />
 </template>

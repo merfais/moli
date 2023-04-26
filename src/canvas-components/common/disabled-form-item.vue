@@ -1,6 +1,5 @@
 <script setup>
 import {
-  shallowRef,
   computed,
 } from 'vue';
 import { Form } from 'ant-design-vue';
@@ -10,16 +9,23 @@ const formItemContext = Form.useInjectFormItemContext();
 
 const props = defineProps({
   exportDSs: Array,
+  value: String,
 });
 
 const emit = defineEmits([
   'update:value',
 ]);
 
-const trueValue = shallowRef();
 const options = computed(() => {
   const list = getEditorDSOpts(props.exportDSs);
   return list;
+});
+
+const trueValue = computed(() => {
+  if (!props.value) {
+    return;
+  }
+  return props.value;
 });
 
 function onUpdateValue(value) {
@@ -35,6 +41,7 @@ export default { inheritAttrs: false };
   <div class="align-center">
     <ARadioGroup
       v-bind="$attrs"
+      :value="value"
       @update:value="onUpdateValue"
     >
       <ARadio value="">不禁用</ARadio>
@@ -44,16 +51,18 @@ export default { inheritAttrs: false };
         当数据源
       </ARadio>
     </ARadioGroup>
-    <RSelect class="var-selector mr-10"
-      v-model:value="trueValue"
+    <RSelect class="ds-selector mr-10"
+      :value="trueValue"
       :options="options"
+      :disabled="value === ''"
       placeholder="请选择数据源"
+      @update:value="onUpdateValue"
     />
     的值为真时禁用
   </div>
 </template>
 <style scoped>
-.var-selector {
+.ds-selector {
   width: 200px;
 }
 </style>

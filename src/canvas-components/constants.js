@@ -1,3 +1,4 @@
+export const NOOP = () => {};
 // 组件的key
 export const COMP_KEY = {
   SINGLE_SELECT: 'singleSelect',
