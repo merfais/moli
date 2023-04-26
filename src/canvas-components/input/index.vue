@@ -80,10 +80,14 @@ function onUpdateValue(value) {
 function onDbClick() {
   focused.value = true;
 }
+
+function setInputDomRef(v) {
+  inputDomRef.value = v?.input;
+}
 </script>
 <script>export default { inheritAttrs: false }; </script>
 <template>
-  <AInput ref="inputDomRef"
+  <RInput :ref="setInputDomRef"
     :placeholder="innerPlaceholder"
     :disabled="disabled"
     v-bind="$attrs"

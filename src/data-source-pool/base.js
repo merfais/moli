@@ -172,8 +172,7 @@ export default class Base {
    * 执行计算逻辑，在子类中重载实现对应的逻辑
    */
   async calculate() {
-    // this.innerValue = this.tmpData;
-    // this.innerStatus = ASYNC_STATUS.FULFILLED;
+    this.innerValue = this.tmpData;
   }
 
   /**
@@ -183,31 +182,35 @@ export default class Base {
     if (this.upperStaticIsPending()) {
       return;
     }
-    this.innerStatus = ASYNC_STATUS.PENDING;
-    const dataSource = this.getDSProxy();
-    this.jsFnCtx = { dataSource };
-    try {
-      this.innerValue = await this.runJs();
-      this.innerStatus = ASYNC_STATUS.FULFILLED;
-    } catch (e) {
-      this.innerStatus = ASYNC_STATUS.REJECTED;
-      this.setError(e);
-      // 如果发生错误，否则订阅全部
-      this.jsDepSet = new Set('*');
-    }
-    const newJsDeps = [...this.jsDepSet];
+    if (this.jsFn) {
+      this.innerStatus = ASYNC_STATUS.PENDING;
+      const dataSource = this.getDSProxy();
+      this.jsFnCtx = { dataSource };
+      try {
+        await this.runJs();
+        this.innerStatus = ASYNC_STATUS.FULFILLED;
+      } catch (e) {
+        this.innerStatus = ASYNC_STATUS.REJECTED;
+        this.setError(e);
+        // 如果发生错误，否则订阅全部
+        this.jsDepSet = new Set('*');
+      }
+      const newJsDeps = [...this.jsDepSet];
 
-    if (xor(newJsDeps, this.jsDeps)?.length) {
-      this.reSubscribeJsDeps(newJsDeps, this.jsDeps);
+      if (xor(newJsDeps, this.jsDeps)?.length) {
+        this.reSubscribeJsDeps(newJsDeps, this.jsDeps);
+      }
+      this.jsDeps = newJsDeps;
+    } else {
+      this.innerStatus = ASYNC_STATUS.FULFILLED;
+      this.jsDeps = [];
     }
-    this.jsDeps = newJsDeps;
   }
 
   /**
    * 执行js逻辑，在子类中实现对应的逻辑
    */
   async runJs() {
-    return this.innerValue;
   }
 
   getDSProxy() {

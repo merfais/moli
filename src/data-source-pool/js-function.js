@@ -8,14 +8,16 @@ export default class JsFunction extends Base {
     this.jsFn = info.jsFn;
   }
 
+  calculate() {
+    if (!this.jsFn) {
+      this.innerValue = [];
+    }
+  }
   /**
    * 重载父类方法
    */
   async runJs() {
-    if (this.jsFn) {
-      return runInNewContext(this.jsFn, this.jsFnCtx);
-    }
-    return [];
+    this.innerValue = await runInNewContext(this.jsFn, this.jsFnCtx);
   }
 
   getAddonConfig() {
