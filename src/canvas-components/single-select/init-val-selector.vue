@@ -1,12 +1,16 @@
 <script setup>
 import { Form } from 'ant-design-vue';
+import {
+  INIT_VAL_TYPE,
+  INIT_VAL_TYPE_NAME,
+} from '../constants';
 import SingleSelect from './index';
 
 const formItemContext = Form.useInjectFormItemContext();
 
 defineProps({
   value: {},
-  initVal: String,
+  initValType: String,
   depDSs: Object,
   labelField: String,
   valueField: String,
@@ -14,20 +18,20 @@ defineProps({
 
 const emit = defineEmits([
   'update:value',
-  'updateInitVal',
+  'updateInitValType',
 ]);
 
 const options = [
-  { label: '使用静态值', value: 'static' },
-  { label: '选中第一个', value: 'first' },
-];
+  INIT_VAL_TYPE.STATIC,
+  INIT_VAL_TYPE.FIRST,
+].map(value => ({ label: INIT_VAL_TYPE_NAME[value], value }));
 
 function onUpdateValue(value) {
   onUpdate(value);
 }
 
 function onUpdateInitVal(value) {
-  emit('updateInitVal', value);
+  emit('updateInitValType', value);
   onUpdate();
 }
 
@@ -41,7 +45,7 @@ function onUpdate(value) {
   <div class="d-flex">
     <div class="init-val-wrapper">
       <RadioGroup
-        :value="initVal"
+        :value="initValType"
         :options="options"
         @update:value="onUpdateInitVal"
       />
@@ -49,7 +53,7 @@ function onUpdate(value) {
     <div class="flex-grow">
       <SingleSelect
         :value="value"
-        :disabled="initVal !== 'static'"
+        :disabled="initValType !== INIT_VAL_TYPE.STATIC"
         :depDSs="depDSs"
         :labelField="labelField"
         :valueField="valueField"

@@ -16,6 +16,7 @@ import {
   getEditorDSValue,
 } from '@/stores/ds-pool';
 import {
+  INIT_VAL_TYPE,
   SELECT_COMP_TYPE,
   NOOP,
 } from '../constants';
@@ -37,6 +38,7 @@ const props = defineProps({
     default: 'select',
   },
   depDSs: Object,
+  initValType: String,
 });
 
 const emit = defineEmits([
@@ -99,6 +101,16 @@ watch(() => props?.depDSs?.disabled, () => {
       disabled.value = !!value;
     }
   }, { immediate: true });
+}, { immediate: true });
+
+watch(() => [
+  props.initValType,
+  unref(innerOptions),
+], () => {
+  if (props.initValType !== INIT_VAL_TYPE.FIRST) {
+    return;
+  }
+  onUpdateValue(get(unref(innerOptions), ['0', props.valueField]));
 }, { immediate: true });
 
 function onUpdateValue(value) {

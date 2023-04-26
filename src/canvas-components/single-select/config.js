@@ -1,6 +1,8 @@
 import { DATA_SOURCE_TYPE } from '@/constants';
 import {
   COMP_KEY,
+  INIT_VAL_TYPE,
+  SELECT_COMP_TYPE,
 } from '../constants';
 
 export default function genConf() {
@@ -34,10 +36,10 @@ export default function genConf() {
         disabled: undefined,
       },
       value: undefined,
-      initVal: 'static',
+      initValType: INIT_VAL_TYPE.STATIC,
       labelField: 'label',
       valueField: 'value',
-      compType: 'select',
+      compType: SELECT_COMP_TYPE.SELECT,
     },
     style: {
       pc: {

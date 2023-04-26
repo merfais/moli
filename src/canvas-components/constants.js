@@ -69,3 +69,17 @@ export const SELECT_COMP_TYPE_NAME = {
   [SELECT_COMP_TYPE.BTN_RADIO]: '按钮单选框',
   [SELECT_COMP_TYPE.BTN_CHECKBOX]: '按钮复选框',
 };
+
+export const INIT_VAL_TYPE = {
+  STATIC: 'static',
+  FIRST: 'first',
+  FIRST_N: 'first_n',
+  FULL: 'full',
+};
+
+export const INIT_VAL_TYPE_NAME = {
+  [INIT_VAL_TYPE.STATIC]: '使用静态值',
+  [INIT_VAL_TYPE.FIRST]: '选中第一个',
+  [INIT_VAL_TYPE.FIRST_N]: '选中前N个',
+  [INIT_VAL_TYPE.FULL]: '全选',
+};
