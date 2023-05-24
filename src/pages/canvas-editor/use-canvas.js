@@ -115,15 +115,16 @@ export function genViewConf(options = {}) {
     compKey: conf.key,
     ...conf.dftConf,
     exportDSs: [],
+    exportDSMetaConf: [],
     style: get(conf.style, device || 'pc') || {},
   };
   viewConf.name = `${viewConf.compName}${viewConf.i}`;
   forEach(conf.dataSource, (item, index) => {
-    const { idPrefix } = item;
-    const id = newId(idPrefix, 6);
-    viewConf.exportDSs = [id];
+    const id = newId(conf.key, 6);
+    viewConf.exportDSs[index] = id;
     const k = `exportDS${index + 1}`;
     viewConf[k] = id;
+    viewConf.exportDSMetaConf[index] = item;
   });
   return viewConf;
 }
@@ -265,6 +266,7 @@ export function onClickSetting(i, index) {
     if (!dsConf) {
       return;
     }
+    dsConf.metaConf = get(viewConf, `exportDSMetaConf[${index}]`) || {};
     set(compEditorStore, ['dataSource', `exportDS${index + 1}`], dsConf);
   });
 }

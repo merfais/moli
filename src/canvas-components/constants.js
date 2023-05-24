@@ -1,16 +1,16 @@
 export const NOOP = () => {};
 // 组件的key
 export const COMP_KEY = {
-  SINGLE_SELECT: 'singleSelect',
-  MULTI_SELECT: 'multiSelect',
-  BOOL_SELECT: 'boolSelect',
+  SINGLE_SELECT: 'single_select',
+  MULTI_SELECT: 'multi_select',
+  BOOL_SELECT: 'bool_select',
   INPUT: 'input',
   DATETIME: 'datetime',
-  DATETIME_RANGE: 'datetimeRange',
+  DATETIME_RANGE: 'datetime_range',
   NUMBER: 'number',
   TEXTAREA: 'textarea',
-  OP_NUMBER: 'opNumber',
-  OP_DATETIME: 'opDatetime',
+  OP_NUMBER: 'op_number',
+  OP_DATETIME: 'op_datetime',
 };
 
 export const COMP_GROUP_KEY = {
@@ -70,16 +70,4 @@ export const SELECT_COMP_TYPE_NAME = {
   [SELECT_COMP_TYPE.BTN_CHECKBOX]: '按钮复选框',
 };
 
-export const INIT_VAL_TYPE = {
-  STATIC: 'static',
-  FIRST: 'first',
-  FIRST_N: 'first_n',
-  FULL: 'full',
-};
 
-export const INIT_VAL_TYPE_NAME = {
-  [INIT_VAL_TYPE.STATIC]: '使用静态值',
-  [INIT_VAL_TYPE.FIRST]: '选中第一个',
-  [INIT_VAL_TYPE.FIRST_N]: '选中前N个',
-  [INIT_VAL_TYPE.FULL]: '全选',
-};

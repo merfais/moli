@@ -4,6 +4,8 @@ export {
   MANUAL_DATA_SOURCE_TYPE,
   MANUAL_DATA_SOURCE_TYPE_NAME,
   ASYNC_STATUS,
+  INIT_VAL_TYPE,
+  INIT_VAL_TYPE_NAME,
 } from './data-source-pool/constants';
 
 export const CMP_ORD = {

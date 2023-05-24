@@ -3,7 +3,7 @@ import { Form } from 'ant-design-vue';
 import {
   INIT_VAL_TYPE,
   INIT_VAL_TYPE_NAME,
-} from '../constants';
+} from '@/constants';
 import SingleSelect from './index';
 
 const formItemContext = Form.useInjectFormItemContext();
@@ -27,15 +27,14 @@ const options = [
 ].map(value => ({ label: INIT_VAL_TYPE_NAME[value], value }));
 
 function onUpdateValue(value) {
-  onUpdate(value);
+  updateValue(value);
 }
 
 function onUpdateInitVal(value) {
   emit('updateInitValType', value);
-  onUpdate();
 }
 
-function onUpdate(value) {
+function updateValue(value) {
   emit('update:value', value);
   formItemContext.onFieldChange();
 }

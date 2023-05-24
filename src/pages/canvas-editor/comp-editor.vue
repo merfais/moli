@@ -5,6 +5,7 @@ import {
   map,
   get,
   forEach,
+  pick,
 } from 'lodash-es';
 import {
   ref,
@@ -83,8 +84,9 @@ async function onOk() {
       oldId,
       id: item.id,
       name: item.name,
-      valueType: viewConf.valueType,
       value: viewConf.value,
+      depDSs: viewConf.depDSs,
+      ...pick(viewConf, item?.metaConf?.syncConf || []),
     });
 
     viewConf[expKey] = item.id;

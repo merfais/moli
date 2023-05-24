@@ -21,6 +21,20 @@ export const DATA_SOURCE_TYPE_NAME = {
   ...MANUAL_DATA_SOURCE_TYPE_NAME,
 };
 
+export const INIT_VAL_TYPE = {
+  STATIC: 'static',
+  FIRST: 'first',
+  FIRST_N: 'first_n',
+  ALL: 'all',
+};
+
+export const INIT_VAL_TYPE_NAME = {
+  [INIT_VAL_TYPE.STATIC]: '使用静态值',
+  [INIT_VAL_TYPE.FIRST]: '选中第一个',
+  [INIT_VAL_TYPE.FIRST_N]: '选中前N个',
+  [INIT_VAL_TYPE.ALL]: '全选',
+};
+
 export const ASYNC_STATUS = {
   PENDING: 'pending',
   FULFILLED: 'fulfilled',

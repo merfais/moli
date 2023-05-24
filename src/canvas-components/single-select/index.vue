@@ -17,6 +17,8 @@ import {
 } from '@/stores/ds-pool';
 import {
   INIT_VAL_TYPE,
+} from '@/constants';
+import {
   SELECT_COMP_TYPE,
   NOOP,
 } from '../constants';
@@ -46,9 +48,10 @@ const emit = defineEmits([
   'update:ds',
 ]);
 
-const unwatchMap = {
-  options: NOOP,
-  disabled: NOOP,
+const watchMap = {
+  unwatchOptions: NOOP,
+  unwatchDisabled: NOOP,
+  unwatchUpdateValue: NOOP,
 };
 
 const optionsDSValue = shallowRef([]);
@@ -77,23 +80,23 @@ const innerOptions = computed(() => {
 });
 
 watch(() => props?.depDSs?.options, () => {
-  unwatchMap.options();
+  watchMap.unwatchOptions();
   if (!props?.depDSs?.options) {
     optionsDSValue.value = [];
     return;
   }
-  unwatchMap.options = watchEditorDS(props.depDSs.options, () => {
+  watchMap.unwatchOptions = watchEditorDS(props.depDSs.options, () => {
     optionsDSValue.value = getEditorDSValue(props.depDSs.options);
   }, { immediate: true });
 }, { immediate: true });
 
 watch(() => props?.depDSs?.disabled, () => {
-  unwatchMap.disabled();
+  watchMap.unwatchDisabled();
   if (!props?.depDSs?.disabled) {
     disabled.value = false;
     return;
   }
-  unwatchMap.disabled = watchEditorDS(props.depDSs.disabled, () => {
+  watchMap.unwatchDisabled = watchEditorDS(props.depDSs.disabled, () => {
     const value = getEditorDSValue(props.depDSs.disabled);
     if (typeof value === 'object') {
       disabled.value = !isEmpty(value);
@@ -103,17 +106,25 @@ watch(() => props?.depDSs?.disabled, () => {
   }, { immediate: true });
 }, { immediate: true });
 
-watch(() => [
-  props.initValType,
-  unref(innerOptions),
-], () => {
+watch(() => props.initValType, () => setInitVal(), { immediate: true });
+
+watchMap.unwatchUpdateValue = watch(() => unref(innerOptions), () => {
+  setInitVal();
+}, { immediate: true });
+
+function setInitVal() {
   if (props.initValType !== INIT_VAL_TYPE.FIRST) {
     return;
   }
-  onUpdateValue(get(unref(innerOptions), ['0', props.valueField]));
-}, { immediate: true });
+  updateValue(get(unref(innerOptions), ['0', props.valueField]));
+}
 
 function onUpdateValue(value) {
+  watchMap.unwatchUpdateValue();
+  updateValue(value);
+}
+
+function updateValue(value) {
   emit('update:value', value);
   emit('update:ds', {
     dsId: props.exportDS1,

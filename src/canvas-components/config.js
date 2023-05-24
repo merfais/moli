@@ -11,9 +11,9 @@ import singleSelect from './single-select/config';
 import multiSelect from './multi-select/config';
 
 const compConfigMap = {
-  input,
-  singleSelect,
-  multiSelect,
+  [COMP_KEY.INPUT]: input,
+  [COMP_KEY.SINGLE_SELECT]: singleSelect,
+  [COMP_KEY.MULTI_SELECT]: multiSelect,
 };
 
 /**

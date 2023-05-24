@@ -45,6 +45,7 @@ const compProps = computed(() => {
     'i',
   ]);
   propObj.id = props.i;
+  // TODO: 挂载点
   if (unref(compKey) === COMP_KEY.SELECT) {
     propObj.getPopupContainer = getPopupContainer;
   }

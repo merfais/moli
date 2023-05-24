@@ -1,7 +1,9 @@
-import { DATA_SOURCE_TYPE } from '@/constants';
+import {
+  DATA_SOURCE_TYPE,
+  INIT_VAL_TYPE,
+} from '@/constants';
 import {
   COMP_KEY,
-  INIT_VAL_TYPE,
   SELECT_COMP_TYPE,
 } from '../constants';
 
@@ -60,8 +62,12 @@ export default function genConf() {
       },
     },
     dataSource: [{
-      idPrefix: 'singleValue',
       type: DATA_SOURCE_TYPE.SELECT_LIKE_VIEW,
+      syncConf: [
+        'initValType',
+        'labelField',
+        'valueField',
+      ],
     }],
   };
   return config;

@@ -8,6 +8,7 @@ import {
 import {
   get,
   forEach,
+  pick,
 } from 'lodash-es';
 import newId from '@/uses/id';
 import {
@@ -136,12 +137,10 @@ function onDrop() {
 
   forEach(viewConf.exportDSs, (id, index) => {
     const name = `${draggingConf.name}${id}`;
-    registerEditorDS({
-      id,
-      name,
-      valueType: viewConf.valueType,
-      ...draggingConf.dataSource[index],
-    });
+    const type = get(draggingConf.dataSource, [index, 'type']);
+    const syncConf = get(draggingConf.dataSource, [index, 'syncConf']) || [];
+    const dsConf = { id, name, type, ...pick(viewConf, syncConf) };
+    registerEditorDS(dsConf);
   });
   addView(viewConf);
   addLayout({ ...draggingLayout, i: viewConf.i });

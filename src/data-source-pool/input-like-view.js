@@ -10,6 +10,7 @@ export default class InputLikeView extends Base {
     super(info);
     this.valueType = info.valueType;
   }
+
   /**
    * 重载父类方法
    */
@@ -26,6 +27,9 @@ export default class InputLikeView extends Base {
     }
   }
 
+  /**
+   * 重载父类方法
+   */
   getAddonConfig() {
     return {
       valueType: this.valueType,

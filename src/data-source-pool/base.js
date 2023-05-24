@@ -26,6 +26,9 @@ export default class Base {
   // 数据源的名字
   name = '';
 
+  // 数据源的依赖
+  depDSs = {};
+
   // 修改数据源时，修改的值存在tmpData字段，
   // 因为要在多个函数中传递此值，且可能会多次被调用执行，因此要缓存到this中
   tmpData = null;
@@ -57,11 +60,15 @@ export default class Base {
   // js中依赖的数据源，用于计算时存临时数据
   jsDepSet = new Set();
 
-  // 标记数据源是否已经初始化
-  hasInited = false;
+  // 标记由外部调用setValue改变过数据源的值，
+  // 当改变过会跳过执行初始值计算逻辑
+  useTmpData = false;
 
-  // 编辑数据源是否已经销毁
-  hasDestroyed = false;
+  // // 标记数据源是否已经初始化
+  // hasInited = false;
+
+  // // 编辑数据源是否已经销毁
+  // hasDestroyed = false;
 
   constructor(info) {
     this.tmpData = info.value;
@@ -69,6 +76,7 @@ export default class Base {
       'id',
       'name',
       'type',
+      'depDSs',
       'dsMap',
       'msgCenter',
       'reSubscribeJsDeps',
@@ -76,11 +84,11 @@ export default class Base {
   }
 
   destructor() {
-    this.hasDestroyed = true;
+    // this.hasDestroyed = true;
   }
 
   init() {
-    this.hasInited = true;
+    // this.hasInited = true;
 
     // 初始化数据源后，通知所有订阅者
     this.msgCenter.publish(this.id, { onlyAll: true });
@@ -114,6 +122,9 @@ export default class Base {
     await this.genJsDeps();
   }
 
+  /**
+   * 生成静态依赖，在子类中重载实现对应的逻辑
+   */
   async genStaticDeps() {
     this.staticDeps = [];
   }
@@ -146,6 +157,7 @@ export default class Base {
   }
 
   setValue(value) {
+    this.useTmpData = true;
     this.tmpData = value;
     this.runProcess();
   }
@@ -342,6 +354,9 @@ export default class Base {
     return `数据源${this.id}计算出错: ${msgStack.join(';=>')}`;
   }
 
+  /**
+   * 获取持久化附加配置，在子类中实现对应的逻辑
+   */
   getAddonConfig() {
   }
 
@@ -350,6 +365,7 @@ export default class Base {
       type: this.type,
       id: this.id,
       name: this.name,
+      depDSs: this.depDSs,
       value: cloneDeep(this.getValue()),
       ...this.getAddonConfig(),
     };
