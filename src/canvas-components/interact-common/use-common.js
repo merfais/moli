@@ -3,21 +3,20 @@ import {
   shallowRef,
 } from 'vue';
 import {
-  map,
   get,
+  set,
 } from 'lodash-es';
 import {
   useRules,
   required,
   isNormalChar,
 } from '@/uses/validate';
-import { DisabledFormItem } from './common';
+import Disabled from './disabled';
 import {
-  VALUE_TYPE_NANE,
   EDITOR_MENU,
-} from './constants';
+} from '../constants';
 
-export function getLabel(editor = {}, onUpdate) {
+function getLabel(editor = {}, onUpdate) {
   const items = shallowRef(getLabelFormItems(editor, onUpdate));
 
   watch(() => editor.viewConf?.withLabel, () => {
@@ -64,24 +63,6 @@ function getLabelFormItems(editor = {}, onUpdate) {
   return items;
 }
 
-export function getValueTypeFormItems(editor = {}, onUpdate) {
-  const viewConf = get(editor, 'viewConf') || {};
-
-  const items = {
-    valueType: {
-      label: '值类型',
-      value: viewConf.valueType,
-      component: 'ButtonRadioGroup',
-      compProps: {
-        options: map(VALUE_TYPE_NANE, (label, value) => ({ label, value })),
-      },
-      onUpdate,
-    },
-  };
-
-  return items;
-}
-
 export function getDisabledFormItems(editor = {}, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
 
@@ -90,7 +71,7 @@ export function getDisabledFormItems(editor = {}, onUpdate) {
       label: '是否禁用',
       value: viewConf.depDSs?.disabled || '',
       path: 'depDSs.disabled',
-      component: DisabledFormItem,
+      component: Disabled,
       compProps: {
         exportDSs: get(viewConf, 'exportDSs'),
       },
@@ -126,7 +107,7 @@ export function getPlaceholderFormItems(editor = {}, onUpdate) {
   return items;
 }
 
-export function getDataSource(dataSource = {}, onUpdate) {
+function getDataSource(dataSource = {}, onUpdate) {
   const items = {
     formKey: { value: EDITOR_MENU.DS, class: 'd-none' },
     id: {
@@ -148,7 +129,7 @@ export function getDataSource(dataSource = {}, onUpdate) {
   return items;
 }
 
-export function getLayout(editor = {}, onUpdate) {
+function getLayout(editor = {}, onUpdate) {
   const pcLayout = get(editor, 'pcLayout') || {};
 
   const items = {
@@ -186,7 +167,17 @@ export function getLayout(editor = {}, onUpdate) {
   return items;
 }
 
-export function getViewStyleFormItems(editor = {}, onUpdate) {
+function getStyle(editor, onUpdate) {
+  const items = {
+    formKey: { value: EDITOR_MENU.STYLE, class: 'd-none' },
+    ...getStyleFormItems(editor, onUpdate),
+  };
+
+  return items;
+}
+
+
+function getStyleFormItems(editor = {}, onUpdate) {
   const style = get(editor, 'viewConf.style') || {};
 
   const items = {
@@ -229,5 +220,31 @@ export function getViewStyleFormItems(editor = {}, onUpdate) {
   };
 
   return items;
+}
+
+/**
+ * 简单组件的formItems
+ */
+export function getSimpleCompFormItems(options = {}) {
+  const { editor, getBasic } = options;
+
+  function onUpdate(key) {
+    return ({ path, payload } = {}) => {
+      const vPath = Array.isArray(path)
+        ? [key, ...path]
+        : `${key}.${path}`;
+      set(editor, vPath, payload);
+    };
+  }
+
+  const dataSource = get(editor, 'dataSource.exportDS1') || {};
+
+  return {
+    [EDITOR_MENU.BASIC]: getBasic(editor, onUpdate('viewConf')),
+    [EDITOR_MENU.LABEL]: getLabel(editor, onUpdate('viewConf')),
+    [EDITOR_MENU.DS]: getDataSource(dataSource, onUpdate('dataSource.exportDS1')),
+    [EDITOR_MENU.LAYOUT]: getLayout(editor, onUpdate('pcLayout')),
+    [EDITOR_MENU.STYLE]: getStyle(editor, onUpdate('viewConf.style')),
+  };
 }
 

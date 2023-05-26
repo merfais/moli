@@ -1,16 +1,28 @@
 <script setup>
+import {
+  computed,
+} from 'vue';
+import {
+  map,
+} from 'lodash-es';
 import { Form } from 'ant-design-vue';
 import {
   INIT_VAL_TYPE,
   INIT_VAL_TYPE_NAME,
 } from '@/constants';
-import SingleSelect from './index';
+import {
+  COMP_KEY,
+} from '../constants';
+import SingleSelect from '../single-select';
+import MultiSelect from '../multi-select';
 
 const formItemContext = Form.useInjectFormItemContext();
 
-defineProps({
+const props = defineProps({
+  compKey: String,
   value: {},
   initValType: String,
+  firstN: Number,
   depDSs: Object,
   labelField: String,
   valueField: String,
@@ -21,10 +33,24 @@ const emit = defineEmits([
   'updateInitValType',
 ]);
 
-const options = [
-  INIT_VAL_TYPE.STATIC,
-  INIT_VAL_TYPE.FIRST,
-].map(value => ({ label: INIT_VAL_TYPE_NAME[value], value }));
+const optsMap = {
+  [COMP_KEY.SINGLE_SELECT]: map([
+    INIT_VAL_TYPE.STATIC,
+    INIT_VAL_TYPE.FIRST,
+  ], value => ({ label: INIT_VAL_TYPE_NAME[value], value })),
+  [COMP_KEY.MULTI_SELECT]: map([
+    INIT_VAL_TYPE.STATIC,
+    INIT_VAL_TYPE.FIRST_N,
+    INIT_VAL_TYPE.ALL,
+  ], value => ({ label: INIT_VAL_TYPE_NAME[value], value })),
+};
+const staticIsMap = {
+  [COMP_KEY.SINGLE_SELECT]: SingleSelect,
+  [COMP_KEY.MULTI_SELECT]: MultiSelect,
+};
+
+const options = computed(() => optsMap[props.compKey]);
+const staticIs = computed(() => staticIsMap[props.compKey]);
 
 function onUpdateValue(value) {
   updateValue(value);
@@ -50,7 +76,7 @@ function updateValue(value) {
       />
     </div>
     <div class="flex-grow">
-      <SingleSelect
+      <component :is="staticIs"
         :value="value"
         :disabled="initValType !== INIT_VAL_TYPE.STATIC"
         :depDSs="depDSs"

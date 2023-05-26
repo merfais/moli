@@ -1,6 +1,5 @@
 import {
   get,
-  set,
   map,
 } from 'lodash-es';
 import {
@@ -13,22 +12,18 @@ import {
 } from '@/uses/validate';
 import {
   EDITOR_MENU,
+  COMP_KEY,
   SELECT_COMP_TYPE,
   SELECT_COMP_TYPE_NAME,
 } from '../constants';
+import SelectOptions from '../interact-common/select-options';
+import DsFieldSeletor from '../interact-common/ds-field-selector';
+import SelectInitValType from '../interact-common/select-init-val-type';
 import {
-  SelectOptionsFormItem,
-  DsFieldSeletor,
-} from '../common';
-import {
-  getLabel,
-  getDataSource,
-  getLayout,
   getPlaceholderFormItems,
   getDisabledFormItems,
-  getViewStyleFormItems,
-} from '../use-form-items';
-import InitValSelector from './init-val-selector';
+  getSimpleCompFormItems,
+} from '../interact-common/use-common';
 
 function getBasic(editor, onUpdate) {
   const items = shallowRef(genBasicFormItems(editor, onUpdate));
@@ -44,6 +39,19 @@ function getBasic(editor, onUpdate) {
 
   return items;
 }
+
+const compTypeOptsMap = {
+  [COMP_KEY.SINGLE_SELECT]: map([
+    SELECT_COMP_TYPE.SELECT,
+    SELECT_COMP_TYPE.RADIO,
+    SELECT_COMP_TYPE.BTN_RADIO,
+  ], value => ({ value, label: SELECT_COMP_TYPE_NAME[value] })),
+  [COMP_KEY.MULTI_SELECT]: map([
+    SELECT_COMP_TYPE.SELECT,
+    SELECT_COMP_TYPE.CHECKBOX,
+    SELECT_COMP_TYPE.BTN_CHECKBOX,
+  ], value => ({ value, label: SELECT_COMP_TYPE_NAME[value] })),
+};
 
 function genBasicFormItems(editor, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
@@ -61,19 +69,42 @@ function genBasicFormItems(editor, onUpdate) {
       value: viewConf.compType,
       component: 'ButtonRadioGroup',
       compProps: {
-        options: map([
-          SELECT_COMP_TYPE.SELECT,
-          SELECT_COMP_TYPE.RADIO,
-          SELECT_COMP_TYPE.BTN_RADIO,
-        ], value => ({ value, label: SELECT_COMP_TYPE_NAME[value] })),
+        options: compTypeOptsMap[editor.compKey],
       },
       onUpdate,
     },
+    ...getOptionsFormItems(editor, onUpdate),
+    value: {
+      label: '默认值',
+      value: viewConf.value,
+      component: SelectInitValType,
+      compProps: {
+        compKey: viewConf.compKey,
+        initValType: viewConf.initValType,
+        firstN: viewConf.firstN,
+        depDSs: viewConf.depDSs,
+        labelField: viewConf.labelField,
+        valueField: viewConf.valueField,
+        onUpdateInitValType: (payload) => onUpdate({ path: 'initValType', payload }),
+      },
+      onUpdate,
+    },
+    ...getPlaceholderFormItems(editor, onUpdate),
+    ...getDisabledFormItems(editor, onUpdate),
+  };
+
+  return items;
+}
+
+export function getOptionsFormItems(editor, onUpdate) {
+  const viewConf = get(editor, 'viewConf') || {};
+
+  const items = {
     optionsDepDS: {
       label: '选项列表来源',
       value: viewConf.depDSs?.options,
       path: 'depDSs.options',
-      component: SelectOptionsFormItem,
+      component: SelectOptions,
       compProps: {
         exportDSs: viewConf.exportDSs,
       },
@@ -98,58 +129,14 @@ function genBasicFormItems(editor, onUpdate) {
       },
       onUpdate,
     },
-    value: {
-      label: '默认值',
-      value: viewConf.value,
-      component: InitValSelector,
-      compProps: {
-        initValType: viewConf.initValType,
-        depDSs: viewConf.depDSs,
-        labelField: viewConf.labelField,
-        valueField: viewConf.valueField,
-        onUpdateInitValType: (payload) => onUpdate({ path: 'initValType', payload }),
-      },
-      onUpdate,
-    },
-    ...getPlaceholderFormItems(editor, onUpdate),
-    ...getDisabledFormItems(editor, onUpdate),
   };
-
   return items;
 }
 
-function getStyle(editor, onUpdate) {
-  const formItems = shallowRef({
-    formKey: { value: EDITOR_MENU.STYLE, class: 'd-none' },
-    selectArea: {
-      slot: 'divider',
-      compInnerText: '选择器样式',
-    },
-    ...getViewStyleFormItems(editor, onUpdate),
-  });
-
-  return formItems;
-}
-
 export default function getSelectFormItems(editor) {
-  function onUpdate(key) {
-    return (options = {}) => {
-      let { path } = options;
-      path = Array.isArray(path)
-        ? [key, ...path]
-        : `${key}.${path}`;
-      set(editor, path, options.payload);
-    };
-  }
-
-  const dataSource = get(editor, 'dataSource.exportDS1') || {};
-
-  return {
-    [EDITOR_MENU.BASIC]: getBasic(editor, onUpdate('viewConf')),
-    [EDITOR_MENU.LABEL]: getLabel(editor, onUpdate('viewConf')),
-    [EDITOR_MENU.DS]: getDataSource(dataSource, onUpdate('dataSource.exportDS1')),
-    [EDITOR_MENU.LAYOUT]: getLayout(editor, onUpdate('pcLayout')),
-    [EDITOR_MENU.STYLE]: getStyle(editor, onUpdate('viewConf.style')),
-  };
+  return getSimpleCompFormItems({
+    editor,
+    getBasic,
+  });
 }
 

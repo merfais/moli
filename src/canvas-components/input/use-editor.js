@@ -1,22 +1,19 @@
 import {
   get,
-  set,
+  map,
 } from 'lodash-es';
 import {
   shallowRef,
 } from 'vue';
 import {
   EDITOR_MENU,
+  VALUE_TYPE_NANE,
 } from '../constants';
 import {
-  getLabel,
-  getDataSource,
-  getLayout,
-  getValueTypeFormItems,
   getPlaceholderFormItems,
   getDisabledFormItems,
-  getViewStyleFormItems,
-} from '../use-form-items';
+  getSimpleCompFormItems,
+} from '../interact-common/use-common';
 
 function getBasic(editor, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
@@ -35,7 +32,15 @@ function getBasic(editor, onUpdate) {
       component: 'AInput',
       onUpdate,
     },
-    ...getValueTypeFormItems(editor, onUpdate),
+    valueType: {
+      label: '值类型',
+      value: viewConf.valueType,
+      component: 'ButtonRadioGroup',
+      compProps: {
+        options: map(VALUE_TYPE_NANE, (label, value) => ({ label, value })),
+      },
+      onUpdate,
+    },
     ...getPlaceholderFormItems(editor, onUpdate),
     ...getDisabledFormItems(editor, onUpdate),
   });
@@ -43,38 +48,10 @@ function getBasic(editor, onUpdate) {
   return formItems;
 }
 
-function getStyle(editor, onUpdate) {
-  const formItems = shallowRef({
-    formKey: { value: EDITOR_MENU.STYLE, class: 'd-none' },
-    inputArea: {
-      slot: 'divider',
-      compInnerText: '输入框样式',
-    },
-    ...getViewStyleFormItems(editor, onUpdate),
-  });
-
-  return formItems;
-}
-
 export default function getInputFormItems(editor) {
-  function onUpdate(key) {
-    return (options = {}) => {
-      let { path } = options;
-      path = Array.isArray(path)
-        ? [key, ...path]
-        : `${key}.${path}`;
-      set(editor, path, options.payload);
-    };
-  }
-
-  const dataSource = get(editor, 'dataSource.exportDS1') || {};
-
-  return {
-    [EDITOR_MENU.BASIC]: getBasic(editor, onUpdate('viewConf')),
-    [EDITOR_MENU.LABEL]: getLabel(editor, onUpdate('viewConf')),
-    [EDITOR_MENU.DS]: getDataSource(dataSource, onUpdate('dataSource.exportDS1')),
-    [EDITOR_MENU.LAYOUT]: getLayout(editor, onUpdate('pcLayout')),
-    [EDITOR_MENU.STYLE]: getStyle(editor, onUpdate('viewConf.style')),
-  };
+  return getSimpleCompFormItems({
+    editor,
+    getBasic,
+  });
 }
 

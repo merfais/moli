@@ -1,6 +1,10 @@
-import { DATA_SOURCE_TYPE } from '@/constants';
+import {
+  DATA_SOURCE_TYPE,
+  INIT_VAL_TYPE,
+} from '@/constants';
 import {
   COMP_KEY,
+  SELECT_COMP_TYPE,
 } from '../constants';
 
 export default function genConf() {
@@ -29,14 +33,16 @@ export default function genConf() {
       label: undefined,
       labelPos: 'left',
       placeholder: undefined,
-      disabled: false,
-      options: [],
+      depDSs: {
+        options: undefined,
+        disabled: undefined,
+      },
       value: undefined,
-      enableSelectAll: false,
-      initVal: 'static',
+      initValType: INIT_VAL_TYPE.STATIC,
       labelField: 'label',
       valueField: 'value',
-      compType: 'select',
+      compType: SELECT_COMP_TYPE.SELECT,
+      firstN: 1,
     },
     style: {
       pc: {
@@ -57,8 +63,12 @@ export default function genConf() {
       },
     },
     dataSource: [{
-      idPrefix: 'multiValue',
       type: DATA_SOURCE_TYPE.SELECT_LIKE_VIEW,
+      syncConf: [
+        'initValType',
+        'labelField',
+        'valueField',
+      ],
     }],
   };
   return config;
