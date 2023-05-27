@@ -12,6 +12,7 @@ import {
   unref,
 } from 'vue';
 import { message } from 'ant-design-vue';
+import dayjs from 'dayjs';
 import newId from '@/uses/id';
 import { errorLog } from '@/uses/log';
 import router from '@/router';
@@ -133,9 +134,9 @@ export async function save() {
   const store = useCanvasEditorStore();
   store.loading = true;
   const info = formatConf();
-  console.info('save', store.id, info);
   const data = {
     id: store.id,
+    time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     info: JSON.stringify(info),
   };
   try {

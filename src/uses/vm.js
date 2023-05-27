@@ -9,17 +9,26 @@ export default async function runInNewContext(jsStr, context) {
       iframe.sandbox = 'allow-same-origin allow-scripts';
 
       iframe.onload = function onload() {
-        appendScript(jsStr, iframe.contentDocument);
+        iframe.contentWindow.onerror = function onerror(e) {
+          removeIframe(iframe);
+          reject(e);
+        };
 
-        const result = typeof iframe?.contentWindow?.get === 'function'
-          ? iframe.contentWindow.get(context || {})
-          : undefined;
+        try {
+          appendScript(jsStr, iframe.contentDocument);
 
-        removeIframe(iframe);
+          const result = typeof iframe?.contentWindow?.get === 'function'
+            ? iframe.contentWindow.get(context || {})
+            : undefined;
 
-        resolve(result);
+          removeIframe(iframe);
+
+          resolve(result);
+        } catch (e) {
+          removeIframe(iframe);
+          reject(e);
+        }
       };
-
       document.body.appendChild(iframe);
     } catch (e) {
       removeIframe(iframe);

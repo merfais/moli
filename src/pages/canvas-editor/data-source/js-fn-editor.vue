@@ -31,7 +31,7 @@ async function onClickRun() {
   previewFold.value = false;
   try {
     const result = await runInNewContext(props.value);
-    preview.value = JSON.stringify(result);
+    preview.value = JSON.stringify(result, null, 4);
   } catch (e) {
     errorLog({ e, msg: '执行js出错' });
   }
