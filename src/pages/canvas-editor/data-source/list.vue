@@ -134,7 +134,7 @@ watch(() => [
 });
 
 function onClickRemove(options) {
-  unRegisterEditorDS(options?.record?.id);
+  unRegisterEditorDS(options?.record?.metaItem?.id);
 }
 
 </script>

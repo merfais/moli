@@ -31,6 +31,7 @@ const props = defineProps({
 const emit = defineEmits([
   'update:value',
   'updateInitValType',
+  'updateFirstN',
 ]);
 
 const optsMap = {
@@ -58,10 +59,16 @@ function onUpdateValue(value) {
 
 function onUpdateInitVal(value) {
   emit('updateInitValType', value);
+  formItemContext.onFieldChange();
 }
 
 function updateValue(value) {
   emit('update:value', value);
+  formItemContext.onFieldChange();
+}
+
+function onUpdateFirstN(n) {
+  emit('updateFirstN', n);
   formItemContext.onFieldChange();
 }
 
@@ -77,6 +84,7 @@ function updateValue(value) {
     </div>
     <div class="flex-grow">
       <component :is="staticIs"
+        class="mb-5"
         :value="value"
         :disabled="initValType !== INIT_VAL_TYPE.STATIC"
         :depDSs="depDSs"
@@ -85,20 +93,38 @@ function updateValue(value) {
         placeholder="请选择默认值"
         @update:value="onUpdateValue"
       />
+      <AInputNumber
+        class="first-n"
+        :value="firstN"
+        :min="1"
+        addonAfter="个"
+        :disabled="initValType !== INIT_VAL_TYPE.FIRST_N"
+        @update:value="onUpdateFirstN"
+      />
     </div>
   </div>
 </template>
 <style scoped>
 .init-val-wrapper {
-  width: 110px;
+  width: 105px;
 
   :deep(.ant-radio-wrapper) {
-    &:first-child {
-      height: 30px;
-      padding-top: 5px;
-      margin-bottom: 10px;
+    padding-top: 6px;
+    height: 30px;
+    margin-right: 0;
+    margin-bottom: 5px;
+
+    &:last-child {
+      margin: 0;
     }
-    margin: 0;
+
+    > span + span {
+      padding-right: 5px;
+    }
   }
+}
+
+.first-n {
+  transform: translateX(-30px);
 }
 </style>

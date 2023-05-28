@@ -31,7 +31,7 @@ export const INIT_VAL_TYPE = {
 export const INIT_VAL_TYPE_NAME = {
   [INIT_VAL_TYPE.STATIC]: '使用静态值',
   [INIT_VAL_TYPE.FIRST]: '选中第一个',
-  [INIT_VAL_TYPE.FIRST_N]: '选中前N个',
+  [INIT_VAL_TYPE.FIRST_N]: '选中前',
   [INIT_VAL_TYPE.ALL]: '全选',
 };
 
