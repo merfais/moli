@@ -12,9 +12,11 @@ import RModal from './modal';
 import RTable from './table/r-table';
 import VTable from './table/v-table';
 import RSelect from './select';
+import MultiSelect from './multi-select';
 import RInput from './input';
 import RTextarea from './textarea';
 import RAutoComplete from './auto-complete';
+import DatetimePicker from './datetime-picker';
 import LabelValueInfo from './label-value-info';
 import LabelValueInfos from './label-value-infos';
 import ConfirmButton from './confirm-button';
@@ -40,6 +42,7 @@ import DownloadButton from './download-button';
 import PhoneContainer from './phone-container';
 import ErrorCover from './error-cover';
 import LoadingCover from './loading-cover';
+import Loading from './loading';
 import KeyValueInput from './key-value-input';
 import RangePicker from './range-picker';
 import ColorPicker from './color-picker';
@@ -56,6 +59,7 @@ export default function install(app) {
     RDrawer,
     REmpty,
     RSelect,
+    MultiSelect,
     RInput,
     RTextarea,
     RAutoComplete,
@@ -76,13 +80,14 @@ export default function install(app) {
     CompareSelect,
     BoolSelector,
     ImgLink,
+    DatetimePicker,
     HelpLink,
     HelpTip,
     // eslint-disable-next-line max-len
     JsonViewer: () => import(/* webpackChunkName: "json-viewer-comp" */'./json-viewer'),
     // eslint-disable-next-line max-len
-    LargeJsonViewer: () => import(/* webpackChunkName: "json-viewer-comp" */'./large-json-viewer'),
-    DiffViewer: () => import(/* webpackChunkName: "monaco" */'./diff-viewer'),
+    LargeJsonViewer: () => import(/* webpackChunkName: "large-json-viewer-comp" */'./large-json-viewer'),
+    DiffViewer: () => import(/* webpackChunkName: "monaco" */'./monaco/diff-viewer'),
     Monaco: () => import(/* webpackChunkName: "monaco" */'./monaco'),
     ToolBox,
     RChart: () => import(/* webpackChunkName: "chart-comp" */'./chart'),
@@ -96,6 +101,7 @@ export default function install(app) {
     RTooltip,
     ErrorCover,
     LoadingCover,
+    Loading,
     LogDiff,
     KeyValueInput,
     Repeat,

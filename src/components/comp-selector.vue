@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Form } from 'ant-design-vue';
+import ISelect from './select';
 
 Form.useInjectFormItemContext();
 
@@ -26,7 +27,7 @@ const options = computed(() => {
   if (props.multiple) {
     return [{
       label: '下拉框',
-      value: 'ASelect',
+      value: ISelect,
     }, {
       label: '多选框',
       value: 'CheckboxGroup',
@@ -37,7 +38,7 @@ const options = computed(() => {
   }
   return [{
     label: '下拉框',
-    value: 'ASelect',
+    value: ISelect,
   }, {
     label: '单选框',
     value: 'ARadioGroup',
@@ -50,7 +51,7 @@ const options = computed(() => {
 const comps = computed(() => {
   if (props.multiple) {
     return [{
-      component: 'ASelect',
+      component: ISelect,
       value: ['A', 'B'],
       props: {
         options: data,
@@ -71,7 +72,7 @@ const comps = computed(() => {
     }];
   }
   return [{
-    component: 'ASelect',
+    component: ISelect,
     value: 'A',
     props: {
       options: data,

@@ -92,7 +92,7 @@ if (process.env.NODE_ENV !== 'production') {
     'operator-linebreak': 1,
     'prefer-const': 1,
     'padded-blocks': 1,
-    'quotes': 1,
+    quotes: 1,
     'quote-props': 1,
     semi: 1,
     'spaced-comment': 1,

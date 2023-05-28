@@ -11,6 +11,7 @@ import ImgLink from '../img-link';
 const props = defineProps({
   itemKey: [String, Number],
   item: {},
+  itemLength: Number,
   column: Object,
   record: Object,
   index: Number,
@@ -19,8 +20,29 @@ const props = defineProps({
 
 const emit = defineEmits(['click']);
 
+const isOp = computed(() => !!props.column?.isOperator);
+
+const isHtml = computed(() => props.item?.html || props.column?.isHtml);
+
+const isImg = computed(() => {
+  const { valueType } = props?.column || {};
+  return valueType === 'picture' || valueType === 'img';
+});
+
+const isLink = computed(() => {
+  const { valueType } = props?.column || {};
+  return valueType === 'link' || /^https?:\/\//.test(unref(cellText));
+});
+
 const is = computed(() => {
-  const comp = props.item?.component || props.column?.component;
+  let comp = props.item?.component || props.column?.component;
+  if (!comp) {
+    if (unref(isImg)) {
+      comp = ImgLink;
+    } else if (unref(isLink)) {
+      comp = 'a';
+    }
+  }
   if (!comp) {
     return;
   }
@@ -36,7 +58,7 @@ const cellText = computed(() => {
   // dataSource中字段的值是 object，可能使用了component渲染
   // 判断component是否有值，取item.text 或固定值column.compInnerText
   if (typeof text === 'object'
-    && text
+    && text // 过滤text = null的情况
     && (props.column?.component || props.item?.component)
   ) {
     text = text.text || props.column?.compInnerText;
@@ -55,29 +77,35 @@ const cellHtml = computed(() => {
   return props.item?.html || unref(cellText);
 });
 
-const isOp = computed(() => !!props.column?.isOperator);
-
-const isHtml = computed(() => props.item?.html || props.column?.isHtml);
-
-const isImg = computed(() => {
-  const { valueType } = props?.column || {};
-  return valueType === 'picture' || valueType === 'img';
-});
-
-const isUrl = computed(() => /^https?:\/\//.test(unref(cellText)));
-
 function getCompProps() {
   if (unref(isOp)) {
     return props.item?.compProps;
   }
-  return {
+  if (unref(isImg)) {
+    return {
+      href: unref(cellText),
+    };
+  }
+  if (unref(isLink)) {
+    return {
+      href: unref(cellText),
+      target: '_blank',
+      class: props.itemLength > 1 ? 'd-block' : '',
+    };
+  }
+  const compProps = {
     ...props.column?.compProps,
     ...props.item?.compProps,
   };
+  if (!/ellipsis/.test(compProps.class)) {
+    return compProps;
+  }
+  return { title: unref(cellText), ...compProps };
 }
 
 function onCompClick(e) {
   if (props.inConfirm) {
+    e.stopPropagation();
     emit('click', e);
     return;
   }
@@ -138,15 +166,6 @@ function onUpdateValue(value) {
   <template v-else-if="isHtml">
     <span v-html="cellHtml" />
   </template>
-  <ImgLink v-else-if="isImg"
-    :href="cellText"
-  />
-  <a v-else-if="isUrl"
-    :href="cellText"
-    target="_blank"
-    >
-    {{cellText}}
-  </a>
   <template v-else>
     {{cellText}}
   </template>

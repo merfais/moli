@@ -5,6 +5,7 @@ import {
 import {
   DownOutlined,
   UpOutlined,
+  RightOutlined,
 } from '@ant-design/icons-vue';
 import IButton from './button';
 
@@ -32,6 +33,10 @@ const compMap = {
   },
   down: {
     true: UpOutlined,
+    false: DownOutlined,
+  },
+  rightDown: {
+    true: RightOutlined,
     false: DownOutlined,
   },
 };

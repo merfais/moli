@@ -225,7 +225,7 @@ function batchValToList(value) {
     const [left = '', right = ''] = str.split(/ *[,，] */);
     return {
       [keyF]: left.trim() || undefined,
-      [valF]: right.trim() || undefined,
+      [valF]: right.trim() || left.trim(),
     };
   });
   return list;

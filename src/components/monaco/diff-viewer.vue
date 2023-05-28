@@ -32,6 +32,8 @@ const props = defineProps({
 
 const emit = defineEmits([
   'inited',
+  'input',
+  'update:value',
 ]);
 
 let editorIns;
@@ -50,15 +52,15 @@ const exposeObj = reactive({
 });
 
 const original = computed(() => {
-  if (has(props.value, 'left')) {
-    return props.value.left;
+  if (has(unref(props.value), 'left')) {
+    return unref(unref(props.value).left);
   }
   return '';
 });
 
 const modified = computed(() => {
-  if (has(props.value, 'right')) {
-    return props.value.right;
+  if (has(unref(props.value), 'right')) {
+    return unref(unref(props.value).right);
   }
   return '';
 });
@@ -68,16 +70,16 @@ const style = computed(() => ({
   height: props.height,
 }));
 
-watch(() => props.value, () => {
-  const { left, right } = props.value || {};
+watch(() => unref(props.value), () => {
+  const { left, right } = unref(props.value) || {};
   if (originalModel) {
-    if (left !== originalModel.getValue()) {
-      originalModel.setValue(left);
+    if (unref(left) !== originalModel.getValue()) {
+      originalModel.setValue(unref(left) || '');
     }
   }
   if (modifiedModel) {
-    if (right !== modifiedModel.getValue()) {
-      modifiedModel.setValue(right);
+    if (unref(right) !== modifiedModel.getValue()) {
+      modifiedModel.setValue(unref(right) || '');
     }
   }
 }, { deep: true });
@@ -109,10 +111,20 @@ function init() {
   });
   const originalEditor = editorIns.getOriginalEditor();
   const modifiedEditor = editorIns.getModifiedEditor();
-  emit('inited', { editorIns, originalEditor, modifiedEditor });
   exposeObj.editorIns = editorIns;
   exposeObj.originalEditor = originalEditor;
   exposeObj.modifiedEditor = modifiedEditor;
+
+  originalModel.onDidChangeContent((event) => {
+    const value = originalModel.getValue();
+    const { left } = unref(props.value) || {};
+    if (unref(left) !== value) {
+      emit('update:value', { ...unref(props.value), left: value });
+      emit('input', value, event);
+    }
+  });
+
+  emit('inited', { editorIns, originalEditor, modifiedEditor });
 }
 
 function dispose() {
@@ -149,11 +161,14 @@ onBeforeUnmount(() => {
 defineExpose(exposeObj);
 </script>
 <template>
-  <div :style="style">
+  <div class="monaco-dom-wrapper" :style="style">
     <div ref="domRef" class="editor-ele" />
   </div>
 </template>
 <style scoped>
+.monaco-dom-wrapper {
+  border: 1px solid #ddd;
+}
 .editor-ele {
   height: 100%;
 }

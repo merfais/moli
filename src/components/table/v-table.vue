@@ -21,13 +21,11 @@ import {
 } from 'lodash-es';
 import { message } from 'ant-design-vue';
 import {
-  HolderOutlined,
   QuestionCircleOutlined,
   LockOutlined,
   UnlockOutlined,
 } from '@ant-design/icons-vue';
 import { useResizeObserver } from '@vueuse/core';
-import sortable from 'sortablejs';
 import newId from '@/uses/id';
 import useCopyText from '@/uses/copy';
 import Empty from '../empty';
@@ -37,7 +35,6 @@ import SortIcon from './sort-icon';
 const props = defineProps({
   columns: Array,
   dataSource: Array,
-  dragable: Boolean,
   disableCopy: Boolean,
   withIndexCol: Boolean,
   withCheckboxCol: Boolean,
@@ -52,7 +49,6 @@ const props = defineProps({
   bordered: Boolean,
 });
 const emit = defineEmits([
-  'dragEnd',
   'sort',
   'change',
   'pageChange',
@@ -120,7 +116,7 @@ const pageProps = computed(() => {
   const conf = {
     current: 1,
     pageSize: 10,
-    total: props.dataSource?.length || 0,
+    total: unref(props.dataSource)?.length || 0,
     showTotal: total => `总共 ${total < 0 ? 0 : total} 条`,
     showSizeChanger: true,
     size: 'small',
@@ -160,12 +156,12 @@ const bottomPageVisible = computed(() => {
 const innerDataSource = computed(() => {
   const { current, pageSize } = unref(pageProps) || innerPagination;
   let data;
-  if (props.dataSource?.length <= pageSize) {
-    data = props.dataSource;
+  if (unref(props.dataSource)?.length <= pageSize) {
+    data = unref(props.dataSource);
   } else {
     const start = current * pageSize - pageSize;
     const end = current * pageSize;
-    data = (props.dataSource || []).slice(start, end);
+    data = (unref(props.dataSource) || []).slice(start, end);
   }
   forEach(data, (item) => {
     if (item[unref(innerRowKey)]) {
@@ -191,7 +187,7 @@ const allRowChecked = computed(() => {
   return all;
 });
 
-watch(() => [props.columns, wrapperSize.w], (newVal, oldVal) => {
+watch(() => [unref(props.columns), wrapperSize.w], (newVal, oldVal) => {
   // 长度发生变化
   if (oldVal && newVal && oldVal.length !== newVal.length) {
     sortColIdxSet.clear();
@@ -215,14 +211,6 @@ watch(() => [props.columns, wrapperSize.w], (newVal, oldVal) => {
       type: 'checkbox',
       width: 45,
       align: 'center',
-    });
-    addonCount += 1;
-  }
-  if (props.dragable) {
-    columns.unshift({
-      key: '#drag#',
-      type: 'drag',
-      width: 40,
     });
     addonCount += 1;
   }
@@ -470,6 +458,13 @@ function getItem(options = {}) {
   return cellData;
 }
 
+function getItemLength(options) {
+  const item = getItem(options);
+  return (Array.isArray(item))
+    ? item.length
+    : Object.keys(item || {}).length;
+}
+
 function getPopConfirmProps({ column, item } = {}) {
   const tmp = {
     ...column?.popConfirmProps,
@@ -498,7 +493,7 @@ function enableCopy(column = {}) {
 }
 
 function isSpecialCol(colItem) {
-  return /^(seq|checkbox|drag|operators)$/.test(colItem.type);
+  return /^(seq|checkbox|operators)$/.test(colItem.type);
 }
 
 function onClickCopy(options) {
@@ -611,11 +606,15 @@ function getRowProps(options = {}) {
 
 function onHeaderCellResize(entries) {
   forEach(entries, (entry) => {
-    const scrollHeight = entry?.target?.scrollHeight;
-    if (scrollHeight > unref(headerHeight)) {
-      headerHeight.value = scrollHeight + 5;
-    }
+    const scrollHeight = entry?.target?.scrollHeight || 0;
+    resetHeaderHeight(scrollHeight);
   });
+}
+
+function resetHeaderHeight(scrollHeight) {
+  if (scrollHeight > unref(headerHeight)) {
+    headerHeight.value = scrollHeight + 5;
+  }
 }
 
 onMounted(() => {
@@ -623,20 +622,20 @@ onMounted(() => {
   const headerStr = '.el-table-v2__main .el-table-v2__header > div';
   const theaderEl = tableEl.querySelector(headerStr);
 
-  const cellEls = theaderEl.querySelectorAll('.header-name');
-  forEach(cellEls, (el) => {
-    useResizeObserver(el, onHeaderCellResize);
+  const ro = useResizeObserver(theaderEl, (entries) => {
+    const [entry] = entries;
+    if (entry && entry.target) {
+      const cellEls = entry.target.querySelectorAll('.header-name');
+      forEach(cellEls, (el) => {
+        useResizeObserver(el, onHeaderCellResize);
+        const scrollHeight = el?.scrollHeight || 0;
+        resetHeaderHeight(scrollHeight);
+      });
+      ro.stop();
+    }
   });
-
   const bodyStr = '.el-table-v2__main .el-table-v2__body > div > div';
   const tbodyEl = tableEl.querySelector(bodyStr);
-  if (tbodyEl && props.dragable) {
-    sortable.create(tbodyEl, {
-      animation: 100,
-      handle: '.drag-holder',
-      onEnd: e => emit('dragEnd', e),
-    });
-  }
   exposeObj.tbodyEl = tbodyEl;
   exposeObj.tableEl = tableEl;
 });
@@ -683,7 +682,7 @@ defineExpose(exposeObj);
           @click="onClickHeader({ column, ...rest, e:$event })"
         />
         <span v-else
-          class="header-name height-100 align-center"
+          class="header-name height-100 align-center break-all"
           :title="column?.title"
           @click="onClickHeader({ column, ...rest, e:$event })"
         >
@@ -720,9 +719,6 @@ defineExpose(exposeObj);
           :name="column?.slot"
           v-bind="{ record, column, index, ...rest }"
         />
-        <template v-else-if="column?.type === 'drag'">
-          <HolderOutlined class="drag-holder flex-center" />
-        </template>
         <template v-else-if="column?.type === 'checkbox'">
           <ACheckbox
             :checked="checkedRowSet.has(record?.[unref(innerRowKey)])"
@@ -734,7 +730,7 @@ defineExpose(exposeObj);
         <span v-else
           :class="{ operators: column?.type === 'operators' }"
         >
-          <template v-for="(item, key) in getItem({ column, record, rest })"
+          <template v-for="(item, key) in getItem({ column, record })"
             :key="key"
           >
             <APopconfirm v-if="getPopConfirmProps({ column, item })"
@@ -748,6 +744,7 @@ defineExpose(exposeObj);
                 :index="index"
                 :item="item"
                 :itemKey="key"
+                :itemLength="getItemLength({ column, record })"
                 inConfirm
               />
             </APopconfirm>
@@ -757,6 +754,7 @@ defineExpose(exposeObj);
               :index="index"
               :item="item"
               :itemKey="key"
+              :itemLength="getItemLength({ column, record })"
             />
           </template>
           <ATag v-if="enableCopy(column)"
@@ -905,12 +903,6 @@ defineExpose(exposeObj);
 
   .loading {
     background: rgba(255, 255, 255, .5);
-  }
-
-  .drag-holder {
-    width: 24px;
-    height: 22px;
-    cursor: move;
   }
 
   .copy-tag {

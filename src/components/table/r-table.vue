@@ -2,6 +2,7 @@
 import {
   computed,
   onMounted,
+  onBeforeUnmount,
   watch,
   unref,
   shallowRef,
@@ -32,6 +33,7 @@ import SortIcon from './sort-icon';
 
 const props = defineProps({
   columns: Array,
+  dataSource: Array,
   dragable: Boolean,
   disableCopy: Boolean,
   withIndexCol: Boolean,
@@ -48,6 +50,7 @@ const emit = defineEmits([
 const sortColIdxSet = new Set();
 const colKey = 'key';
 const id = `table_${newId()}`;
+let dragHandler;
 
 const exposeObj = shallowReactive({
   id,
@@ -79,7 +82,7 @@ const pageProps = computed(() => {
   const conf = {
     current: 1,
     pageSize: 10,
-    total: props.dataSource?.length || 0,
+    total: unref(props.dataSource)?.length || 0,
     showSizeChanger: true,
     showTotal: (totalNum) => {
       let { total } = props.pagination || {};
@@ -112,7 +115,7 @@ const pageProps = computed(() => {
   return conf;
 });
 
-watch(() => props.columns, (newVal, oldVal) => {
+watch(() => [unref(props.columns), props.dragable], (newVal, oldVal) => {
   // 长度发生变化
   if (oldVal && newVal && oldVal.length !== newVal.length) {
     sortColIdxSet.clear();
@@ -160,6 +163,10 @@ watch(() => props.columns, (newVal, oldVal) => {
   });
   innerColumns.value = cols;
 }, { immediate: true });
+
+// watch(() => unref(props.dataSource), () => {
+//   createDrag()
+// })
 
 function getColKey(colItem) {
   const { dataIndex, key } = colItem;
@@ -287,6 +294,13 @@ function getItem(options = {}) {
   return cellData;
 }
 
+function getItemLength(options) {
+  const item = getItem(options);
+  return (Array.isArray(item))
+    ? item.length
+    : Object.keys(item || {}).length;
+}
+
 function getPopConfirmProps({ column, item } = {}) {
   const tmp = {
     ...column?.popConfirmProps,
@@ -345,14 +359,11 @@ function getOp({ column, record } = {}) {
       set(item, 'compProps.type', 'link');
     }
     // 如果是删除按钮，设置删除确认参数
-    if (item.isDelete) {
-      if (!item.popConfirmProps) {
-        item.popConfirmProps = {
-          title: '确认要删除吗？',
-          placement: 'left',
-        };
-      }
-      set(item, 'compProps.danger', true);
+    if (item.isDelete && !item.popConfirmProps) {
+      item.popConfirmProps = {
+        title: '确认要删除吗？',
+        placement: 'left',
+      };
     }
     const { popConfirmProps, onClick, onConfirm } = item;
     if (popConfirmProps) {
@@ -441,14 +452,38 @@ function getPopupContainer() {
   return document.querySelector(`#${id}`);
 }
 
+function createDrag() {
+  const tbodyEl = document.querySelector(`#${id} tbody.ant-table-tbody`);
+  exposeObj.tbodyEl = tbodyEl;
+  if (typeof dragHandler?.destroy === 'function') {
+    dragHandler.destroy();
+  }
+  if (props.dragable) {
+    let index;
+    dragHandler = sortable.create(tbodyEl, {
+      animation: 100,
+      handle: '.drag-holder',
+      onChoose: (e) => {
+        index = [...e.item.parentNode.childNodes].indexOf(e.item);
+      },
+      onEnd: (e) => {
+        const { item } = e;
+        const { parentNode } = item;
+        parentNode.removeChild(item);
+        parentNode.insertBefore(item, parentNode.childNodes[index]);
+        emit('dragEnd', e);
+      },
+    });
+  }
+}
+
 onMounted(() => {
-  const tbody = document.querySelector(`#${id} tbody.ant-table-tbody`);
-  sortable.create(tbody, {
-    animation: 100,
-    handle: '.drag-holder',
-    onEnd: e => emit('dragEnd', e),
-  });
-  exposeObj.tbodyEl = tbody;
+  createDrag();
+});
+onBeforeUnmount(() => {
+  if (typeof dragHandler?.destroy === 'function') {
+    dragHandler.destroy();
+  }
 });
 
 defineExpose(exposeObj);
@@ -459,6 +494,7 @@ defineExpose(exposeObj);
     :id="id"
     size="small"
     :columns="innerColumns"
+    :dataSource="dataSource"
     :sortDirections="['descend', 'ascend']"
     :showSorterTooltip="false"
     :pagination="pageProps"
@@ -519,7 +555,7 @@ defineExpose(exposeObj);
       <span v-else
         :class="{ operators: column?.isOperator }"
       >
-        <template v-for="(item, key) in getItem({ column, record, rest })"
+        <template v-for="(item, key) in getItem({ column, record })"
           :key="key"
         >
           <APopconfirm v-if="getPopConfirmProps({ column, item })"
@@ -533,6 +569,7 @@ defineExpose(exposeObj);
               :index="index"
               :item="item"
               :itemKey="key"
+              :itemLength="getItemLength({ column, record })"
               inConfirm
             />
           </APopconfirm>
@@ -542,6 +579,7 @@ defineExpose(exposeObj);
             :index="index"
             :item="item"
             :itemKey="key"
+            :itemLength="getItemLength({ column, record })"
           />
         </template>
         <ATag v-if="enableCopy(column)"
@@ -577,7 +615,7 @@ defineExpose(exposeObj);
   .ant-table-tbody > tr > td {
     position: relative;
 
-    &:hover .copy-tag {
+    &:hover > span > .copy-tag {
       display: unset;
     }
   }

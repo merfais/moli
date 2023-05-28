@@ -8,7 +8,7 @@ import useCopyText from '@/uses/copy';
 
 const props = defineProps({
   label: String,
-  value: [String, Boolean, Number],
+  value: [String, Boolean, Number, Array],
   title: String,
   is: {},
   compProps: Object,

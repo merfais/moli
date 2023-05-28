@@ -11,6 +11,7 @@ import {
 
 defineProps({
   disableDel: Boolean,
+  disableCopy: Boolean,
   enableConfim: Boolean,
   confirmText: {
     type: String,
@@ -59,7 +60,7 @@ function onClickConfirm() {
       >
         <SettingOutlined :size="15" />
       </AButton>
-      <AButton
+      <AButton v-if="!disableCopy"
         class='tool-btn'
         type="link"
         title="拷贝"

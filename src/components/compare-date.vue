@@ -120,5 +120,10 @@ export default {
   .picker {
     flex-grow: 1;
   }
+
+  :deep(.date-time-range-picker) {
+    flex-grow: 1;
+    display: flex;
+  }
 }
 </style>

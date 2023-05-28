@@ -12,9 +12,7 @@ defineEmits([
   'click',
 ]);
 </script>
-<script>
-export default { inheritAttrs: false };
-</script>
+<script>export default { inheritAttrs: false }; </script>
 <template>
   <APopconfirm
     :title="confirmText"

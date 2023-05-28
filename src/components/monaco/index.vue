@@ -21,12 +21,16 @@ const props = defineProps({
 const emit = defineEmits([
   'inited',
   'input',
+  'change',
+  'update:value',
   'blur',
   'focus',
+  'changeSelection',
 ]);
 
 let editorIns;
 let valueModel;
+let innerOpts = {};
 const dftOptions = {
   minimap: {
     enabled: false,
@@ -41,7 +45,10 @@ const placeholderVisible = ref(!props.value);
 const exposeObj = reactive({
   resize,
   focus,
+  getSelectionValue,
+  setSelectionValue,
 });
+
 defineExpose(exposeObj);
 
 onMounted(() => {
@@ -57,13 +64,14 @@ onBeforeUnmount(() => {
 });
 
 watch(() => props.value, () => {
-  if (valueModel && props.value !== valueModel.getValue()) {
-    valueModel.setValue(props.value);
+  const value = unref(props.value) || '';
+  if (valueModel?.setValue && value !== valueModel.getValue()) {
+    valueModel.setValue(value);
   }
 }, { deep: true });
 
 watch(() => props.options, () => {
-  if (editorIns) {
+  if (editorIns?.updateOptions) {
     editorIns.updateOptions(props.options);
   }
 }, { deep: true });
@@ -81,17 +89,19 @@ watch(() => props.readonly, () => {
 });
 
 function dispose() {
-  if (editorIns) {
+  if (editorIns?.dispose) {
     editorIns.dispose();
   }
 }
 
 function focus() {
-  editorIns.focus();
+  if (editorIns?.focus) {
+    editorIns.focus();
+  }
 }
 
 function resize() {
-  if (editorIns) {
+  if (editorIns?.layout) {
     editorIns.layout();
   }
 }
@@ -100,20 +110,40 @@ function showPlaceholder() {
   placeholderVisible.value = !valueModel.getValue();
 }
 
+function getSelectionValue() {
+  if (valueModel?.getValueInRange && editorIns?.getSelection) {
+    return valueModel.getValueInRange(editorIns.getSelection());
+  }
+}
+
+function setSelectionValue(text) {
+  if (!editorIns?.getSelection || !editorIns?.executeEdits) {
+    return;
+  }
+  const selection = editorIns.getSelection();
+  editorIns.executeEdits('replace', [{
+    range: selection,
+    text,
+  }]);
+}
+
 function init() {
-  valueModel = editor.createModel(props.value, props.language);
-  editorIns = editor.create(unref(domRef), {
+  valueModel = editor.createModel(unref(props.value) || '', props.language);
+  innerOpts = {
     ...dftOptions,
     ...props.options,
     readOnly: props.readonly,
-  });
+  };
+  editorIns = editor.create(unref(domRef), innerOpts);
   editorIns.setModel(valueModel);
 
   editorIns.onDidChangeModelContent((event) => {
     const value = valueModel.getValue();
     showPlaceholder();
-    if (props.value !== value) {
+    if ((unref(props.value) || '') !== value) {
+      emit('update:value', value);
       emit('input', value, event);
+      emit('change', value, event);
     }
   });
   editorIns.onDidBlurEditorWidget((e) => {
@@ -124,6 +154,12 @@ function init() {
     showPlaceholder();
     emit('focus', e);
   });
+
+  editorIns.onDidChangeCursorSelection((e) => {
+    const value = valueModel.getValueInRange(e?.selection);
+    emit('changeSelection', { ...e, value });
+  });
+
   exposeObj.editorIns = editorIns;
   emit('inited', editorIns);
 }

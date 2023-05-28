@@ -6,6 +6,7 @@ import {
   watch,
 } from 'vue';
 import {
+  get,
   set,
   omit,
   pick,
@@ -56,11 +57,16 @@ watch(() => unref(props.items), () => {
 
       Object.assign(compValueMap, { [key]: value });
     } else {
-      const { label } = item;
       if (compProps?.placeholder === undefined) {
-        if (/^(a|r)-?(input(-?(search|number))?|textarea)$/i.test(item.component)) {
+        const is = compProps?.component || item.component;
+        const label = get(item.label, 'text', item.label);
+        if (/^(a|r)-?(input(-?(search|number))?|textarea)$/i.test(is)) {
           set(compProps, 'placeholder', `请输入${label}`);
-        } else if (/^((a|r)-?(select|cascader)|color-?picker)$/i.test(item.component)) {
+        } else if (/^CompareNumber|auto-?complete$/i.test(is)) {
+          set(compProps, 'placeholder', `请输入${label}`);
+        } else if (/^((a|r)-?(select|cascader)|color-?picker)$/i.test(is)) {
+          set(compProps, 'placeholder', `请选择${label}`);
+        } else if (/^CompareDate$/i.test(is)) {
           set(compProps, 'placeholder', `请选择${label}`);
         }
       }
@@ -89,7 +95,7 @@ watch(() => unref(props.items), () => {
   compItemValueMap.value = compValueMap;
 }, { immediate: true });
 
-function onUpdateValue(value, item) {
+function onUpdate(value, item) {
   const { key, path, onUpdate, formProps } = item;
   let { compProps } = item;
   if (formProps) {
@@ -119,19 +125,19 @@ function onUpdateValue(value, item) {
       v-bind="item.formProps"
       :value="formItemValueMap[key]"
       :name="key"
-      @update:value="onUpdateValue($event, item)"
+      @update:value="onUpdate($event, item)"
     />
     <slot v-else-if="item.slot"
       :name="item.slot"
+      :value="compItemValueMap[key]"
       :text="item.compInnerText"
       v-bind="item.compProps"
-      :value="compItemValueMap[key]"
     />
     <component v-else
       :is="item.component"
-      v-bind="item.compProps"
       :value="compItemValueMap[key]"
-      @update:value="onUpdateValue($event, item)"
+      v-bind="item.compProps"
+      @update:value="onUpdate($event, item)"
     >
       <template v-for="(slotItem, name) in item.compSlots"
         #[name]="slotProps"
