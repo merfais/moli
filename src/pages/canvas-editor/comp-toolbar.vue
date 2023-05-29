@@ -74,8 +74,9 @@ function onClickMenuItem(options = {}) {
 </template>
 <style scoped>
 .toolbar {
-  top: -15px;
-  right: -1px;
+  top: -17px;
+  right: -3px;
+  padding: 3px;
 
   .tool-btn {
     padding: 0 4px;

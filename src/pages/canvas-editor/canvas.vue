@@ -195,6 +195,7 @@ function getToolbarPopupContainer(item) {
           <ATooltip
             placement="topRight"
             destroyTooltipOnHide
+            overlayClassName="z-1"
             :getPopupContainer="() => getToolbarPopupContainer(item)"
           >
             <template #title>
@@ -259,6 +260,7 @@ function getToolbarPopupContainer(item) {
   .grid-item-wrapper {
     &:hover {
       box-shadow: 0 0 1px 1px #0E73FF;
+      z-index: 1;
     }
 
     &.dragging {

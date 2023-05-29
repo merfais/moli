@@ -31,6 +31,7 @@ function getBasic(editor, onUpdate) {
   watch(() => [
     editor.viewConf.depDSs?.options,
     editor.viewConf.initValType,
+    editor.viewConf.firstN,
     editor.viewConf.labelField,
     editor.viewConf.valueField,
   ], () => {
@@ -86,6 +87,7 @@ function genBasicFormItems(editor, onUpdate) {
         labelField: viewConf.labelField,
         valueField: viewConf.valueField,
         onUpdateInitValType: (payload) => onUpdate({ path: 'initValType', payload }),
+        onUpdateFirstN: (payload) => onUpdate({ path: 'firstN', payload }),
       },
       onUpdate,
     },

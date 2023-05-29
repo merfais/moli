@@ -24,6 +24,7 @@ import {
 } from '../constants';
 
 const props = defineProps({
+  i: String,
   placeholder: String,
   label: String,
   exportDS1: String,
@@ -132,6 +133,12 @@ function updateValue(value) {
   });
 }
 
+function getPopupContainer() {
+  return props.i
+    ? document.querySelector(`#${props.i}_grid_item`)
+    : document.body;
+}
+
 </script>
 <template>
   <ButtonRadioGroup v-if="compType === SELECT_COMP_TYPE.BTN_RADIO"
@@ -149,6 +156,7 @@ function updateValue(value) {
     :placeholder="innerPlaceholder"
     :options="innerOptions"
     :disabled="disabled"
+    :getPopupContainer="getPopupContainer"
     @update:value="onUpdateValue"
   />
 </template>

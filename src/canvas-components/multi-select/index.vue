@@ -3,6 +3,7 @@ import {
   get,
   forEach,
   isEmpty,
+  map,
 } from 'lodash-es';
 import {
   ref,
@@ -10,7 +11,9 @@ import {
   computed,
   shallowRef,
   watch,
+  useAttrs,
 } from 'vue';
+import { useElementHover } from '@vueuse/core';
 import {
   watchEditorDS,
   getEditorDSValue,
@@ -24,6 +27,7 @@ import {
 } from '../constants';
 
 const props = defineProps({
+  i: String,
   placeholder: String,
   label: String,
   exportDS1: String,
@@ -41,7 +45,11 @@ const props = defineProps({
   },
   depDSs: Object,
   initValType: String,
+  firstN: Number,
+  withoutAllOption: Boolean,
 });
+
+const attrs = useAttrs();
 
 const emit = defineEmits([
   'update:value',
@@ -56,6 +64,18 @@ const watchMap = {
 
 const optionsDSValue = shallowRef([]);
 const disabled = ref(false);
+const allOptDomRef = ref();
+const reverseOptDomRef = ref();
+const allOptIsHovered = useElementHover(allOptDomRef);
+const reverseOptIsHovered = useElementHover(reverseOptDomRef);
+
+const allOptClass = computed(() => {
+  return { 'ant-select-item-option-active': unref(allOptIsHovered) };
+});
+
+const reverseOptClass = computed(() => {
+  return { 'ant-select-item-option-active': unref(reverseOptIsHovered) };
+});
 
 const innerPlaceholder = computed(() => {
   if (props.placeholder) {
@@ -106,17 +126,26 @@ watch(() => props?.depDSs?.disabled, () => {
   }, { immediate: true });
 }, { immediate: true });
 
-watch(() => props.initValType, () => setInitVal(), { immediate: true });
+watch([
+  () => props.initValType,
+  () => props.firstN,
+], () => setInitVal(), { immediate: true });
 
 watchMap.unwatchUpdateValue = watch(() => unref(innerOptions), () => {
   setInitVal();
 }, { immediate: true });
 
 function setInitVal() {
-  if (props.initValType !== INIT_VAL_TYPE.FIRST) {
+  if (props.initValType === INIT_VAL_TYPE.STATIC) {
     return;
   }
-  updateValue(get(unref(innerOptions), ['0', props.valueField]));
+
+  let arr = unref(innerOptions);
+  if (props.initValType === INIT_VAL_TYPE.FIRST_N) {
+    arr = arr.slice(0, props.firstN || 1);
+  }
+  const value = map(arr, item => get(item, props.valueField));
+  updateValue(value);
 }
 
 function onUpdateValue(value) {
@@ -132,15 +161,27 @@ function updateValue(value) {
   });
 }
 
-const allItemClass = computed(() => {
-  return {};
-});
-
-
-function onClickAllItem() {
-
+function onClickAllOpt() {
+  const value = map(unref(innerOptions), item => get(item, props.valueField));
+  if (value.length && value.length === attrs.value?.length) {
+    updateValue([]);
+  } else {
+    updateValue(value);
+  }
 }
 
+function onClickReverseOpt() {
+  let value = map(unref(innerOptions), item => get(item, props.valueField));
+  const oldVal = attrs.value || [];
+  value = value.filter(v => oldVal.indexOf(v) === -1);
+  updateValue(value);
+}
+
+function getPopupContainer() {
+  return props.i
+    ? document.querySelector(`#${props.i}_grid_item`)
+    : document.body;
+}
 
 </script>
 <template>
@@ -160,18 +201,30 @@ function onClickAllItem() {
     :placeholder="innerPlaceholder"
     :options="innerOptions"
     :disabled="disabled"
+    :getPopupContainer="getPopupContainer"
+    maxTagCount="responsive"
     @update:value="onUpdateValue"
   >
     <template #dropdownRender="{ menuNode }">
-      <div
+      <component :is="menuNode" />
+      <ADivider style="margin: 4px 0" />
+      <div v-if="withoutAllOption !== true"
+        ref="allOptDomRef"
         class="ant-select-item ant-select-item-option"
-        :class="allItemClass"
-        @click="onClickAllItem"
+        :class="allOptClass"
+        @mousedown.prevent="() => {}"
+        @click.stop="onClickAllOpt"
       >
         全选
       </div>
-      <ADivider style="margin: 4px 0" />
-      <component :is="() => menuNode" />
+      <div ref="reverseOptDomRef"
+        class="ant-select-item ant-select-item-option"
+        :class="reverseOptClass"
+        @mousedown.prevent="() => {}"
+        @click.stop="onClickReverseOpt"
+      >
+        反选
+      </div>
     </template>
   </RSelect>
 </template>

@@ -53,16 +53,12 @@ const staticIsMap = {
 const options = computed(() => optsMap[props.compKey]);
 const staticIs = computed(() => staticIsMap[props.compKey]);
 
-function onUpdateValue(value) {
-  updateValue(value);
-}
-
 function onUpdateInitVal(value) {
   emit('updateInitValType', value);
   formItemContext.onFieldChange();
 }
 
-function updateValue(value) {
+function onUpdateValue(value) {
   emit('update:value', value);
   formItemContext.onFieldChange();
 }
@@ -88,12 +84,14 @@ function onUpdateFirstN(n) {
         :value="value"
         :disabled="initValType !== INIT_VAL_TYPE.STATIC"
         :depDSs="depDSs"
+        :initValType="INIT_VAL_TYPE.STATIC"
         :labelField="labelField"
         :valueField="valueField"
         placeholder="请选择默认值"
+        withoutAllOption
         @update:value="onUpdateValue"
       />
-      <AInputNumber
+      <AInputNumber v-if="compKey === COMP_KEY.MULTI_SELECT"
         class="first-n"
         :value="firstN"
         :min="1"

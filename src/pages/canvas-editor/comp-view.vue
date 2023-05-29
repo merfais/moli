@@ -42,7 +42,7 @@ const compProps = computed(() => {
     'compKey',
     'exportDSs',
     'name',
-    'i',
+    'exportDSMetaConf',
   ]);
   propObj.id = props.i;
   // TODO: 挂载点
