@@ -18,14 +18,8 @@ import {
 function getBasic(editor, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
 
-  const formItems = shallowRef({
+  const items = shallowRef({
     formKey: { value: EDITOR_MENU.BASIC, class: 'd-none' },
-    name: {
-      label: '组件名',
-      value: viewConf.name,
-      component: 'AInput',
-      onUpdate,
-    },
     value: {
       label: '默认值',
       value: viewConf.value,
@@ -41,17 +35,34 @@ function getBasic(editor, onUpdate) {
       },
       onUpdate,
     },
+  });
+
+  return items;
+}
+
+function getAdvanced(editor, onUpdate) {
+  const viewConf = get(editor, 'viewConf') || {};
+
+  const items = shallowRef({
+    formKey: { value: EDITOR_MENU.ADVANCED, class: 'd-none' },
+    name: {
+      label: '组件名',
+      value: viewConf.name,
+      component: 'AInput',
+      onUpdate,
+    },
     ...getPlaceholderFormItems(editor, onUpdate),
     ...getDisabledFormItems(editor, onUpdate),
   });
 
-  return formItems;
+  return items;
 }
 
 export default function getInputFormItems(editor) {
   return getSimpleCompFormItems({
     editor,
     getBasic,
+    getAdvanced,
   });
 }
 

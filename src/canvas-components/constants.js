@@ -44,10 +44,12 @@ export const EDITOR_MENU = {
   DS: 'ds',
   LAYOUT: 'layout',
   STYLE: 'style',
+  ADVANCED: 'advanced',
 };
 
 export const EDITOR_MENU_NAME = {
   [EDITOR_MENU.BASIC]: '基础配置',
+  [EDITOR_MENU.ADVANCED]: '更多配置',
   [EDITOR_MENU.LABEL]: 'Label 配置',
   [EDITOR_MENU.DS]: '导出数据配置',
   [EDITOR_MENU.LAYOUT]: '布局配置',

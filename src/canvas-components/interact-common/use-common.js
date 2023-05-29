@@ -226,7 +226,7 @@ function getStyleFormItems(editor = {}, onUpdate) {
  * 简单组件的formItems
  */
 export function getSimpleCompFormItems(options = {}) {
-  const { editor, getBasic } = options;
+  const { editor, getBasic, getAdvanced } = options;
 
   function onUpdate(key) {
     return ({ path, payload } = {}) => {
@@ -241,6 +241,7 @@ export function getSimpleCompFormItems(options = {}) {
 
   return {
     [EDITOR_MENU.BASIC]: getBasic(editor, onUpdate('viewConf')),
+    [EDITOR_MENU.ADVANCED]: getAdvanced(editor, onUpdate('viewConf')),
     [EDITOR_MENU.LABEL]: getLabel(editor, onUpdate('viewConf')),
     [EDITOR_MENU.DS]: getDataSource(dataSource, onUpdate('dataSource.exportDS1')),
     [EDITOR_MENU.LAYOUT]: getLayout(editor, onUpdate('pcLayout')),

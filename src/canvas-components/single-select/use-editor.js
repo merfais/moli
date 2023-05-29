@@ -59,12 +59,6 @@ function genBasicFormItems(editor, onUpdate) {
 
   const items = {
     formKey: { value: EDITOR_MENU.BASIC, class: 'd-none' },
-    name: {
-      label: '组件名',
-      value: viewConf.name,
-      component: 'AInput',
-      onUpdate,
-    },
     compType: {
       label: '组件形态',
       value: viewConf.compType,
@@ -74,7 +68,17 @@ function genBasicFormItems(editor, onUpdate) {
       },
       onUpdate,
     },
-    ...getOptionsFormItems(editor, onUpdate),
+    optionsDepDS: {
+      label: '选项列表来源',
+      value: viewConf.depDSs?.options,
+      path: 'depDSs.options',
+      component: SelectOptions,
+      compProps: {
+        exportDSs: viewConf.exportDSs,
+      },
+      rules: useRules(required),
+      onUpdate,
+    },
     value: {
       label: '默认值',
       value: viewConf.value,
@@ -91,26 +95,25 @@ function genBasicFormItems(editor, onUpdate) {
       },
       onUpdate,
     },
-    ...getPlaceholderFormItems(editor, onUpdate),
-    ...getDisabledFormItems(editor, onUpdate),
   };
 
   return items;
 }
 
-export function getOptionsFormItems(editor, onUpdate) {
+function getAdvanced(editor, onUpdate) {
+  const items = shallowRef(genAdvancedFormItems(editor, onUpdate));
+  return items;
+}
+
+function genAdvancedFormItems(editor, onUpdate) {
   const viewConf = get(editor, 'viewConf') || {};
 
   const items = {
-    optionsDepDS: {
-      label: '选项列表来源',
-      value: viewConf.depDSs?.options,
-      path: 'depDSs.options',
-      component: SelectOptions,
-      compProps: {
-        exportDSs: viewConf.exportDSs,
-      },
-      rules: useRules(required),
+    formKey: { value: EDITOR_MENU.ADVANCED, class: 'd-none' },
+    name: {
+      label: '组件名',
+      value: viewConf.name,
+      component: 'AInput',
       onUpdate,
     },
     labelField: {
@@ -131,7 +134,10 @@ export function getOptionsFormItems(editor, onUpdate) {
       },
       onUpdate,
     },
+    ...getPlaceholderFormItems(editor, onUpdate),
+    ...getDisabledFormItems(editor, onUpdate),
   };
+
   return items;
 }
 
@@ -139,6 +145,7 @@ export default function getSelectFormItems(editor) {
   return getSimpleCompFormItems({
     editor,
     getBasic,
+    getAdvanced,
   });
 }
 
