@@ -16,7 +16,7 @@ import MultiSelect from './multi-select';
 import RInput from './input';
 import RTextarea from './textarea';
 import RAutoComplete from './auto-complete';
-import DatetimePicker from './datetime-picker';
+import RDatetimePicker from './datetime-picker';
 import LabelValueInfo from './label-value-info';
 import LabelValueInfos from './label-value-infos';
 import ConfirmButton from './confirm-button';
@@ -63,6 +63,7 @@ export default function install(app) {
     RInput,
     RTextarea,
     RAutoComplete,
+    RDatetimePicker,
     LabelValueInfo,
     LabelValueInfos,
     ConfirmButton,
@@ -80,7 +81,6 @@ export default function install(app) {
     CompareSelect,
     BoolSelector,
     ImgLink,
-    DatetimePicker,
     HelpLink,
     HelpTip,
     // eslint-disable-next-line max-len

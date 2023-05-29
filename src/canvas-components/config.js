@@ -9,11 +9,13 @@ import {
 import input from './input/config';
 import singleSelect from './single-select/config';
 import multiSelect from './multi-select/config';
+import datetime from './datetime/config';
 
 const compConfigMap = {
   [COMP_KEY.INPUT]: input,
   [COMP_KEY.SINGLE_SELECT]: singleSelect,
   [COMP_KEY.MULTI_SELECT]: multiSelect,
+  [COMP_KEY.DATETIME]: datetime,
 };
 
 /**
