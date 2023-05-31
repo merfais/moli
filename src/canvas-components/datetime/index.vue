@@ -75,7 +75,14 @@ function onUpdateValue(value) {
     v-bind="$attrs"
     @update:value="onUpdateValue"
   />
-  <RichDatetimePicker class="p-absolute xx"/>
+  <div class="p-absolute xx">
+    <RichDatetimePicker
+      :placeholder="innerPlaceholder"
+      :disabled="disabled"
+      v-bind="$attrs"
+      @update:value="onUpdateValue"
+    />
+  </div>
 </template>
 <style scoped>
 .xx {
