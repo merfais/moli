@@ -17,6 +17,7 @@ import RInput from './input';
 import RTextarea from './textarea';
 import RAutoComplete from './auto-complete';
 import RDatetimePicker from './datetime-picker';
+import RichDatetimePicker from './rich-datetime-picker';
 import LabelValueInfo from './label-value-info';
 import LabelValueInfos from './label-value-infos';
 import ConfirmButton from './confirm-button';
@@ -64,6 +65,7 @@ export default function install(app) {
     RTextarea,
     RAutoComplete,
     RDatetimePicker,
+    RichDatetimePicker,
     LabelValueInfo,
     LabelValueInfos,
     ConfirmButton,

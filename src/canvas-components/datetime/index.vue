@@ -1,11 +1,8 @@
 <script setup>
-import { PickerPanel } from 'ant-design-vue/es/vc-picker';
-import generateConfig from 'ant-design-vue/es/vc-picker/generate/dayjs';
 import {
   computed,
   ref,
   watch,
-  inject,
 } from 'vue';
 import {
   isEmpty,
@@ -69,7 +66,6 @@ function onUpdateValue(value) {
   });
 }
 
-const localeData = inject('localeData');
 </script>
 <script>export default { inheritAttrs: false }; </script>
 <template>
@@ -79,12 +75,11 @@ const localeData = inject('localeData');
     v-bind="$attrs"
     @update:value="onUpdateValue"
   />
-  <PickerPanel class="p-absolute"
-    :generateConfig="generateConfig"
-    :locale="localeData.antLocale"
-    prefixCls="ant-picker"
-    showToday
-  />
+  <RichDatetimePicker class="p-absolute xx"/>
 </template>
 <style scoped>
+.xx {
+  right: 0;
+  top: 0;
+}
 </style>
