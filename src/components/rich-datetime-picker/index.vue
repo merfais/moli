@@ -3,15 +3,22 @@ import {
   ref,
   unref,
   computed,
+  watch,
 } from 'vue';
 import {
   CalendarOutlined,
   CloseCircleFilled,
 } from '@ant-design/icons-vue';
 import PickerTrigger from 'ant-design-vue/es/vc-picker/PickerTrigger';
+import { useProvidePanel } from 'ant-design-vue/es/vc-picker/PanelContext';
+import { NOOP } from '@/constants';
 import PickerPanel from './picker-panel';
+import {
+  getStaticDayjsValue,
+} from './use-picker';
 
 const props = defineProps({
+  value: Object,
   getPopupContainer: Function,
   disabled: Boolean,
   placeholder: String,
@@ -22,14 +29,17 @@ const emit = defineEmits([
   'update:value',
 ]);
 
+
+const wrapperDomRef = ref();
 const inputDomRef = ref();
+
 const visible = ref(false);
 const focused = ref(false);
 const hoverValue = ref(false);
 const inputReadOnly = ref(false);
 
 const inputValue = ref();
-const selectedValue = ref();
+// const selectedValue = ref();
 
 const wrapperClass = computed(() => ({
   'ant-picker': true,
@@ -42,6 +52,18 @@ const inputWrapperClass = computed(() => ({
   'ant-picker-input-placeholder': unref(hoverValue),
 }));
 
+useProvidePanel({
+  open: visible,
+});
+
+watch(() => props.value, () => {
+  const { type, staticVal } = props.value || {};
+  if (type === 'static') {
+    const text = getStaticDayjsValue(staticVal);
+    inputValue.value = text ? text.format('YYYY-MM-DD HH:mm:ss') : undefined;
+  }
+}, { immediate: true, deep: true });
+
 function onMouseup() {
   if (unref(inputDomRef)) {
     unref(inputDomRef).focus();
@@ -50,19 +72,17 @@ function onMouseup() {
 }
 
 function onClearIconMouseup() {
-  triggerChange(null);
-  triggerOpen(false);
+  updateValue({ type: 'static' });
 }
 
-function onClearIconMousedown() {
-}
-function triggerChange(newValue) {
-  const { onChange, generateConfig, locale } = props;
-  selectedValue.value = newValue;
+function updateValue(value) {
+  visible.value = false;
+  emit('change', value);
+  emit('update:value', value);
+  // const { onChange, generateConfig, locale } = props;
+  // selectedValue.value = newValue;
   // setInnerValue(newValue);
 
-  emit('change', newValue);
-  emit('update:value', newValue);
   // if (onChange && !isEqual(generateConfig, mergedValue.value, newValue)) {
   //   onChange(
   //     newValue,
@@ -81,19 +101,28 @@ function triggerOpen(newOpen) {
   // triggerInnerOpen(newOpen);
 }
 
+function onOk(value) {
+  updateValue(value);
+}
+
 </script>
 <script>export default { inheritAttrs: false }; </script>
 <template>
   <PickerTrigger
     :visible="visible"
     prefixCls="ant-picker"
-    :getPopupContainer="getPopupContainer"
+    :getPopupContainer="() => wrapperDomRef"
     transitionName="ant-slide-up"
   >
     <template #popupElement>
-      <PickerPanel />
+      <PickerPanel
+        :visible="visible"
+        :value="value"
+        @ok="onOk"
+      />
     </template>
     <div
+      ref="wrapperDomRef"
       v-bind="$attrs"
       :class="wrapperClass"
       @mouseup="onMouseup"
@@ -114,7 +143,7 @@ function triggerOpen(newOpen) {
         <span v-if="inputValue"
           class="ant-picker-clear"
           role="button"
-          @mousedown.stop.prevent="onClearIconMousedown"
+          @mousedown.stop.prevent="NOOP"
           @mouseup.prevent.stop="onClearIconMouseup"
         >
           <CloseCircleFilled />

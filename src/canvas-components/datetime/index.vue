@@ -72,7 +72,7 @@ function onUpdateValue(value) {
   <RDatetimePicker
     :placeholder="innerPlaceholder"
     :disabled="disabled"
-    v-bind="$attrs"
+    v-bind="{...$attrs, value: $attrs.value?.staticVal}"
     @update:value="onUpdateValue"
   />
   <div class="p-absolute xx">

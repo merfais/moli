@@ -35,3 +35,5 @@ export const PLACEHOLDER = {
     + '// 在这里添加数据, 比如等于空数组\n'
     + '[]',
 };
+
+export const NOOP = () => {};
