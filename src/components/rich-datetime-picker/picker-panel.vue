@@ -4,6 +4,7 @@ import {
   watch,
 } from 'vue';
 import DatetimePanel from './datetime-panel';
+import DynamicPanel from './dynamic-panel';
 import {
   getStaticDayjsValue,
 } from './use-picker';
@@ -19,6 +20,7 @@ const emit = defineEmits([
 
 const activeTab = ref();
 const staticVal = ref();
+const dynamicVal = ref();
 
 watch(() => props.value?.staticVal, () => {
   staticVal.value = getStaticDayjsValue(props.value?.staticVal);
@@ -41,28 +43,35 @@ function onChangeStatic(staticVal) {
   emit('ok', value);
 }
 
+function onChangeDynamic() {
+}
+
 </script>
 <template>
   <div
-    class="ant-picker-panel-container"
+    class="ant-picker-panel-container c-default"
   >
     <div class="tab-section d-flex">
-      <div class="pl-10 pr-10 pb-5 pt-5 c-pointer p-relative"
-        :class="{ active: activeTab === 'dynamic'}"
-        @click="() => onClickTab('dynamic')"
-      >
-        动态时间
-      </div>
       <div class="pl-10 pr-10 pb-5 pt-5 c-pointer p-relative"
         :class="{ active: activeTab === 'static'}"
         @click="() => onClickTab('static')"
       >
         静态时间
       </div>
+      <div class="pl-10 pr-10 pb-5 pt-5 c-pointer p-relative"
+        :class="{ active: activeTab === 'dynamic'}"
+        @click="() => onClickTab('dynamic')"
+      >
+        动态时间
+      </div>
     </div>
     <DatetimePanel v-show="activeTab === 'static'"
       v-model:value="staticVal"
       @ok="onChangeStatic"
+    />
+    <DynamicPanel v-show="activeTab === 'dynamic'"
+      v-model:value="dynamicVal"
+      @ok="onChangeDynamic"
     />
   </div>
 </template>

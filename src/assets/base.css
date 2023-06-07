@@ -331,6 +331,10 @@ em.highlight {
   cursor: pointer;
 }
 
+.c-default {
+  cursor: default;
+}
+
 .col-1 {
   flex: 0 0 calc(100% / 24 * 1) !important;
   max-width: calc(100% / 24 * 1) !important;

@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons-vue';
 import PickerTrigger from 'ant-design-vue/es/vc-picker/PickerTrigger';
 import { useProvidePanel } from 'ant-design-vue/es/vc-picker/PanelContext';
+import { onClickOutside } from '@vueuse/core';
 import { NOOP } from '@/constants';
 import PickerPanel from './picker-panel';
 import {
@@ -56,6 +57,11 @@ useProvidePanel({
   open: visible,
 });
 
+onClickOutside(wrapperDomRef, () => {
+  focused.value = false;
+  visible.value = false;
+});
+
 watch(() => props.value, () => {
   const { type, staticVal } = props.value || {};
   if (type === 'static') {
@@ -65,41 +71,31 @@ watch(() => props.value, () => {
 }, { immediate: true, deep: true });
 
 function onMouseup() {
+  if (unref(props.disabled)) {
+    return;
+  }
   if (unref(inputDomRef)) {
     unref(inputDomRef).focus();
-    triggerOpen(true);
+    focused.value = true;
+    visible.value = true;
   }
+}
+
+function onBlur() {
+
 }
 
 function onClearIconMouseup() {
   updateValue({ type: 'static' });
+  focused.value = true;
 }
 
 function updateValue(value) {
   visible.value = false;
   emit('change', value);
   emit('update:value', value);
-  // const { onChange, generateConfig, locale } = props;
-  // selectedValue.value = newValue;
-  // setInnerValue(newValue);
-
-  // if (onChange && !isEqual(generateConfig, mergedValue.value, newValue)) {
-  //   onChange(
-  //     newValue,
-  //     newValue
-  //       ? formatValue(newValue, { generateConfig, locale, format: formatList.value[0] })
-  //       : '',
-  //   );
-  // }
 }
 
-function triggerOpen(newOpen) {
-  if (props.disabled && newOpen) {
-    return;
-  }
-  visible.value = newOpen;
-  // triggerInnerOpen(newOpen);
-}
 
 function onOk(value) {
   updateValue(value);
@@ -125,17 +121,18 @@ function onOk(value) {
       ref="wrapperDomRef"
       v-bind="$attrs"
       :class="wrapperClass"
-      @mouseup="onMouseup"
     >
       <div
         :class="inputWrapperClass"
+        @mouseup="onMouseup"
       >
         <input ref="inputDomRef"
           :placeholder="placeholder"
           :disabled="disabled"
           :readonly="inputReadOnly"
-          :value="inputValue"
+          v-model="inputValue"
           autocomplete="off"
+          @blur="onBlur"
         />
         <span class="ant-picker-suffix">
           <CalendarOutlined />
@@ -147,7 +144,6 @@ function onOk(value) {
           @mouseup.prevent.stop="onClearIconMouseup"
         >
           <CloseCircleFilled />
-          <!--span class="ant-picker-clear-btn" /-->
         </span>
       </div>
     </div>
