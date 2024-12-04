@@ -4,6 +4,7 @@ import {
 } from 'lodash-es';
 import {
   ref,
+  // unref,
 } from 'vue';
 
 const domRef = ref();
@@ -59,6 +60,27 @@ const monthOpts = map(Array(12), (_, i) => ({ label: `${i + 1}月`, value: i + 1
 const dayOpts = map(Array(31), (_, i) => ({ label: `${i + 1}日`, value: i + 1 }));
 const weekOpts = map(Array(7), (_, i) => ({ label: weekNameArr[i], value: i + 1 }));
 
+// function genItems() {
+//   const weekSelector = {
+//     is: 'ASelect',
+//     compProps: {
+//       value: unref(week),
+//       options: weekOpts,
+//       disabled: unref(timeType) !== 'week' || unref(unit) !== 'w',
+//       getPopupContainer,
+//       'onUpdate:value': onUpdateValue(week),
+//     },
+//   }
+// }
+
+// function getPopupContainer() {
+//   return unref(domRef)
+// }
+//
+// function onUpdateValue(target) {
+//   return (value) => target.value = value
+// }
+
 function onChangeDateType(e) {
   const { value } = e.target;
   dateType.value = value;
@@ -97,97 +119,112 @@ function onChangeTime(timeStr) {
 
 </script>
 <template>
-  <div ref="domRef">
-    <ARadioGroup
-      :value="dateType"
-      :options="options"
-      @change="onChangeDateType"
-    />
+  <div ref="domRef" class="p-10 d-flex">
+    <div class="flex-0-0">
+      <div class="cat-date pr-10">日期</div>
+      <div class="cat-time pr-10">时间</div>
+    </div>
     <div>
-      <ARadio :checked="dateType === 'adv'"
-        name="dateType"
-        value="adv"
+      <ARadioGroup
+        :value="dateType"
+        :options="options"
         @change="onChangeDateType"
-      >
-        更多
-      </ARadio>
-      <AInputNumber
-        class="w-80"
-        :value="num"
-        :min="0"
-        :disabled="dateType !== 'adv'"
-        :getPopupContainer="() => $refs.domRef"
-        @change="onChangeNum"
       />
-      <RSelect
-        class="w-80"
-        :allowClear="false"
-        :value="unit"
-        :options="uintOpts"
-        :disabled="dateType !== 'adv'"
-        :getPopupContainer="() => $refs.domRef"
-        @change="onChangeUnit"
-      />
-      <RSelect
-        class="w-80"
-        :allowClear="false"
-        :value="order"
-        :options="orderOpts"
-        :disabled="dateType !== 'adv'"
-        :getPopupContainer="() => $refs.domRef"
-        @change="onChangeOrder"
-      />
-    </div>
-    <div>
-      <ARadio :checked="timeType === 'now'"
-        name="timeType"
-        value="now"
-        @change="onChangeTimeType"
-      >
-        此刻
-      </ARadio>
-    </div>
-    <div class="align-center">
-      <ARadio :checked="timeType === 'static'"
-        name="timeType"
-        value="static"
-        @change="onChangeTimeType"
-      >
-        固定值
-      </ARadio>
-      <RSelect
-        v-model:value="month"
-        :allowClear="false"
-        :options="monthOpts"
-        :disabled="timeType === 'now'"
-        :getPopupContainer="() => $refs.domRef"
-      />
-      <RSelect
-        v-model:value="day"
-        :allowClear="false"
-        :options="dayOpts"
-        :disabled="timeType === 'now'"
-        :getPopupContainer="() => $refs.domRef"
-      />
-      <RSelect
-        v-model:value="week"
-        :allowClear="false"
-        :options="weekOpts"
-        :disabled="timeType === 'now'"
-        :getPopupContainer="() => $refs.domRef"
-      />
-      <ATimePicker
-        v-model:value="time"
-        valueFormat="HH:mm:ss"
-        :disabled="timeType === 'now'"
-        :getPopupContainer="() => $refs.domRef"
-        @change="onChangeTime"
-      />
+      <div class="align-center mt-5 mb-15">
+        <ARadio :checked="dateType === 'adv'"
+          name="dateType"
+          value="adv"
+          @change="onChangeDateType"
+        >
+          其他
+        </ARadio>
+        <AInputNumber
+          class="w-80"
+          :value="num"
+          :min="0"
+          :disabled="dateType !== 'adv'"
+          :getPopupContainer="() => $refs.domRef"
+          @change="onChangeNum"
+        />
+        <RSelect
+          class="w-80"
+          :allowClear="false"
+          :value="unit"
+          :options="uintOpts"
+          :disabled="dateType !== 'adv'"
+          :getPopupContainer="() => $refs.domRef"
+          @change="onChangeUnit"
+        />
+        <RSelect
+          class="w-80"
+          :allowClear="false"
+          :value="order"
+          :options="orderOpts"
+          :disabled="dateType !== 'adv'"
+          :getPopupContainer="() => $refs.domRef"
+          @change="onChangeOrder"
+        />
+      </div>
+      <div>
+        <ARadio :checked="timeType === 'now'"
+          name="timeType"
+          value="now"
+          @change="onChangeTimeType"
+        >
+          此刻
+        </ARadio>
+      </div>
+      <div class="align-center mt-5">
+        <ARadio :checked="timeType === 'static'"
+          name="timeType"
+          value="static"
+          @change="onChangeTimeType"
+        >
+          固定值
+        </ARadio>
+        <RSelect
+          v-model:value="month"
+          :allowClear="false"
+          :options="monthOpts"
+          :disabled="timeType === 'now'"
+          :getPopupContainer="() => $refs.domRef"
+        />
+        <RSelect
+          v-model:value="day"
+          :allowClear="false"
+          :options="dayOpts"
+          :disabled="timeType === 'now'"
+          :getPopupContainer="() => $refs.domRef"
+        />
+        <RSelect
+          v-model:value="week"
+          :allowClear="false"
+          :options="weekOpts"
+          :disabled="timeType === 'now'"
+          :getPopupContainer="() => $refs.domRef"
+        />
+        <ATimePicker
+          v-model:value="time"
+          valueFormat="HH:mm:ss"
+          :disabled="timeType === 'now'"
+          :getPopupContainer="() => $refs.domRef"
+          @change="onChangeTime"
+        />
+      </div>
     </div>
   </div>
 </template>
 <style scoped>
+.cat-date {
+  margin-bottom: 52px;
+}
 .w-80 {
   width: 80px
+}
+:deep(.ant-radio-wrapper) {
+  span + span {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
 }
 </style>
