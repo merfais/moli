@@ -16,11 +16,11 @@ const chainWebpack = (config) => {
     .set('@', path.resolve(__dirname, 'src'))
     .set('vue', path.resolve('./node_modules/vue'));
 
-  config.watchOptions({
-    ignored: /node_modules([\\]+|\/)+(?!vue-grid-layout-v3)/,
-    //   /vue-grid-layout-v3([\\]+|\/)node_modules/
-    // ]
-  });
+  // config.watchOptions({
+  //   // ignored: /node_modules([\\]+|\/)+(?!vue-grid-layout-v3)/,
+  //   //   /vue-grid-layout-v3([\\]+|\/)node_modules/
+  //   // ]
+  // });
 
   // monaco
   config.plugin('monaco')

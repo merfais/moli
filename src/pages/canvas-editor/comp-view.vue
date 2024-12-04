@@ -31,7 +31,9 @@ const canvasStore = useCanvasEditorStore();
 
 const domRef = ref();
 
-const compKey = computed(() => get(canvasStore.viewMap, [props.i, 'compKey']));
+const compKey = computed(() => {
+  return get(canvasStore.viewMap, [props.i, 'compKey']);
+});
 const compProps = computed(() => {
   const viewConf = unref(get(canvasStore.viewMap, props.i) || {});
   const propObj = omit(viewConf, [

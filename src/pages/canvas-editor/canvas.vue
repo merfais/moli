@@ -3,7 +3,6 @@ import {
   computed,
   ref,
   unref,
-  nextTick,
 } from 'vue';
 import {
   get,
@@ -38,7 +37,6 @@ const canvasStore = useCanvasEditorStore();
 
 const canvasDomRef = ref();
 const gridLayoutRef = ref();
-const gridItemsRef = ref();
 const gridItemsClass = ref('');
 
 const contentStyle = computed(() => {
@@ -71,16 +69,6 @@ async function onDragenter(e) {
   };
   removeLayout(draggingLayout);
   addLayout(draggingLayout);
-
-  await nextTick();
-  const latestRef = unref(gridItemsRef).slice(-1).pop() || {};
-  const draggingDomRef = unref(latestRef.domRef);
-  try {
-    // 隐藏正在拖拽的dom
-    draggingDomRef.style.display = 'none';
-  } catch (e) {
-    // 忽略
-  }
 }
 
 function onDragleave(e) {
@@ -110,12 +98,14 @@ function onDragover(e) {
   const { clientX, clientY } = e;
   const wrapperRect = unref(canvasDomRef)?.getBoundingClientRect();
   const { top: pTop, left: pLeft } = wrapperRect;
-  const top = clientY - pTop;
-  const left = clientX - pLeft;
-  const { placeholderRef, emitter } = unref(gridLayoutRef) || {};
-  const calcXY = get(unref(placeholderRef), 'calcXY');
+  const top = clientY - pTop - 10;
+  const left = clientX - pLeft - 50;
+  const { placeholder, emitter } = unref(gridLayoutRef) || {};
+  const calcXY = get(placeholder, 'calcXY');
   if (calcXY) {
     const { x, y } = calcXY(top, left);
+    draggingLayout.x = x;
+    draggingLayout.y = y;
     emitter.emit('dragEvent', ['dragmove', i, x, y, h, w]);
   }
 }
@@ -154,7 +144,6 @@ function onDrop() {
 }
 
 function onMove() {
-
 }
 
 function onMoved() {
@@ -163,6 +152,14 @@ function onMoved() {
 
 function getToolbarPopupContainer(item) {
   return document.querySelector(`#${item.i}_grid_item`);
+}
+
+function setItemRef(i, e) {
+  if (i === draggingLayout?.i) {
+    if (e?.el) {
+      e.el.style.display = 'none';
+    }
+  }
 }
 
 </script>
@@ -203,7 +200,7 @@ function getToolbarPopupContainer(item) {
             </template>
             <GridItem
               :id="`${item.i}_grid_item`"
-              ref="gridItemsRef"
+              :ref="e => setItemRef(item.i, e)"
               class='grid-item-wrapper'
               :class="gridItemsClass"
               v-bind="item"

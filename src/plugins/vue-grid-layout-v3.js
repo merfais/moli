@@ -1,6 +1,6 @@
-import * as VueGridLayoutV3 from 'vue-grid-layout-v3';
+import VueGridLayout from 'vue-grid-layout-v3';
 
 export function add(app) {
-  app.use(VueGridLayoutV3);
+  app.use(VueGridLayout);
 }
 
